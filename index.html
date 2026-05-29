@@ -1839,5 +1839,85 @@ if(pwua){ pwua.addEventListener('dragover',e=>{e.preventDefault();pwua.classList
 })();
 
 </script>
+
+<!-- ── SITE FOOTER ── -->
+<style>
+@keyframes footerGoldPulse {
+  0%,100% { text-shadow: 0 0 8px rgba(201,168,76,0.6), 0 0 20px rgba(201,168,76,0.35), 0 0 40px rgba(201,168,76,0.15); }
+  50%      { text-shadow: 0 0 14px rgba(232,201,122,0.9), 0 0 35px rgba(201,168,76,0.6), 0 0 70px rgba(201,168,76,0.3); }
+}
+@keyframes footerArabicPulse {
+  0%,100% { text-shadow: 0 0 10px rgba(232,201,122,0.55), 0 0 28px rgba(201,168,76,0.3); }
+  50%      { text-shadow: 0 0 18px rgba(232,201,122,0.95), 0 0 50px rgba(201,168,76,0.55), 0 0 90px rgba(201,168,76,0.2); }
+}
+@keyframes footerBorderGlow {
+  0%,100% { box-shadow: 0 -3px 18px rgba(201,168,76,0.25), inset 0 1px 0 rgba(201,168,76,0.15); }
+  50%      { box-shadow: 0 -3px 35px rgba(201,168,76,0.55), inset 0 1px 0 rgba(201,168,76,0.3); }
+}
+@keyframes footerStarSpin {
+  0%   { transform: rotate(0deg) scale(1);   opacity:0.7; }
+  50%  { transform: rotate(180deg) scale(1.3); opacity:1; }
+  100% { transform: rotate(360deg) scale(1);  opacity:0.7; }
+}
+@keyframes footerLineGlow {
+  0%,100% { opacity:0.3; box-shadow: 0 0 4px rgba(201,168,76,0.2); }
+  50%      { opacity:0.7; box-shadow: 0 0 10px rgba(201,168,76,0.5); }
+}
+@keyframes footerAmbient {
+  0%,100% { opacity:0.18; }
+  50%      { opacity:0.32; }
+}
+</style>
+
+<footer style="
+  background:var(--green-deep);
+  border-top:3px solid var(--gold);
+  text-align:center;
+  padding:2rem 1.5rem 1.75rem;
+  margin-top:3rem;
+  position:relative;
+  overflow:hidden;
+  animation: footerBorderGlow 3.5s ease-in-out infinite;
+">
+  <!-- subtle lattice background -->
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(201,168,76,0.04) 20px,rgba(201,168,76,0.04) 21px),repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(201,168,76,0.04) 20px,rgba(201,168,76,0.04) 21px);pointer-events:none"></div>
+  <!-- radial ambient glow behind the text -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:420px;height:180px;background:radial-gradient(ellipse,rgba(201,168,76,0.18) 0%,transparent 70%);pointer-events:none;animation:footerAmbient 3.5s ease-in-out infinite"></div>
+
+  <div style="position:relative;z-index:1;max-width:600px;margin:0 auto">
+    <!-- ornamental divider -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:1.1rem">
+      <span style="flex:1;height:1px;background:var(--gold);display:block;max-width:120px;animation:footerLineGlow 3.5s ease-in-out infinite"></span>
+      <span style="color:var(--gold);font-size:1rem;display:inline-block;animation:footerStarSpin 6s linear infinite">✦</span>
+      <span style="flex:1;height:1px;background:var(--gold);display:block;max-width:120px;animation:footerLineGlow 3.5s ease-in-out infinite"></span>
+    </div>
+    <!-- "crafted by" label -->
+    <p style="font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.22em;color:var(--gold);opacity:0.6;text-transform:uppercase;margin-bottom:0.55rem">Crafted &amp; Maintained by</p>
+    <!-- Arabic title -->
+    <p style="font-family:'Amiri',serif;font-size:1.45rem;color:var(--gold-light);line-height:1.5;margin-bottom:0.3rem;direction:rtl;animation:footerArabicPulse 3.5s ease-in-out infinite">
+      غُلامِ خاکِ نعلینِ شریف
+    </p>
+    <!-- transliterated title -->
+    <p style="font-family:'EB Garamond',serif;font-style:italic;font-size:0.95rem;color:var(--gold-light);letter-spacing:0.06em;margin-bottom:0.2rem;animation:footerGoldPulse 3.5s ease-in-out infinite;animation-delay:0.4s">
+      Ghulām-e-Khaak-e-Na'layn Sharīf
+    </p>
+    <!-- name -->
+    <p style="font-family:'Cinzel',serif;font-size:0.9rem;color:var(--gold);letter-spacing:0.12em;font-weight:600;margin-bottom:1.1rem;animation:footerGoldPulse 3.5s ease-in-out infinite;animation-delay:0.8s">
+      Sarmad <span style="opacity:0.65;font-weight:400">(SMZ)</span>
+    </p>
+    <!-- bottom divider -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:0.9rem">
+      <span style="flex:1;height:1px;background:var(--gold);display:block;max-width:80px;animation:footerLineGlow 3.5s ease-in-out infinite;animation-delay:0.5s"></span>
+      <span style="color:var(--gold);font-size:0.6rem;opacity:0.45">◆</span>
+      <span style="flex:1;height:1px;background:var(--gold);display:block;max-width:80px;animation:footerLineGlow 3.5s ease-in-out infinite;animation-delay:0.5s"></span>
+    </div>
+    <!-- copyright -->
+    <p style="font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.1em;color:var(--gold);opacity:0.4">
+      &copy; <span id="footer-year"></span> &nbsp;·&nbsp; All Rights Reserved
+    </p>
+  </div>
+</footer>
+<script>document.getElementById('footer-year').textContent=new Date().getFullYear();</script>
+
 </body>
 </html>

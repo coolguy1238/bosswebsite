@@ -337,7 +337,28 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .card-colour-label{font-family:'Cinzel',serif;font-size:0.62rem;color:var(--gold-light);flex:1}
 .card-colour-input{width:32px;height:22px;border:1px solid rgba(201,168,76,0.3);border-radius:2px;cursor:pointer;background:none;padding:0}
 
-/* ── MISC ── */
+/* ── OWNER NOTIFICATION BELL ── */
+.owner-notif-bell{position:fixed;bottom:9rem;right:1.5rem;background:var(--green-deep);color:var(--gold);border:2px solid var(--gold);border-radius:50%;width:44px;height:44px;display:none;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;z-index:101;box-shadow:0 3px 12px rgba(0,0,0,0.3);transition:transform 0.15s}
+.owner-notif-bell.show{display:flex}
+.owner-notif-bell:hover{transform:scale(1.1)}
+.owner-notif-badge{position:absolute;top:-5px;right:-5px;background:#c0392b;color:#fff;font-family:'Cinzel',serif;font-size:0.58rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--cream);line-height:1}
+.owner-notif-panel{position:fixed;bottom:14.5rem;right:1.5rem;background:var(--green-deep);border:1px solid var(--gold);border-radius:4px;padding:0;z-index:200;width:300px;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-height:400px;flex-direction:column;overflow:hidden}
+.owner-notif-panel.show{display:flex}
+.owner-notif-panel-header{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.12em;color:var(--gold);padding:0.65rem 0.85rem 0.5rem;border-bottom:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.owner-notif-clear{background:none;border:none;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.08em;color:var(--gold-light);cursor:pointer;opacity:0.65;padding:0}
+.owner-notif-clear:hover{opacity:1}
+.owner-notif-list{overflow-y:auto;flex:1}
+.owner-notif-item{padding:0.6rem 0.85rem;border-bottom:1px solid rgba(201,168,76,0.12);cursor:pointer;transition:background 0.15s}
+.owner-notif-item:hover{background:rgba(201,168,76,0.1)}
+.owner-notif-item.unread{background:rgba(201,168,76,0.07)}
+.owner-notif-item-title{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.06em;color:var(--gold);margin-bottom:2px;display:flex;align-items:center;gap:0.4rem}
+.owner-notif-item-title::before{content:'💬';font-size:0.7rem}
+.owner-notif-item-body{font-size:0.78rem;color:var(--gold-light);opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.owner-notif-item-meta{font-size:0.68rem;color:var(--gold-light);opacity:0.5;font-style:italic;margin-top:2px}
+.owner-notif-empty{padding:1.25rem;text-align:center;font-style:italic;font-size:0.82rem;color:var(--gold-light);opacity:0.5}
+@keyframes bellShake{0%,100%{transform:rotate(0)}15%{transform:rotate(15deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(10deg)}60%{transform:rotate(-8deg)}75%{transform:rotate(5deg)}90%{transform:rotate(-3deg)}}
+.owner-notif-bell.shake{animation:bellShake 0.7s ease-in-out}
+
 .empty-state{text-align:center;padding:3.5rem 1rem;color:var(--text-light)}
 .empty-state .big-ornament{font-size:2.5rem;opacity:0.25;margin-bottom:0.75rem}
 .empty-state p{font-style:italic;font-size:0.95rem;margin-bottom:1rem}
@@ -852,6 +873,19 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
   </div>
 </div>
 
+<!-- OWNER NOTIFICATION BELL -->
+<button class="owner-notif-bell" id="owner-notif-bell" onclick="toggleNotifPanel()" title="Comment Notifications">
+  🔔
+  <span class="owner-notif-badge" id="owner-notif-badge" style="display:none">0</span>
+</button>
+<div class="owner-notif-panel" id="owner-notif-panel">
+  <div class="owner-notif-panel-header">
+    <span>💬 New Comments</span>
+    <button class="owner-notif-clear" onclick="clearAllNotifs()">Mark all read</button>
+  </div>
+  <div class="owner-notif-list" id="owner-notif-list"></div>
+</div>
+
 <!-- ADMIN LOGIN MODAL -->
 <div class="modal-overlay" id="login-modal">
   <div class="modal-box">
@@ -879,7 +913,6 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
     <div class="modal-error" id="new-admin-error" style="margin-top:-0.5rem"></div>
     <div class="modal-btns" style="margin-top:0.75rem">
       <button class="btn btn-gold" onclick="addAdmin()">Add Admin</button>
-      <button id="manage-admins-btn" class="btn btn-outline" onclick="closeOwnerPanel()" style="display:none">Close</button>
       <button class="btn btn-outline" onclick="closeOwnerPanel()">Close</button>
       <button class="btn btn-danger" onclick="ownerLogout()">Log Out</button>
     </div>
@@ -1045,8 +1078,6 @@ function updateAdminUI(){
     ?'👑 Owner Mode — Full control: write, edit, delete posts and manage admin access'
     :'🔑 Admin Mode — You can write, edit and delete posts';
   document.getElementById('admin-bar').classList.toggle('show',loggedIn);
-  const mb=document.getElementById('manage-admins-btn');
-  if(mb) mb.style.display=owner?'inline-block':'none';
   if(typeof updateThemePanelUI==='function') updateThemePanelUI();
 }
 function handleAdminBtn(){
@@ -1935,6 +1966,7 @@ updateAdminUI=function(){
     if(isLoggedIn()){ btn.classList.add('revealed'); }
     else { btn.classList.remove('revealed'); }
   }
+  if(typeof updateNotifBell==='function') updateNotifBell();
 };
 
 // ════════════════════════════════════════════════
@@ -2095,6 +2127,9 @@ function submitComment(){
   document.getElementById('comment-text').value='';
   renderComments(currentPostId);
   notify('Comment posted ✓');
+  // Notify owner
+  const post = posts.find(p=>p.id===currentPostId);
+  addOwnerNotif('comment', currentPostId, post?post.title:'Post', name, body);
 }
 
 function submitReply(ci){
@@ -2113,6 +2148,9 @@ function submitReply(ci){
   toggleReplyForm(ci);
   renderComments(currentPostId);
   notify('Reply posted ✓');
+  // Notify owner
+  const post = posts.find(p=>p.id===currentPostId);
+  addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
 }
 
 function likeComment(ci){
@@ -2162,9 +2200,117 @@ if(swua){ swua.addEventListener('dragover',e=>{e.preventDefault();swua.classList
 const pwua=document.getElementById('pw-upload-area');
 if(pwua){ pwua.addEventListener('dragover',e=>{e.preventDefault();pwua.classList.add('dragover')}); pwua.addEventListener('dragleave',()=>pwua.classList.remove('dragover')); pwua.addEventListener('drop',e=>{e.preventDefault();pwua.classList.remove('dragover');handlePdfFile(e.dataTransfer.files)}); }
 
+// ════════════════════════════════════════════════
+// OWNER COMMENT NOTIFICATIONS
+// ════════════════════════════════════════════════
+const OWNER_NOTIFS_KEY = 'khaak_owner_notifs_v1';
+
+function getOwnerNotifs(){ try{ return JSON.parse(localStorage.getItem(OWNER_NOTIFS_KEY))||[]; }catch(e){ return []; } }
+function saveOwnerNotifs(arr){ localStorage.setItem(OWNER_NOTIFS_KEY, JSON.stringify(arr)); }
+
+function addOwnerNotif(type, postId, postTitle, author, body){
+  const notifs = getOwnerNotifs();
+  notifs.unshift({
+    id: Date.now().toString(),
+    type,           // 'comment' | 'reply'
+    postId,
+    postTitle,
+    author,
+    preview: body.length > 60 ? body.slice(0,60)+'…' : body,
+    date: new Date().toISOString(),
+    read: false
+  });
+  // Keep max 50
+  if(notifs.length > 50) notifs.splice(50);
+  saveOwnerNotifs(notifs);
+  updateNotifBell();
+  shakeNotifBell();
+}
+
+function updateNotifBell(){
+  if(!isOwner()){ document.getElementById('owner-notif-bell').classList.remove('show'); return; }
+  const notifs = getOwnerNotifs();
+  const unread = notifs.filter(n=>!n.read).length;
+  const bell = document.getElementById('owner-notif-bell');
+  const badge = document.getElementById('owner-notif-badge');
+  bell.classList.add('show');
+  if(unread > 0){
+    badge.style.display='flex';
+    badge.textContent = unread > 99 ? '99+' : unread;
+  } else {
+    badge.style.display='none';
+  }
+}
+
+function shakeNotifBell(){
+  const bell = document.getElementById('owner-notif-bell');
+  bell.classList.remove('shake');
+  void bell.offsetWidth; // reflow
+  bell.classList.add('shake');
+  setTimeout(()=>bell.classList.remove('shake'), 800);
+}
+
+function toggleNotifPanel(){
+  const panel = document.getElementById('owner-notif-panel');
+  const showing = panel.classList.toggle('show');
+  if(showing) renderNotifPanel();
+}
+
+function renderNotifPanel(){
+  const notifs = getOwnerNotifs();
+  const list = document.getElementById('owner-notif-list');
+  if(!notifs.length){
+    list.innerHTML = '<div class="owner-notif-empty">No new comments yet.</div>';
+    return;
+  }
+  list.innerHTML = notifs.map(n=>`
+    <div class="owner-notif-item ${n.read?'':'unread'}" onclick="notifGoToPost('${n.id}','${n.postId}')">
+      <div class="owner-notif-item-title">${esc(n.postTitle||'Post')}</div>
+      <div class="owner-notif-item-body"><strong>${esc(n.author)}</strong>: ${esc(n.preview)}</div>
+      <div class="owner-notif-item-meta">${n.type==='reply'?'Reply · ':''}${fmtDate(n.date)}</div>
+    </div>`
+  ).join('');
+}
+
+function notifGoToPost(notifId, postId){
+  // Mark this notif as read
+  const notifs = getOwnerNotifs();
+  const n = notifs.find(x=>x.id===notifId);
+  if(n) n.read = true;
+  saveOwnerNotifs(notifs);
+  updateNotifBell();
+  // Close panel
+  document.getElementById('owner-notif-panel').classList.remove('show');
+  // Navigate to post
+  openPost(postId);
+  // Scroll to comments after a tick
+  setTimeout(()=>{
+    const cs = document.getElementById('comments-section');
+    if(cs) cs.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 300);
+}
+
+function clearAllNotifs(){
+  const notifs = getOwnerNotifs();
+  notifs.forEach(n=>n.read=true);
+  saveOwnerNotifs(notifs);
+  updateNotifBell();
+  renderNotifPanel();
+}
+
+// Close notif panel when clicking outside
+document.addEventListener('click', e=>{
+  const panel = document.getElementById('owner-notif-panel');
+  const bell = document.getElementById('owner-notif-bell');
+  if(panel && !panel.contains(e.target) && e.target !== bell && !bell.contains(e.target)){
+    panel.classList.remove('show');
+  }
+});
+
 (async()=>{
   await loadSavedTheme();
   updateAdminUI();
+  updateNotifBell();
   initPrayerBar();
   loadPosts();
 })();

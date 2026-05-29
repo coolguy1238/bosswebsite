@@ -85,9 +85,12 @@ body{background:var(--cream);color:var(--text-dark);font-family:'EB Garamond',Ge
 .header-rule{display:flex;align-items:center;gap:0.75rem;margin:1rem auto 0;max-width:400px;justify-content:center}
 .header-rule::before,.header-rule::after{content:'';flex:1;height:1px;background:var(--gold);opacity:0.45}
 .header-spacer{flex:1}
-.header-admin-btn{background:none;border:1px solid rgba(201,168,76,0.3);border-radius:2px;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold-light);padding:0.35rem 0.75rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.header-admin-btn{background:none;border:1px solid rgba(201,168,76,0.3);border-radius:2px;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold-light);padding:0.35rem 0.75rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;opacity:0;pointer-events:none;user-select:none}
 .header-admin-btn:hover{background:rgba(201,168,76,0.15);color:var(--gold)}
-.header-admin-btn.logged-in{border-color:var(--gold);color:var(--gold)}
+.header-admin-btn.logged-in{border-color:var(--gold);color:var(--gold);opacity:1;pointer-events:all}
+.header-admin-btn.revealed{opacity:1;pointer-events:all}
+/* Secret reveal zone — invisible tap target in header top-right */
+.admin-secret-zone{position:absolute;top:0;right:0;width:60px;height:48px;cursor:default;z-index:1002}
 
 /* ── PRAYER BAR (compact on homepage) ── */
 .prayer-bar{background:rgba(13,59,31,0.96);border-bottom:1px solid var(--border-gold);overflow:hidden;transition:background 0.3s}
@@ -162,6 +165,51 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .post-like-btn.liked{background:var(--gold);color:var(--green-deep)}
 .post-like-count{font-size:0.82rem;color:var(--text-light);font-style:italic}
 
+/* ── COMMENTS SECTION ── */
+.comments-section{margin-top:2rem;padding-top:1.25rem;border-top:2px solid var(--border-gold)}
+.comments-title{font-family:'Cinzel',serif;font-size:0.88rem;letter-spacing:0.1em;color:var(--green-deep);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+.comments-title::before{content:'◆';color:var(--gold);font-size:0.55rem}
+.comment-form{background:var(--gold-pale);border:1px solid var(--border-gold);border-radius:2px;padding:1rem;margin-bottom:1.25rem}
+.comment-form-title{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.09em;color:var(--green-mid);margin-bottom:0.6rem}
+.comment-input-row{display:flex;gap:0.5rem;margin-bottom:0.5rem}
+.comment-name-input,.comment-text-input,.comment-reply-input{width:100%;padding:0.45rem 0.7rem;border:1px solid var(--border-gold);border-radius:2px;font-family:'EB Garamond',serif;font-size:0.95rem;color:var(--text-dark);background:var(--card-bg);outline:none;transition:border-color 0.2s}
+.comment-name-input{max-width:220px;flex-shrink:0}
+.comment-name-input:focus,.comment-text-input:focus,.comment-reply-input:focus{border-color:var(--gold)}
+.comment-text-input{resize:vertical;min-height:70px;display:block;width:100%;margin-bottom:0.5rem}
+.comment-submit-row{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+.comments-disabled-notice{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.07em;color:var(--text-light);font-style:italic;text-align:center;padding:1rem;background:var(--gold-pale);border:1px solid var(--border-gold);border-radius:2px;margin-bottom:1rem}
+.comment-list{display:flex;flex-direction:column;gap:0.85rem}
+.comment-item{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:2px;padding:0.85rem 1rem}
+.comment-item.banned-comment{opacity:0.4;pointer-events:none;position:relative}
+.comment-header{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.35rem;flex-wrap:wrap}
+.comment-author{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--green-deep);font-weight:600}
+.comment-date{font-size:0.75rem;color:var(--text-light);font-style:italic}
+.comment-body{font-size:0.95rem;color:var(--text-dark);line-height:1.65;margin-bottom:0.5rem;word-break:break-word}
+.comment-actions{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+.comment-reply-btn,.comment-like-btn{background:none;border:1px solid var(--border-gold);border-radius:12px;padding:0.2rem 0.65rem;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.06em;color:var(--text-light);cursor:pointer;transition:all 0.15s}
+.comment-reply-btn:hover,.comment-like-btn:hover{border-color:var(--gold);color:var(--gold-dark)}
+.comment-like-btn.liked{border-color:var(--gold);color:#c0392b;background:var(--gold-pale)}
+.comment-admin-actions{margin-left:auto;display:flex;gap:0.4rem}
+.comment-ban-btn,.comment-del-btn{background:none;border:1px solid rgba(139,26,26,0.3);border-radius:12px;padding:0.2rem 0.65rem;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.05em;color:#8B1A1A;cursor:pointer;transition:all 0.15s}
+.comment-ban-btn:hover,.comment-del-btn:hover{background:rgba(139,26,26,0.08)}
+.reply-form{margin-top:0.65rem;padding-top:0.65rem;border-top:1px dashed var(--border-gold);display:none}
+.reply-form.open{display:block}
+.reply-list{margin-top:0.65rem;display:flex;flex-direction:column;gap:0.5rem;padding-left:1rem;border-left:2px solid var(--border-gold)}
+.reply-item{background:var(--green-pale);border-radius:2px;padding:0.6rem 0.75rem}
+.reply-author{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.06em;color:var(--green-mid);font-weight:600}
+.reply-date{font-size:0.72rem;color:var(--text-light);font-style:italic;margin-left:0.5rem}
+.reply-body{font-size:0.9rem;color:var(--text-dark);line-height:1.6;margin-top:0.2rem;word-break:break-word}
+.reply-admin-actions{margin-top:0.3rem;display:flex;gap:0.4rem}
+.admin-comment-controls{margin-bottom:1rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;padding:0.6rem 0.85rem;background:rgba(201,168,76,0.07);border:1px solid var(--border-gold);border-radius:2px}
+.admin-comment-controls-label{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.1em;color:var(--gold-dark)}
+.toggle-switch{position:relative;display:inline-flex;align-items:center;gap:0.45rem;cursor:pointer;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.07em;color:var(--text-mid)}
+.toggle-switch input{position:absolute;opacity:0;width:0;height:0}
+.toggle-track{width:34px;height:18px;background:rgba(0,0,0,0.15);border-radius:9px;transition:background 0.2s;flex-shrink:0;position:relative}
+.toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.toggle-switch input:checked+.toggle-track{background:var(--gold)}
+.toggle-switch input:checked+.toggle-track::after{transform:translateX(16px)}
+.banned-badge{background:rgba(139,26,26,0.12);color:#8B1A1A;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.06em;padding:1px 6px;border-radius:3px;border:1px solid rgba(139,26,26,0.2)}
+.comment-no-comments{font-style:italic;font-size:0.88rem;color:var(--text-light);text-align:center;padding:0.75rem 0}
 /* ── WRITE VIEW ── */
 .write-view{display:none}.write-view.active{display:block}
 .form-group{margin-bottom:1.15rem}
@@ -392,6 +440,7 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
     </button>
     <div class="header-spacer"></div>
     <button class="header-admin-btn" id="admin-btn" onclick="handleAdminBtn()">🔒 Admin Login</button>
+    <div class="admin-secret-zone" id="admin-secret-zone" title=""></div>
   </div>
   <div class="header-inner">
     <span class="bismillah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
@@ -460,6 +509,35 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
         <span class="post-like-count" id="post-like-count"></span>
       </div>
       <div class="post-edit-bar" id="post-edit-bar"></div>
+      <!-- COMMENTS SECTION -->
+      <div class="comments-section" id="comments-section">
+        <div class="comments-title">Comments</div>
+        <!-- Admin controls (only visible when logged in) -->
+        <div class="admin-comment-controls" id="admin-comment-controls" style="display:none">
+          <span class="admin-comment-controls-label">👑 Comments:</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="comments-toggle" onchange="toggleComments(this.checked)">
+            <span class="toggle-track"></span>
+            Enabled
+          </label>
+          <span id="comments-status-label" style="font-size:0.65rem;font-style:italic;color:var(--text-light);margin-left:0.25rem"></span>
+        </div>
+        <div id="comments-disabled-notice" class="comments-disabled-notice" style="display:none">Comments are disabled for this post.</div>
+        <div id="comment-form-wrap">
+          <div class="comment-form">
+            <div class="comment-form-title">Leave a comment</div>
+            <div class="comment-input-row">
+              <input class="comment-name-input" id="comment-name" type="text" placeholder="Your name…" maxlength="60">
+              <input class="comment-text-input" id="comment-text" type="text" placeholder="Write your comment…" style="flex:1;max-width:none;min-height:unset">
+            </div>
+            <div class="comment-submit-row">
+              <button class="btn btn-gold" style="font-size:0.68rem;padding:0.35rem 1rem" onclick="submitComment()">Post Comment</button>
+              <span id="comment-submit-error" style="font-size:0.78rem;color:#8B1A1A;font-style:italic"></span>
+            </div>
+          </div>
+        </div>
+        <div class="comment-list" id="comment-list"></div>
+      </div>
     </div>
 
     <!-- WRITE VIEW -->
@@ -1294,6 +1372,7 @@ function openPost(id){
   }).join('');
   document.getElementById('post-edit-bar').innerHTML=isLoggedIn()?`<button class="btn btn-outline" onclick="showWrite('${id}')">Edit Post</button><button class="btn btn-danger" onclick="promptDelete('${id}')">Delete Post</button>`:'';
   renderPostLike(id);
+  loadComments(id);
   window.scrollTo(0,0);
 }
 
@@ -1825,7 +1904,259 @@ function confirmDeleteResource(){
   notify('Deleted ✓');
 }
 
-// Drag & drop for salawat/pdf upload areas
+// ════════════════════════════════════════════════
+// SECRET ADMIN BUTTON REVEAL (triple-click top-right corner)
+// ════════════════════════════════════════════════
+(function(){
+  let clicks=0, timer=null;
+  const zone=document.getElementById('admin-secret-zone');
+  if(!zone) return;
+  zone.addEventListener('click',()=>{
+    clicks++;
+    clearTimeout(timer);
+    if(clicks>=3){
+      clicks=0;
+      const btn=document.getElementById('admin-btn');
+      btn.classList.add('revealed');
+      // auto-hide again after 10s if not logged in
+      setTimeout(()=>{ if(!isLoggedIn()) btn.classList.remove('revealed'); },10000);
+    } else {
+      timer=setTimeout(()=>{ clicks=0; },800);
+    }
+  });
+})();
+
+// Patch updateAdminUI to also manage revealed state
+const _adminUIBase=updateAdminUI;
+updateAdminUI=function(){
+  _adminUIBase();
+  const btn=document.getElementById('admin-btn');
+  if(btn){
+    if(isLoggedIn()){ btn.classList.add('revealed'); }
+    else { btn.classList.remove('revealed'); }
+  }
+};
+
+// ════════════════════════════════════════════════
+// COMMENTS STORAGE KEYS & HELPERS
+// ════════════════════════════════════════════════
+const COMMENTS_KEY      = 'khaak_comments_v1';
+const BANNED_KEY        = 'khaak_banned_v1';
+const COMMENT_LIKES_KEY = 'khaak_clikes_v1';
+const COMMENTS_OFF_KEY  = 'khaak_coff_v1';  // set of post IDs with comments disabled
+
+function getComments(postId){
+  try{ const all=JSON.parse(localStorage.getItem(COMMENTS_KEY))||{}; return all[postId]||[]; }catch(e){ return []; }
+}
+function saveComments(postId,arr){
+  try{ const all=JSON.parse(localStorage.getItem(COMMENTS_KEY))||{}; all[postId]=arr; localStorage.setItem(COMMENTS_KEY,JSON.stringify(all)); }catch(e){}
+}
+function getBanned(){
+  try{ return JSON.parse(localStorage.getItem(BANNED_KEY))||[]; }catch(e){ return []; }
+}
+function saveBanned(arr){ localStorage.setItem(BANNED_KEY,JSON.stringify(arr)); }
+function isBanned(name){ return getBanned().map(b=>b.toLowerCase()).includes((name||'').toLowerCase().trim()); }
+function getCommentsOff(){
+  try{ return JSON.parse(localStorage.getItem(COMMENTS_OFF_KEY))||[]; }catch(e){ return []; }
+}
+function setCommentsOff(arr){ localStorage.setItem(COMMENTS_OFF_KEY,JSON.stringify(arr)); }
+function areCommentsEnabled(postId){ return !getCommentsOff().includes(postId); }
+
+function getCommentLikes(){
+  try{ return JSON.parse(localStorage.getItem(COMMENT_LIKES_KEY))||{}; }catch(e){ return {}; }
+}
+function saveCommentLikes(obj){ localStorage.setItem(COMMENT_LIKES_KEY,JSON.stringify(obj)); }
+
+// ════════════════════════════════════════════════
+// COMMENTS RENDERING & CONTROLS
+// ════════════════════════════════════════════════
+function loadComments(postId){
+  const enabled=areCommentsEnabled(postId);
+  const adminControls=document.getElementById('admin-comment-controls');
+  const disabledNotice=document.getElementById('comments-disabled-notice');
+  const formWrap=document.getElementById('comment-form-wrap');
+  const toggle=document.getElementById('comments-toggle');
+  const statusLabel=document.getElementById('comments-status-label');
+
+  // Admin controls
+  if(isLoggedIn()){
+    adminControls.style.display='flex';
+    toggle.checked=enabled;
+    statusLabel.textContent=enabled?'(comments are open)':'(comments are closed)';
+  } else {
+    adminControls.style.display='none';
+  }
+
+  // Show/hide form based on enabled state
+  if(enabled){
+    disabledNotice.style.display='none';
+    formWrap.style.display='block';
+  } else {
+    disabledNotice.style.display='block';
+    formWrap.style.display='none';
+  }
+
+  renderComments(postId);
+}
+
+function toggleComments(enabled){
+  if(!isLoggedIn()) return;
+  const off=getCommentsOff();
+  if(enabled){ const i=off.indexOf(currentPostId); if(i>-1) off.splice(i,1); }
+  else { if(!off.includes(currentPostId)) off.push(currentPostId); }
+  setCommentsOff(off);
+  const statusLabel=document.getElementById('comments-status-label');
+  statusLabel.textContent=enabled?'(comments are open)':'(comments are closed)';
+  const disabledNotice=document.getElementById('comments-disabled-notice');
+  const formWrap=document.getElementById('comment-form-wrap');
+  if(enabled){ disabledNotice.style.display='none'; formWrap.style.display='block'; }
+  else { disabledNotice.style.display='block'; formWrap.style.display='none'; }
+  notify(enabled?'Comments enabled ✓':'Comments disabled.');
+}
+
+function renderComments(postId){
+  const comments=getComments(postId);
+  const cont=document.getElementById('comment-list');
+  const clikes=getCommentLikes();
+  if(!comments.length){
+    cont.innerHTML='<p class="comment-no-comments">No comments yet. Be the first to share your thoughts.</p>';
+    return;
+  }
+  cont.innerHTML=comments.map((c,ci)=>{
+    const banned=isBanned(c.author);
+    const clikeKey='c_'+postId+'_'+ci;
+    const liked=!!clikes[clikeKey];
+    const likeCount=clikes[clikeKey+'_count']||0;
+    const adminBtns=isLoggedIn()?`<div class="comment-admin-actions">
+      <button class="comment-ban-btn" onclick="banCommenter('${esc(c.author)}')">${banned?'🔓 Unban':'🚫 Ban'}</button>
+      <button class="comment-del-btn" onclick="deleteComment(${ci})">🗑 Delete</button>
+    </div>`:'';
+    const replies=(c.replies||[]).map((r,ri)=>{
+      const rBanned=isBanned(r.author);
+      const adminReplyBtns=isLoggedIn()?`<div class="reply-admin-actions">
+        <button class="comment-ban-btn" onclick="banCommenter('${esc(r.author)}')" style="font-size:0.55rem;padding:0.15rem 0.5rem">${rBanned?'🔓 Unban':'🚫 Ban'}</button>
+        <button class="comment-del-btn" onclick="deleteReply(${ci},${ri})" style="font-size:0.55rem;padding:0.15rem 0.5rem">🗑</button>
+      </div>`:'';
+      return `<div class="reply-item${rBanned?' banned-comment':''}">
+        <span class="reply-author">${esc(r.author)}</span><span class="reply-date">${fmtDate(r.date)}</span>
+        ${rBanned?'<span class="banned-badge">Banned</span>':''}
+        <div class="reply-body">${esc(r.body)}</div>
+        ${adminReplyBtns}
+      </div>`;
+    }).join('');
+    return `<div class="comment-item${banned?' banned-comment':''}" id="comment-${ci}">
+      <div class="comment-header">
+        <span class="comment-author">${esc(c.author)}</span>
+        <span class="comment-date">${fmtDate(c.date)}</span>
+        ${banned?'<span class="banned-badge">Banned</span>':''}
+      </div>
+      <div class="comment-body">${esc(c.body)}</div>
+      <div class="comment-actions">
+        <button class="comment-like-btn ${liked?'liked':''}" onclick="likeComment(${ci})">${liked?'❤':'♡'} ${likeCount||'Like'}</button>
+        ${areCommentsEnabled(postId)?`<button class="comment-reply-btn" onclick="toggleReplyForm(${ci})">↩ Reply</button>`:''}
+        ${adminBtns}
+      </div>
+      <div class="reply-form" id="reply-form-${ci}">
+        <div class="comment-input-row" style="margin-bottom:0.4rem">
+          <input class="comment-name-input" id="reply-name-${ci}" type="text" placeholder="Your name…" maxlength="60">
+          <input class="comment-reply-input" id="reply-text-${ci}" type="text" placeholder="Write a reply…" style="flex:1;max-width:none">
+        </div>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn btn-gold" style="font-size:0.65rem;padding:0.3rem 0.85rem" onclick="submitReply(${ci})">Post Reply</button>
+          <button class="btn btn-outline" style="font-size:0.65rem;padding:0.3rem 0.75rem" onclick="toggleReplyForm(${ci})">Cancel</button>
+        </div>
+      </div>
+      ${replies?`<div class="reply-list">${replies}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleReplyForm(ci){
+  const f=document.getElementById('reply-form-'+ci);
+  if(!f) return;
+  const open=f.classList.toggle('open');
+  if(open) { const inp=document.getElementById('reply-name-'+ci); if(inp) inp.focus(); }
+}
+
+function submitComment(){
+  if(!currentPostId) return;
+  if(!areCommentsEnabled(currentPostId)){ notify('Comments are disabled for this post.'); return; }
+  const name=document.getElementById('comment-name').value.trim();
+  const body=document.getElementById('comment-text').value.trim();
+  const errEl=document.getElementById('comment-submit-error');
+  if(!name){ errEl.textContent='Please enter your name.'; return; }
+  if(!body){ errEl.textContent='Please write a comment.'; return; }
+  errEl.textContent='';
+  if(isBanned(name)){ errEl.textContent='You are not permitted to comment.'; return; }
+  const comments=getComments(currentPostId);
+  comments.push({author:name,body,date:new Date().toISOString(),replies:[]});
+  saveComments(currentPostId,comments);
+  document.getElementById('comment-name').value='';
+  document.getElementById('comment-text').value='';
+  renderComments(currentPostId);
+  notify('Comment posted ✓');
+}
+
+function submitReply(ci){
+  if(!currentPostId) return;
+  const name=document.getElementById('reply-name-'+ci).value.trim();
+  const body=document.getElementById('reply-text-'+ci).value.trim();
+  if(!name||!body){ notify('Please fill in your name and reply.'); return; }
+  if(isBanned(name)){ notify('You are not permitted to reply.'); return; }
+  const comments=getComments(currentPostId);
+  if(!comments[ci]) return;
+  if(!comments[ci].replies) comments[ci].replies=[];
+  comments[ci].replies.push({author:name,body,date:new Date().toISOString()});
+  saveComments(currentPostId,comments);
+  document.getElementById('reply-name-'+ci).value='';
+  document.getElementById('reply-text-'+ci).value='';
+  toggleReplyForm(ci);
+  renderComments(currentPostId);
+  notify('Reply posted ✓');
+}
+
+function likeComment(ci){
+  if(!currentPostId) return;
+  const clikes=getCommentLikes();
+  const key='c_'+currentPostId+'_'+ci;
+  const countKey=key+'_count';
+  if(clikes[key]){ delete clikes[key]; clikes[countKey]=Math.max(0,(clikes[countKey]||1)-1); }
+  else { clikes[key]=true; clikes[countKey]=(clikes[countKey]||0)+1; }
+  saveCommentLikes(clikes);
+  renderComments(currentPostId);
+}
+
+function deleteComment(ci){
+  if(!isLoggedIn()||!currentPostId) return;
+  if(!confirm('Delete this comment?')) return;
+  const comments=getComments(currentPostId);
+  comments.splice(ci,1);
+  saveComments(currentPostId,comments);
+  renderComments(currentPostId);
+  notify('Comment deleted.');
+}
+
+function deleteReply(ci,ri){
+  if(!isLoggedIn()||!currentPostId) return;
+  if(!confirm('Delete this reply?')) return;
+  const comments=getComments(currentPostId);
+  if(comments[ci]&&comments[ci].replies) comments[ci].replies.splice(ri,1);
+  saveComments(currentPostId,comments);
+  renderComments(currentPostId);
+  notify('Reply deleted.');
+}
+
+function banCommenter(name){
+  if(!isLoggedIn()) return;
+  const banned=getBanned();
+  const lower=name.toLowerCase().trim();
+  const idx=banned.findIndex(b=>b.toLowerCase()===lower);
+  if(idx>-1){ banned.splice(idx,1); saveBanned(banned); notify(`${name} has been unbanned.`); }
+  else { banned.push(name); saveBanned(banned); notify(`${name} has been banned from commenting.`); }
+  if(currentPostId) renderComments(currentPostId);
+}
+
+
 const swua=document.getElementById('sw-upload-area');
 if(swua){ swua.addEventListener('dragover',e=>{e.preventDefault();swua.classList.add('dragover')}); swua.addEventListener('dragleave',()=>swua.classList.remove('dragover')); swua.addEventListener('drop',e=>{e.preventDefault();swua.classList.remove('dragover');handleSalawatFile(e.dataTransfer.files)}); }
 const pwua=document.getElementById('pw-upload-area');

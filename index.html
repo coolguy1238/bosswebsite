@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khaak al Na'layn Sharif</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── Colour Theme Variables ── */
+  --gold:#C9A84C;--gold-light:#E8C97A;--gold-pale:#F5EDD0;--gold-dark:#8B6914;
+  --green-deep:#0D3B1F;--green-mid:#1A5C32;--green-light:#2E7D4A;--green-pale:#E8F4EC;
+  --cream:#FAF7F0;--text-dark:#1A1208;--text-mid:#3D2E0E;--text-light:#6B5929;
+  --border-gold:rgba(201,168,76,0.35);
+  /* ── Post embed colours (changeable via theme panel) ── */
+  --card-bg:#ffffff;--card-border:var(--border-gold);--card-accent:var(--gold);
+  --card-title:var(--green-deep);--card-meta:var(--text-light);
+}
+/* ── THEMES ── */
+body.theme-midnight{
+  --cream:#0f1117;--text-dark:#e8dfc5;--text-mid:#c5b68a;--text-light:#8a7a5a;
+  --green-deep:#c9a84c;--green-mid:#e8c97a;--green-light:#f5edd0;--green-pale:#1e2030;
+  --gold:#e8c97a;--gold-light:#f5edd0;--gold-pale:#1e2030;--gold-dark:#c9a84c;
+  --border-gold:rgba(201,168,76,0.25);
+  --card-bg:#1a1d2e;--card-border:rgba(201,168,76,0.2);--card-accent:#c9a84c;
+  --card-title:#e8c97a;--card-meta:#8a7a5a;
+}
+body.theme-rose{
+  --cream:#fdf6f0;--text-dark:#2a1212;--text-mid:#5c2a2a;--text-light:#8a5555;
+  --green-deep:#6b1a1a;--green-mid:#8b2e2e;--green-light:#a84444;--green-pale:#fce8e8;
+  --gold:#c9844c;--gold-light:#e8a87a;--gold-pale:#fce8d0;--gold-dark:#8b4914;
+  --border-gold:rgba(201,132,76,0.35);
+  --card-bg:#fff5f0;--card-border:rgba(201,132,76,0.3);--card-accent:#c9844c;
+  --card-title:#6b1a1a;--card-meta:#8a5555;
+}
+body.theme-ocean{
+  --cream:#f0f6fa;--text-dark:#0a1e2a;--text-mid:#1a3a4a;--text-light:#4a6a7a;
+  --green-deep:#0a3a5a;--green-mid:#1a5a7a;--green-light:#2a7a9a;--green-pale:#e0f0fa;
+  --gold:#4a9ac9;--gold-light:#7ab8e8;--gold-pale:#d0eaf5;--gold-dark:#0a6a8b;
+  --border-gold:rgba(74,154,201,0.35);
+  --card-bg:#eef5fb;--card-border:rgba(74,154,201,0.3);--card-accent:#1a5a7a;
+  --card-title:#0a3a5a;--card-meta:#4a6a7a;
+}
+
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--cream);color:var(--text-dark);font-family:'EB Garamond',Georgia,serif;min-height:100vh;line-height:1.7;transition:background 0.3s,color 0.3s}
+
+/* ── HAMBURGER OVERLAY NAV (Dar al Zahra style) ── */
+.hamburger-btn{background:none;border:none;cursor:pointer;padding:0.6rem 0.8rem;display:flex;flex-direction:column;gap:5px;z-index:1001;position:relative}
+.hamburger-btn span{display:block;width:24px;height:2px;background:var(--gold-light);border-radius:2px;transition:all 0.3s}
+.hamburger-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger-btn.open span:nth-child(2){opacity:0}
+.hamburger-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+.side-menu{position:fixed;top:0;left:-320px;width:300px;height:100vh;background:var(--green-deep);border-right:2px solid var(--gold);z-index:1000;overflow-y:auto;transition:left 0.35s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column}
+.side-menu.open{left:0}
+.side-menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:999;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.side-menu-overlay.show{opacity:1;pointer-events:all}
+
+.side-menu-header{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(201,168,76,0.25);text-align:center}
+.side-menu-bismillah{font-family:'Amiri',serif;font-size:1.2rem;color:var(--gold-light);display:block;margin-bottom:0.3rem}
+.side-menu-title{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.12em;color:var(--gold);opacity:0.85}
+
+.side-menu-section{padding:0.75rem 0}
+.side-menu-section-label{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.18em;color:var(--gold);opacity:0.55;padding:0.25rem 1.25rem;text-transform:uppercase}
+.side-menu-item{display:flex;align-items:center;gap:0.65rem;padding:0.65rem 1.25rem;cursor:pointer;transition:background 0.15s;border:none;background:none;width:100%;text-align:left;color:var(--gold-light);font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.07em;opacity:0.85}
+.side-menu-item:hover,.side-menu-item.active{background:rgba(201,168,76,0.12);opacity:1;color:var(--gold)}
+.side-menu-item .menu-icon{font-size:0.95rem;flex-shrink:0}
+.side-menu-divider{border:none;border-top:1px solid rgba(201,168,76,0.15);margin:0.35rem 1.25rem}
+.side-menu-prayer-mini{padding:0.75rem 1.25rem;background:rgba(201,168,76,0.07);border-top:1px solid rgba(201,168,76,0.15)}
+.side-menu-prayer-mini-title{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.15em;color:var(--gold);opacity:0.7;margin-bottom:0.5rem}
+.prayer-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 0.5rem}
+.prayer-mini-item{font-size:0.75rem;color:var(--gold-light);opacity:0.85}
+.prayer-mini-item span{color:var(--gold);font-family:'Cinzel',serif;font-size:0.7rem}
+
+/* ── SITE HEADER ── */
+.site-header{background:var(--green-deep);border-bottom:3px solid var(--gold);position:relative;overflow:hidden;transition:background 0.3s}
+.header-ornament{position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(201,168,76,0.04) 20px,rgba(201,168,76,0.04) 21px),repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(201,168,76,0.04) 20px,rgba(201,168,76,0.04) 21px);pointer-events:none}
+.header-top-bar{position:relative;max-width:980px;margin:0 auto;display:flex;align-items:center;padding:0.5rem 0.75rem 0}
+.header-inner{position:relative;max-width:980px;margin:0 auto;padding:1rem 1.5rem 1.5rem;text-align:center}
+.bismillah{font-family:'Amiri',serif;font-size:1.6rem;color:var(--gold-light);display:block;margin-bottom:0.5rem;opacity:0.9}
+.site-title{font-family:'Cinzel',serif;font-size:2.4rem;color:var(--gold);letter-spacing:0.08em;font-weight:700;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.4)}
+.site-title span{display:block;font-size:0.95rem;font-family:'EB Garamond',serif;font-style:italic;color:var(--gold-light);opacity:0.85;letter-spacing:0.12em;margin-top:0.4rem;font-weight:400}
+.header-rule{display:flex;align-items:center;gap:0.75rem;margin:1rem auto 0;max-width:400px;justify-content:center}
+.header-rule::before,.header-rule::after{content:'';flex:1;height:1px;background:var(--gold);opacity:0.45}
+.header-spacer{flex:1}
+.header-admin-btn{background:none;border:1px solid rgba(201,168,76,0.3);border-radius:2px;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold-light);padding:0.35rem 0.75rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.header-admin-btn:hover{background:rgba(201,168,76,0.15);color:var(--gold)}
+.header-admin-btn.logged-in{border-color:var(--gold);color:var(--gold)}
+
+/* ── PRAYER BAR (compact on homepage) ── */
+.prayer-bar{background:rgba(13,59,31,0.96);border-bottom:1px solid var(--border-gold);overflow:hidden;transition:background 0.3s}
+body.theme-midnight .prayer-bar{background:rgba(26,29,46,0.97)}
+body.theme-rose .prayer-bar{background:rgba(107,26,26,0.96)}
+body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
+.prayer-bar-inner{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none}
+.prayer-bar-inner::-webkit-scrollbar{display:none}
+.prayer-bar-label{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.14em;color:var(--gold);opacity:0.7;padding:0 1rem 0 0.75rem;white-space:nowrap;flex-shrink:0}
+.prayer-pill{display:flex;flex-direction:column;align-items:center;padding:0.45rem 0.85rem;border-right:1px solid rgba(201,168,76,0.15);flex-shrink:0;cursor:pointer;transition:background 0.15s;position:relative}
+.prayer-pill:last-child{border-right:none}
+.prayer-pill:hover,.prayer-pill.active-prayer{background:rgba(201,168,76,0.12)}
+.prayer-pill.active-prayer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)}
+.prayer-pill-name{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.12em;color:var(--gold);opacity:0.75;text-transform:uppercase}
+.prayer-pill-time{font-family:'Cinzel',serif;font-size:0.88rem;color:var(--gold-light);font-weight:600;margin-top:1px}
+.prayer-bar-more{margin-left:auto;flex-shrink:0;background:none;border:none;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);opacity:0.7;padding:0 0.75rem;cursor:pointer;white-space:nowrap}
+.prayer-bar-more:hover{opacity:1}
+
+/* ── LAYOUT ── */
+.main-wrap{max-width:980px;margin:0 auto;padding:0 1.25rem 4rem;display:grid;grid-template-columns:1fr 280px;gap:2.5rem;align-items:start}
+@media(max-width:720px){.main-wrap{grid-template-columns:1fr}.sidebar{display:none}.site-title{font-size:1.6rem}}
+.content{padding-top:2rem}
+.page-title{font-family:'Cinzel',serif;font-size:1.25rem;color:var(--green-deep);letter-spacing:0.06em;border-bottom:2px solid var(--gold);padding-bottom:0.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.6rem}
+.page-title::before{content:'❧';color:var(--gold);font-size:1rem}
+
+/* ── BLOG CARDS ── */
+.blog-card{background:var(--card-bg);border:1px solid var(--card-border);border-left:4px solid var(--card-accent);border-radius:2px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;cursor:pointer;transition:box-shadow 0.2s,border-left-color 0.2s}
+.blog-card:hover{box-shadow:0 4px 20px rgba(13,59,31,0.10);border-left-color:var(--green-mid)}
+.blog-card-category{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem}
+.blog-card-category::before{content:'◆';font-size:0.4rem;color:var(--gold)}
+.blog-card-title{font-family:'Cinzel',serif;font-size:1.15rem;color:var(--card-title);font-weight:600;margin-bottom:0.35rem;line-height:1.35}
+.blog-card-meta{font-size:0.78rem;color:var(--card-meta);font-style:italic;margin-bottom:0.65rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
+.blog-card-excerpt{font-size:0.95rem;color:var(--text-mid);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* ── IMAGE SHAPE FIX: natural aspect ratio like Dar al Zahra ── */
+.blog-card-thumb{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:2px;margin-bottom:0.75rem;border:1px solid var(--card-border);display:block}
+.read-more{display:inline-block;margin-top:0.75rem;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.1em;color:var(--gold-dark);border-bottom:1px solid var(--gold);padding-bottom:1px}
+
+/* ── LIKE BUTTON ── */
+.blog-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:0.75rem}
+.like-btn{background:none;border:1px solid var(--border-gold);border-radius:20px;padding:0.25rem 0.75rem;cursor:pointer;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.06em;color:var(--text-light);display:flex;align-items:center;gap:0.35rem;transition:all 0.2s}
+.like-btn:hover{border-color:var(--gold);color:var(--gold-dark);background:var(--gold-pale)}
+.like-btn.liked{border-color:var(--gold);color:var(--gold-dark);background:var(--gold-pale)}
+.like-btn .heart{font-size:0.85rem;transition:transform 0.2s}
+.like-btn:hover .heart{transform:scale(1.2)}
+.like-btn.liked .heart{color:#c0392b}
+
+/* ── POST VIEW ── */
+.post-view{display:none}.post-view.active{display:block}
+.post-back{background:none;border:none;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--green-mid);cursor:pointer;padding:0;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.4rem}
+.post-back:hover{color:var(--gold-dark)}
+.post-title{font-family:'Cinzel',serif;font-size:1.7rem;color:var(--green-deep);font-weight:700;line-height:1.3;margin-bottom:0.4rem}
+.post-meta{font-size:0.82rem;color:var(--text-light);font-style:italic;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
+.post-category-badge{background:var(--green-pale);color:var(--green-mid);font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.12em;padding:2px 8px;border-radius:2px;font-style:normal}
+.post-divider{border:none;border-top:1px solid var(--border-gold);margin:1rem 0 1.5rem}
+.post-body{font-size:1.08rem;line-height:1.9;color:var(--text-dark)}
+.post-body p{margin-bottom:1.15rem}
+.post-body blockquote{border-left:3px solid var(--gold);margin:1.25rem 0;padding:0.5rem 1rem 0.5rem 1.25rem;background:var(--gold-pale);font-style:italic;color:var(--text-mid);font-size:1rem}
+/* ── Natural image shape in posts (no forced crop) ── */
+.post-images{margin:1.5rem 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem}
+.post-img{width:100%;height:auto;border-radius:2px;border:1px solid var(--border-gold);cursor:pointer;transition:opacity 0.2s;display:block}
+.post-img:hover{opacity:0.9}
+.post-files{margin:1.25rem 0}
+.file-attachment{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.75rem;background:#fff;border:1px solid var(--border-gold);border-radius:2px;margin-bottom:0.5rem;text-decoration:none;color:var(--text-mid);font-size:0.9rem;transition:background 0.15s}
+.file-attachment:hover{background:var(--gold-pale)}
+.file-icon{font-size:1.1rem;color:var(--gold-dark)}
+.file-name{flex:1;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.05em;color:var(--green-mid)}
+.file-size{font-size:0.75rem;color:var(--text-light);font-style:italic}
+.post-edit-bar{margin-top:1.75rem;padding-top:1rem;border-top:1px solid var(--border-gold);display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center}
+.post-like-section{margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border-gold);display:flex;align-items:center;gap:0.75rem}
+.post-like-btn{background:var(--gold-pale);border:1px solid var(--border-gold);border-radius:24px;padding:0.4rem 1.2rem;cursor:pointer;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--gold-dark);display:flex;align-items:center;gap:0.45rem;transition:all 0.2s}
+.post-like-btn:hover{background:var(--gold);color:var(--green-deep)}
+.post-like-btn.liked{background:var(--gold);color:var(--green-deep)}
+.post-like-count{font-size:0.82rem;color:var(--text-light);font-style:italic}
+
+/* ── WRITE VIEW ── */
+.write-view{display:none}.write-view.active{display:block}
+.form-group{margin-bottom:1.15rem}
+.form-label{display:block;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.12em;color:var(--green-mid);margin-bottom:0.35rem}
+.form-input,.form-textarea{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border-gold);border-radius:2px;font-family:'EB Garamond',serif;font-size:1rem;color:var(--text-dark);background:var(--card-bg);outline:none;transition:border-color 0.2s}
+.form-input:focus,.form-textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,0.15)}
+.form-textarea{min-height:320px;resize:vertical;line-height:1.8}
+.form-hint{font-size:0.8rem;font-style:italic;color:var(--text-light);margin-top:0.35rem}
+.category-input-row{display:flex;gap:0.5rem}
+.category-input-row .form-input{flex:1}
+.category-pills{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem}
+.cat-pill{background:var(--green-pale);color:var(--green-mid);font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;padding:3px 8px 3px 10px;border-radius:2px;display:flex;align-items:center;gap:0.4rem}
+.cat-pill-remove{background:none;border:none;color:var(--green-light);cursor:pointer;font-size:0.85rem;line-height:1;padding:0}
+.cat-pill-remove:hover{color:#8B1A1A}
+.upload-area{border:2px dashed var(--border-gold);border-radius:2px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--card-bg);position:relative}
+.upload-area:hover,.upload-area.dragover{border-color:var(--gold);background:var(--gold-pale)}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:1.75rem;margin-bottom:0.4rem;opacity:0.5}
+.upload-label{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--text-light)}
+.upload-hint{font-size:0.78rem;font-style:italic;color:var(--text-light);margin-top:0.25rem}
+.attachment-previews{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}
+.att-preview{position:relative;border:1px solid var(--border-gold);border-radius:2px;overflow:hidden;background:#fff}
+.att-preview img{width:90px;height:70px;object-fit:cover;display:block}
+.att-preview.file-prev{display:flex;align-items:center;gap:0.4rem;padding:0.4rem 0.6rem;min-width:120px}
+.att-preview.file-prev span{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.05em;color:var(--green-mid);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att-remove{position:absolute;top:2px;right:2px;background:rgba(139,26,26,0.85);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.att-preview.file-prev .att-remove{position:static;flex-shrink:0;background:rgba(139,26,26,0.7)}
+
+/* ── SIDEBAR ── */
+.sidebar{padding-top:2rem}
+.sidebar-box{background:var(--card-bg);border:1px solid var(--border-gold);border-top:3px solid var(--gold);border-radius:2px;margin-bottom:1.25rem;overflow:hidden}
+.sidebar-title{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.14em;color:var(--green-deep);padding:0.6rem 1rem;background:var(--gold-pale);border-bottom:1px solid var(--border-gold)}
+.sidebar-content{padding:0.75rem 1rem}
+.sidebar-cats{list-style:none}
+.sidebar-cats li{padding:0.3rem 0;border-bottom:1px solid rgba(201,168,76,0.15);font-size:0.9rem}
+.sidebar-cats li:last-child{border:none}
+.sidebar-cats button{background:none;border:none;color:var(--text-mid);cursor:pointer;font-family:'EB Garamond',serif;font-size:0.92rem;text-align:left;padding:0;display:flex;align-items:center;gap:0.4rem;width:100%}
+.sidebar-cats button:hover{color:var(--gold-dark)}
+.sidebar-cats button::before{content:'❧';color:var(--gold);font-size:0.7rem}
+.cat-count{margin-left:auto;background:var(--green-pale);color:var(--green-mid);font-family:'Cinzel',serif;font-size:0.6rem;padding:1px 6px;border-radius:10px}
+.sidebar-search{padding:0.75rem}
+.sidebar-search input{width:100%;padding:0.45rem 0.75rem;border:1px solid var(--border-gold);border-radius:2px;font-family:'EB Garamond',serif;font-size:0.95rem;outline:none;background:var(--card-bg);color:var(--text-dark)}
+.sidebar-search input:focus{border-color:var(--gold)}
+.arabic-quote{font-family:'Amiri',serif;font-size:1.1rem;color:var(--green-mid);line-height:1.8;text-align:center;padding:0.25rem 0}
+.arabic-translation{font-size:0.78rem;font-style:italic;color:var(--text-light);text-align:center;margin-top:0.3rem;line-height:1.5}
+
+/* ── MAIN SEARCH ── */
+.main-search-wrap{margin-bottom:1.5rem;position:relative}
+.main-search-input{width:100%;padding:0.75rem 1rem 0.75rem 2.75rem;border:1.5px solid var(--border-gold);border-radius:2px;font-family:'EB Garamond',serif;font-size:1.05rem;color:var(--text-dark);background:var(--card-bg);outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.main-search-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.15)}
+.main-search-input::placeholder{color:var(--text-light);font-style:italic}
+.main-search-icon{position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:var(--gold-dark);font-size:1rem;pointer-events:none}
+.main-search-clear{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-light);font-size:1.1rem;cursor:pointer;display:none;padding:0;line-height:1}
+.main-search-clear.show{display:block}
+.search-results-label{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.1em;color:var(--text-light);margin-bottom:1rem;display:none}
+.search-results-label.show{display:block}
+.filter-bar{display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.filter-label{font-family:'Cinzel',serif;font-size:0.65rem;color:var(--text-light);letter-spacing:0.08em}
+.filter-tag{background:none;border:1px solid var(--border-gold);border-radius:2px;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--text-light);padding:3px 10px;cursor:pointer;transition:all 0.15s}
+.filter-tag:hover,.filter-tag.active{background:var(--green-deep);color:var(--gold-light);border-color:var(--green-deep)}
+
+/* ── SECTION PAGES ── */
+.section-view{display:none}.section-view.active{display:block}
+.section-back{background:none;border:none;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--green-mid);cursor:pointer;padding:0;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.4rem}
+.section-back:hover{color:var(--gold-dark)}
+
+/* ── SALAWAT SECTION ── */
+.salawat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin-top:0.5rem}
+.salawat-card{background:var(--card-bg);border:1px solid var(--card-border);border-top:3px solid var(--gold);border-radius:2px;padding:1rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.4rem;text-decoration:none;color:inherit;transition:box-shadow 0.2s,border-top-color 0.2s}
+.salawat-card:hover{box-shadow:0 3px 14px rgba(13,59,31,0.12);border-top-color:var(--green-mid)}
+.salawat-icon{font-size:1.6rem;opacity:0.6}
+.salawat-name{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--card-title);font-weight:600}
+.salawat-sub{font-size:0.78rem;color:var(--text-light);font-style:italic}
+
+/* ── PDFs SECTION ── */
+.pdf-list{margin-top:0.5rem}
+.pdf-item{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;background:var(--card-bg);border:1px solid var(--card-border);border-radius:2px;margin-bottom:0.5rem;text-decoration:none;color:inherit;transition:background 0.15s}
+.pdf-item:hover{background:var(--gold-pale)}
+.pdf-icon{font-size:1.3rem;color:var(--gold-dark);flex-shrink:0}
+.pdf-info{flex:1}
+.pdf-name{font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.06em;color:var(--card-title)}
+.pdf-meta{font-size:0.75rem;color:var(--text-light);font-style:italic;margin-top:2px}
+.pdf-badge{background:var(--green-pale);color:var(--green-mid);font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.1em;padding:2px 7px;border-radius:10px;flex-shrink:0}
+
+/* ── PRAYER TIMES FULL PAGE ── */
+.prayer-full-header{background:var(--green-deep);border-radius:2px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;text-align:center;border:1px solid var(--border-gold)}
+.prayer-full-title{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.15rem}
+.prayer-full-sub{font-size:0.8rem;color:var(--gold-light);opacity:0.75;font-style:italic}
+.prayer-today{display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:1.5rem}
+@media(max-width:500px){.prayer-today{grid-template-columns:repeat(3,1fr)}}
+.prayer-today-card{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:2px;padding:0.75rem 0.5rem;text-align:center;position:relative;overflow:hidden;transition:border-color 0.2s}
+.prayer-today-card.is-current{border-color:var(--gold);background:var(--gold-pale)}
+.prayer-today-card.is-current::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)}
+.prayer-today-name{font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.12em;color:var(--green-mid);text-transform:uppercase}
+.prayer-today-start{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--green-deep);font-weight:600;margin-top:3px}
+.prayer-today-jamat{font-size:0.72rem;color:var(--text-light);font-style:italic;margin-top:1px}
+.prayer-today-jamat span{color:var(--gold-dark)}
+.prayer-now-label{position:absolute;bottom:4px;left:0;right:0;font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.1em;color:var(--gold-dark);text-align:center}
+
+.timetable-month-label{font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.12em;color:var(--green-deep);margin-bottom:0.6rem}
+.prayer-table-wrap{overflow-x:auto;border:1px solid var(--border-gold);border-radius:2px}
+.prayer-table{width:100%;border-collapse:collapse;font-size:0.78rem;min-width:520px}
+.prayer-table th{background:var(--green-deep);color:var(--gold-light);font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.1em;padding:0.5rem 0.4rem;text-align:center;white-space:nowrap}
+.prayer-table td{padding:0.4rem 0.4rem;text-align:center;border-bottom:1px solid rgba(201,168,76,0.1);color:var(--text-mid);font-size:0.8rem}
+.prayer-table tr:last-child td{border-bottom:none}
+.prayer-table tr.today-row td{background:var(--gold-pale);color:var(--green-deep);font-weight:500}
+.prayer-table tr.today-row td:first-child{font-family:'Cinzel',serif;font-size:0.68rem}
+.prayer-table td.day-col{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.05em;color:var(--text-light)}
+.prayer-table td.jamat-col{color:var(--gold-dark);font-weight:500}
+
+/* ── THEME PANEL ── */
+.theme-btn{position:fixed;bottom:5rem;right:1.5rem;background:var(--green-deep);color:var(--gold);border:2px solid var(--gold);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,0.3);transition:transform 0.15s}
+.theme-btn:hover{transform:scale(1.1)}
+.theme-panel{position:fixed;bottom:10.5rem;right:1.5rem;background:var(--green-deep);border:1px solid var(--gold);border-radius:4px;padding:1rem;z-index:200;width:200px;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+.theme-panel.show{display:block}
+.theme-panel-title{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.12em;color:var(--gold);margin-bottom:0.65rem;opacity:0.85}
+.theme-option{display:flex;align-items:center;gap:0.6rem;padding:0.35rem 0;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.theme-option:hover .theme-swatch{transform:scale(1.15)}
+.theme-swatch{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;transition:transform 0.15s}
+.theme-swatch.active{border-color:var(--gold)}
+.theme-name{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.06em;color:var(--gold-light)}
+.theme-panel-section{margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(201,168,76,0.2)}
+.theme-panel-section-title{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.12em;color:var(--gold);opacity:0.65;margin-bottom:0.4rem}
+.card-colour-row{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem}
+.card-colour-label{font-family:'Cinzel',serif;font-size:0.62rem;color:var(--gold-light);flex:1}
+.card-colour-input{width:32px;height:22px;border:1px solid rgba(201,168,76,0.3);border-radius:2px;cursor:pointer;background:none;padding:0}
+
+/* ── MISC ── */
+.empty-state{text-align:center;padding:3.5rem 1rem;color:var(--text-light)}
+.empty-state .big-ornament{font-size:2.5rem;opacity:0.25;margin-bottom:0.75rem}
+.empty-state p{font-style:italic;font-size:0.95rem;margin-bottom:1rem}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--cream);border:1px solid var(--border-gold);border-top:3px solid var(--gold);border-radius:2px;padding:1.75rem;max-width:400px;width:92%;text-align:center}
+.modal-box h3{font-family:'Cinzel',serif;font-size:1rem;color:var(--green-deep);margin-bottom:0.5rem}
+.modal-box p{font-size:0.88rem;color:var(--text-mid);margin-bottom:1.1rem;font-style:italic;line-height:1.6}
+.modal-btns{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+.modal-input{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border-gold);border-radius:2px;font-family:'EB Garamond',serif;font-size:1rem;color:var(--text-dark);background:#fff;outline:none;margin-bottom:0.75rem;text-align:center;letter-spacing:0.05em}
+.modal-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,0.15)}
+.modal-error{color:#8B1A1A;font-size:0.82rem;font-style:italic;margin-bottom:0.75rem;display:none}
+.modal-error.show{display:block}
+.admin-badge-bar{background:rgba(201,168,76,0.12);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.3rem;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.1em;color:var(--gold-dark);display:none}
+.admin-badge-bar.show{display:block}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:600;align-items:center;justify-content:center;cursor:zoom-out}
+.lightbox.show{display:flex}
+.lightbox img{max-width:92vw;max-height:90vh;object-fit:contain;border:2px solid var(--border-gold)}
+.lightbox-close{position:fixed;top:1rem;right:1.25rem;background:none;border:none;color:var(--gold-light);font-size:1.75rem;cursor:pointer;font-family:'Cinzel',serif}
+.notif{position:fixed;top:1rem;right:1rem;background:var(--green-deep);color:var(--gold-light);font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.08em;padding:0.65rem 1.25rem;border:1px solid var(--gold);border-radius:2px;z-index:999;opacity:0;transform:translateY(-8px);transition:all 0.3s;pointer-events:none}
+.notif.show{opacity:1;transform:translateY(0)}
+.write-fab{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--green-deep);color:var(--gold);border:2px solid var(--gold);border-radius:50%;width:52px;height:52px;display:none;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;z-index:100;box-shadow:0 3px 16px rgba(0,0,0,0.3);transition:background 0.2s,transform 0.15s}
+.write-fab.show{display:flex}
+.write-fab:hover{background:var(--green-mid);transform:scale(1.06)}
+.btn{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.1em;padding:0.5rem 1.1rem;cursor:pointer;border-radius:2px;transition:all 0.2s}
+.btn-gold{background:var(--gold);color:var(--green-deep);border:1px solid var(--gold-dark);font-weight:600}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-outline{background:none;color:var(--green-mid);border:1px solid var(--green-mid)}
+.btn-outline:hover{background:var(--green-pale)}
+.btn-danger{background:none;color:#8B1A1A;border:1px solid #8B1A1A}
+.btn-danger:hover{background:#FFF0F0}
+footer{background:var(--green-deep);border-top:2px solid var(--gold);text-align:center;padding:1.75rem;transition:background 0.3s}
+footer .footer-arabic{font-family:'Amiri',serif;color:var(--gold-light);font-size:1.1rem;margin-bottom:0.4rem;opacity:0.9}
+footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;color:var(--gold);opacity:0.7}
+</style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+<div class="admin-badge-bar" id="admin-bar">🔑 Admin Mode Active — You can write, edit and delete posts</div>
+
+<!-- SIDE MENU OVERLAY -->
+<div class="side-menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
+
+<!-- SIDE MENU -->
+<nav class="side-menu" id="side-menu">
+  <div class="side-menu-header">
+    <span class="side-menu-bismillah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
+    <div class="side-menu-title">Khaak al Na'layn Sharif ﷺ</div>
+  </div>
+
+  <div class="side-menu-section">
+    <div class="side-menu-section-label">Navigate</div>
+    <button class="side-menu-item active" id="menu-home" onclick="showHome();closeMenu()">
+      <span class="menu-icon">🏠</span> Home
+    </button>
+    <button class="side-menu-item" id="menu-all" onclick="showAllPosts();closeMenu()">
+      <span class="menu-icon">📜</span> All Posts
+    </button>
+    <button class="side-menu-item" id="menu-write" onclick="showWrite();closeMenu()" style="display:none">
+      <span class="menu-icon">✒</span> Write New Post
+    </button>
+  </div>
+
+  <hr class="side-menu-divider">
+
+  <div class="side-menu-section">
+    <div class="side-menu-section-label">Sections</div>
+    <button class="side-menu-item" id="menu-salawat" onclick="showSection('salawat');closeMenu()">
+      <span class="menu-icon">🌙</span> Salawat
+    </button>
+    <button class="side-menu-item" id="menu-pdfs" onclick="showSection('pdfs');closeMenu()">
+      <span class="menu-icon">📖</span> PDFs & Downloads
+    </button>
+    <button class="side-menu-item" id="menu-prayer" onclick="showSection('prayer');closeMenu()">
+      <span class="menu-icon">🕌</span> Prayer Times
+    </button>
+  </div>
+
+  <hr class="side-menu-divider">
+
+  <div class="side-menu-prayer-mini" id="prayer-mini-sidebar">
+    <div class="side-menu-prayer-mini-title">Today's Prayer Times</div>
+    <div class="prayer-mini-grid" id="prayer-mini-grid">
+      <div class="prayer-mini-item">Fajr <span id="pm-fajr">-</span></div>
+      <div class="prayer-mini-item">Zuhar <span id="pm-zuhar">-</span></div>
+      <div class="prayer-mini-item">Asr <span id="pm-asr">-</span></div>
+      <div class="prayer-mini-item">Maghrib <span id="pm-maghrib">-</span></div>
+      <div class="prayer-mini-item">Isha <span id="pm-isha">-</span></div>
+    </div>
+  </div>
+</nav>
+
+<!-- SITE HEADER -->
+<header class="site-header">
+  <div class="header-ornament"></div>
+  <div class="header-top-bar">
+    <button class="hamburger-btn" id="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="header-spacer"></div>
+    <button class="header-admin-btn" id="admin-btn" onclick="handleAdminBtn()">🔒 Admin Login</button>
+  </div>
+  <div class="header-inner">
+    <span class="bismillah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
+    <h1 class="site-title">Khaak al Na'layn Sharif ﷺ<span>Dust of the Blessed Sandal ﷺ</span></h1>
+    <div class="header-rule"><span style="color:var(--gold);font-size:0.6rem;opacity:0.7">◆</span></div>
+  </div>
+</header>
+
+<!-- PRAYER BAR (compact 5 prayers shown on every page) -->
+<div class="prayer-bar" id="prayer-bar">
+  <div class="prayer-bar-inner">
+    <span class="prayer-bar-label">Prayer Times</span>
+    <div class="prayer-pill" id="pb-fajr">
+      <span class="prayer-pill-name">Fajr</span>
+      <span class="prayer-pill-time" id="pb-fajr-t">-</span>
+    </div>
+    <div class="prayer-pill" id="pb-zuhar">
+      <span class="prayer-pill-name">Zuhar</span>
+      <span class="prayer-pill-time" id="pb-zuhar-t">-</span>
+    </div>
+    <div class="prayer-pill" id="pb-asr">
+      <span class="prayer-pill-name">Asr</span>
+      <span class="prayer-pill-time" id="pb-asr-t">-</span>
+    </div>
+    <div class="prayer-pill" id="pb-maghrib">
+      <span class="prayer-pill-name">Maghrib</span>
+      <span class="prayer-pill-time" id="pb-maghrib-t">-</span>
+    </div>
+    <div class="prayer-pill" id="pb-isha">
+      <span class="prayer-pill-name">Isha</span>
+      <span class="prayer-pill-time" id="pb-isha-t">-</span>
+    </div>
+    <button class="prayer-bar-more" onclick="showSection('prayer');closeMenu()">Full Timetable →</button>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <main class="content">
+
+    <!-- BLOG LIST VIEW -->
+    <div id="blog-list-view">
+      <div class="main-search-wrap">
+        <span class="main-search-icon">🔍</span>
+        <input class="main-search-input" id="main-search-input" type="text" placeholder="Search posts by title, content or category…" oninput="doMainSearch(this.value)" autocomplete="off">
+        <button class="main-search-clear" id="main-search-clear" onclick="clearMainSearch()" title="Clear search">✕</button>
+      </div>
+      <div class="search-results-label" id="search-results-label"></div>
+      <div class="filter-bar" id="filter-bar">
+        <span class="filter-label">Filter:</span>
+        <button class="filter-tag active" onclick="filterCat('all',this)">All</button>
+      </div>
+      <div id="blog-list"></div>
+    </div>
+
+    <!-- POST VIEW -->
+    <div class="post-view" id="post-view">
+      <button class="post-back" onclick="backToList()">← Return to all posts</button>
+      <h2 class="post-title" id="post-title"></h2>
+      <div class="post-meta" id="post-meta"></div>
+      <hr class="post-divider">
+      <div class="post-body" id="post-body"></div>
+      <div class="post-images" id="post-images"></div>
+      <div class="post-files" id="post-files"></div>
+      <div class="post-like-section">
+        <button class="post-like-btn" id="post-like-btn" onclick="togglePostLike()">❤ Like this post</button>
+        <span class="post-like-count" id="post-like-count"></span>
+      </div>
+      <div class="post-edit-bar" id="post-edit-bar"></div>
+    </div>
+
+    <!-- WRITE VIEW -->
+    <div class="write-view" id="write-view">
+      <div class="page-title" id="write-view-title">Write New Post</div>
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input class="form-input" id="f-title" placeholder="Enter the title of your post…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categories</label>
+        <div class="category-input-row">
+          <input class="form-input" id="cat-input" placeholder="Type a category and press Add…" onkeydown="if(event.key==='Enter'){addCat();event.preventDefault()}">
+          <button class="btn btn-outline" onclick="addCat()">Add</button>
+        </div>
+        <div class="category-pills" id="cat-pills"></div>
+        <p class="form-hint">Examples: Tasawwuf, Awliya, Hadith, Poetry, Sirah, Salawat, PDFs</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Content</label>
+        <textarea class="form-textarea" id="f-body" placeholder="Write your post here…&#10;&#10;Leave a blank line between paragraphs.&#10;Start a line with > for a block quote (Hadith, Quranic verse, etc.)"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Attach Photos &amp; Files</label>
+        <div class="upload-area" id="upload-area">
+          <input type="file" id="file-input" multiple accept="image/*,.pdf,.doc,.docx,.txt,.mp3,.mp4" onchange="handleFiles(this.files)">
+          <div class="upload-icon">📎</div>
+          <div class="upload-label">Click or drag &amp; drop files here</div>
+          <div class="upload-hint">Images, PDFs, documents, audio — any file type</div>
+        </div>
+        <div class="attachment-previews" id="att-previews"></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="savePost()">Publish Post</button>
+        <button class="btn btn-outline" onclick="cancelWrite()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- SALAWAT SECTION -->
+    <div class="section-view" id="section-salawat">
+      <button class="section-back" onclick="showHome()">← Back to Home</button>
+      <div class="page-title">Salawat</div>
+      <p style="font-size:0.9rem;color:var(--text-light);font-style:italic;margin-bottom:1.25rem">Blessings upon the Prophet ﷺ — click any card to open the PDF</p>
+      <div id="add-salawat-btn-wrap" style="display:none;margin-bottom:1rem">
+        <button class="btn btn-gold" onclick="openAddSalawat()">＋ Add Salawat</button>
+      </div>
+      <div class="salawat-grid" id="salawat-grid">
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat-al-Tajiyya.pdf" target="_blank">
+          <span class="salawat-icon">☽</span>
+          <span class="salawat-name">Darood e Taj</span>
+          <span class="salawat-sub">Salawat al-Tajiyya</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salat-al-Mashishiyya.pdf" target="_blank">
+          <span class="salawat-icon">🌟</span>
+          <span class="salawat-name">Salat al Mashishiyya</span>
+          <span class="salawat-sub">Imam ibn Mashish</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salat-al-Tunjinah.pdf" target="_blank">
+          <span class="salawat-icon">🌙</span>
+          <span class="salawat-name">Salat al Tunjinah</span>
+          <span class="salawat-sub">The Delivering Prayer</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat_relief.pdf" target="_blank">
+          <span class="salawat-icon">✨</span>
+          <span class="salawat-name">Salawat for Relief</span>
+          <span class="salawat-sub">In times of hardship</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Habib-Salawat_Shifa.pdf" target="_blank">
+          <span class="salawat-icon">💚</span>
+          <span class="salawat-name">Salawat al Shifa</span>
+          <span class="salawat-sub">Prayer of Healing</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat_Habib1.pdf" target="_blank">
+          <span class="salawat-icon">⭐</span>
+          <span class="salawat-name">Salawat of Habib 1</span>
+          <span class="salawat-sub">From the Habaib</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat_Habib2.pdf" target="_blank">
+          <span class="salawat-icon">⭐</span>
+          <span class="salawat-name">Salawat of Habib 2</span>
+          <span class="salawat-sub">From the Habaib</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat_Habib3.pdf" target="_blank">
+          <span class="salawat-icon">⭐</span>
+          <span class="salawat-name">Salawat of Habib 3</span>
+          <span class="salawat-sub">From the Habaib</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat_Habib4.pdf" target="_blank">
+          <span class="salawat-icon">⭐</span>
+          <span class="salawat-name">Salawat of Habib 4</span>
+          <span class="salawat-sub">From the Habaib</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat_Habib_al_Badr_al_Muneer_6.pdf" target="_blank">
+          <span class="salawat-icon">🌕</span>
+          <span class="salawat-name">Salawat of Habib 6</span>
+          <span class="salawat-sub">al-Badr al-Muneer</span>
+        </a>
+        <a class="salawat-card" href="https://daralzahra.org/wp-content/uploads/2025/12/Salawat_Habib_ur-Rahman_7.pdf" target="_blank">
+          <span class="salawat-icon">💫</span>
+          <span class="salawat-name">Salawat of Habib 7</span>
+          <span class="salawat-sub">ur-Rahman</span>
+        </a>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-light);font-style:italic;margin-top:1rem;text-align:center">More salawat will be added in sha Allah. Contact the admin to suggest additions.</p>
+    </div>
+
+    <!-- PDFs SECTION -->
+    <div class="section-view" id="section-pdfs">
+      <button class="section-back" onclick="showHome()">← Back to Home</button>
+      <div class="page-title">PDFs &amp; Downloads</div>
+      <p style="font-size:0.9rem;color:var(--text-light);font-style:italic;margin-bottom:1.25rem">Sacred texts, wird, and resources for download</p>
+      <div id="add-pdf-btn-wrap" style="display:none;margin-bottom:1rem">
+        <button class="btn btn-gold" onclick="openAddPdf()">＋ Add PDF</button>
+      </div>
+      <div class="pdf-list" id="pdf-list-dynamic"><!-- dynamic admin PDFs --></div>
+      <div class="pdf-list">
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/12/Surah-Yaseen_Nov23-compressed.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Surah Yasin</div><div class="pdf-meta">Sacred Surah — PDF</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Ayat-al-Shifa.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Ayat al Shifa</div><div class="pdf-meta">Verses of Healing</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Ayat-al-Hifz.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Ayat al Hifz</div><div class="pdf-meta">Verses of Protection</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Manzil.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Manzil</div><div class="pdf-meta">Protection from Jinn &amp; Sihr</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Ratib-al-Hadad_Arabic.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Ratib al Haddad</div><div class="pdf-meta">Imam al-Haddad</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Ratib-al-Attas.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Ratib al Attas</div><div class="pdf-meta">Daily Wird</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Wird-al-Lateef.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Wird al Latif</div><div class="pdf-meta">Imam al-Haddad</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/HIzb-al-Bahr.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Hizb al Bahr</div><div class="pdf-meta">Imam al-Shadhili</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Wird-al-Sakran.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Wird al Sakran</div><div class="pdf-meta">Daily Awrad</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Aqidah-tul-Haq.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Aqidah tul Haq</div><div class="pdf-meta">Creed &amp; Belief</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Hizb-al-Nasr.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Hizb al Nasr</div><div class="pdf-meta">Imam al-Haddad</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Hizb-al-Nawwawi.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Hizb al Nawawi</div><div class="pdf-meta">Imam al-Nawawi</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/12/Sayyidah-Zahra_kalam.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Sayyidah Zahra (s) Duas</div><div class="pdf-meta">Duas &amp; Kalam</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+        <a class="pdf-item" href="https://daralzahra.org/wp-content/uploads/2025/04/Dua_Imam-Faqih-al-Muqqaddam-ra.pdf" target="_blank" download>
+          <span class="pdf-icon">📄</span>
+          <div class="pdf-info"><div class="pdf-name">Dua by Imam Faqih al Muqaddam</div><div class="pdf-meta">Sacred Supplication</div></div>
+          <span class="pdf-badge">PDF</span>
+        </a>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-light);font-style:italic;margin-top:1rem;text-align:center">More PDFs will be added in sha Allah. Contact the admin to suggest additions.</p>
+    </div>
+
+    <!-- PRAYER TIMES SECTION -->
+    <div class="section-view" id="section-prayer">
+      <button class="section-back" onclick="showHome()">← Back to Home</button>
+      <div class="page-title">Prayer Times</div>
+
+      <div class="prayer-full-header">
+        <div class="prayer-full-title">Ghamkol Sharif — Birmingham</div>
+        <div class="prayer-full-sub" id="prayer-full-date">Central Jamia Mosque Ghamkol Sharif</div>
+      </div>
+
+      <div class="page-title" style="font-size:0.85rem;margin-bottom:0.75rem">Today's Prayer Times</div>
+      <div class="prayer-today" id="prayer-today-cards"></div>
+
+      <div class="timetable-month-label" id="timetable-month-label">May 2026 — Full Timetable</div>
+      <div class="prayer-table-wrap">
+        <table class="prayer-table" id="prayer-table">
+          <thead>
+            <tr>
+              <th>Day</th><th>Date</th><th>Hijri</th>
+              <th>Fajr</th><th>Jamat</th>
+              <th>Sunrise</th>
+              <th>Zuhar</th><th>Jamat</th>
+              <th>Asr</th><th>Jamat</th>
+              <th>Maghrib</th>
+              <th>Isha</th><th>Jamat</th>
+            </tr>
+          </thead>
+          <tbody id="prayer-tbody"></tbody>
+        </table>
+      </div>
+      <p style="font-size:0.75rem;color:var(--text-light);font-style:italic;margin-top:0.75rem">Source: gsmosque.org. Times may vary ±5 minutes. Always verify locally.</p>
+    </div>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">Search Posts</div>
+      <div class="sidebar-search">
+        <input type="text" id="search-input" placeholder="Search posts…" oninput="doSearch(this.value)">
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">Categories</div>
+      <div class="sidebar-content">
+        <ul class="sidebar-cats" id="sidebar-cats">
+          <li><button onclick="filterCat('all',null)">All Posts <span class="cat-count">0</span></button></li>
+        </ul>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">Today's Prayers</div>
+      <div class="sidebar-content" id="sidebar-prayer-widget" style="padding:0.5rem 0.75rem">
+        <!-- filled by JS -->
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">From the Heart</div>
+      <div class="sidebar-content">
+        <p class="arabic-quote">مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا</p>
+        <p class="arabic-translation">"Whoever treads a path seeking knowledge, Allah makes easy for him the path to Paradise."<br><em>— Sahih Muslim</em></p>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">About This Blog</div>
+      <div class="sidebar-content" style="font-size:0.88rem;color:var(--text-mid);line-height:1.65">
+        <p>A space dedicated to sacred knowledge, the love of the Prophet ﷺ, and the illuminated path of the Awliya Allah.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- FLOATING BUTTONS -->
+<button class="write-fab" id="write-fab" onclick="showWrite()" title="Write New Post">✒</button>
+<button class="theme-btn" id="theme-btn" onclick="toggleThemePanel()" title="Change Theme">🎨</button>
+
+<!-- THEME PANEL -->
+<div class="theme-panel" id="theme-panel">
+  <div class="theme-panel-title" id="theme-panel-title">Colour Theme</div>
+  <!-- Owner: site default indicator -->
+  <div id="theme-owner-notice" style="display:none;font-size:0.62rem;font-family:'Cinzel',serif;color:var(--gold);opacity:0.8;margin-bottom:0.5rem;letter-spacing:0.08em">👑 You are setting the site default</div>
+  <!-- Viewer: personal override indicator -->
+  <div id="theme-personal-notice" style="display:none;font-size:0.62rem;font-style:italic;color:var(--gold-light);opacity:0.75;margin-bottom:0.5rem">Your personal theme (others unaffected)</div>
+  <button class="theme-option" onclick="setTheme('')">
+    <span class="theme-swatch active" id="swatch-default" style="background:linear-gradient(135deg,#0D3B1F,#C9A84C)"></span>
+    <span class="theme-name">Classic Green</span>
+  </button>
+  <button class="theme-option" onclick="setTheme('midnight')">
+    <span class="theme-swatch" id="swatch-midnight" style="background:linear-gradient(135deg,#0f1117,#c9a84c)"></span>
+    <span class="theme-name">Midnight Gold</span>
+  </button>
+  <button class="theme-option" onclick="setTheme('rose')">
+    <span class="theme-swatch" id="swatch-rose" style="background:linear-gradient(135deg,#6b1a1a,#c9844c)"></span>
+    <span class="theme-name">Rose &amp; Amber</span>
+  </button>
+  <button class="theme-option" onclick="setTheme('ocean')">
+    <span class="theme-swatch" id="swatch-ocean" style="background:linear-gradient(135deg,#0a3a5a,#4a9ac9)"></span>
+    <span class="theme-name">Ocean Blue</span>
+  </button>
+  <div class="theme-panel-section">
+    <div class="theme-panel-section-title">Post Card Colours</div>
+    <div class="card-colour-row">
+      <span class="card-colour-label">Card background</span>
+      <input type="color" class="card-colour-input" id="cc-bg" value="#ffffff" oninput="setCardVar('--card-bg',this.value)">
+    </div>
+    <div class="card-colour-row">
+      <span class="card-colour-label">Accent strip</span>
+      <input type="color" class="card-colour-input" id="cc-accent" value="#C9A84C" oninput="setCardVar('--card-accent',this.value)">
+    </div>
+    <div class="card-colour-row">
+      <span class="card-colour-label">Title colour</span>
+      <input type="color" class="card-colour-input" id="cc-title" value="#0D3B1F" oninput="setCardVar('--card-title',this.value)">
+    </div>
+  </div>
+  <!-- Owner: save as site default -->
+  <div id="theme-owner-actions" style="display:none;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(201,168,76,0.2)">
+    <button class="btn btn-gold" style="width:100%;font-size:0.65rem;padding:0.45rem" onclick="saveOwnerDefault()">💾 Save as site default</button>
+  </div>
+  <!-- Viewer: reset to site default -->
+  <div id="theme-viewer-actions" style="display:none;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(201,168,76,0.2)">
+    <button class="btn btn-outline" style="width:100%;font-size:0.62rem;padding:0.4rem;color:var(--gold-light);border-color:rgba(201,168,76,0.3)" onclick="resetToSiteDefault()">↩ Reset to site default</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal-box">
+    <h3>Admin Login</h3>
+    <p>Enter your password to access admin controls.</p>
+    <input class="modal-input" type="password" id="login-password-input" placeholder="Enter password…" onkeydown="if(event.key==='Enter')submitLogin()">
+    <div class="modal-error" id="login-error">Incorrect password. Please try again.</div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="submitLogin()">Login</button>
+      <button class="btn btn-outline" onclick="closeModal('login-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- OWNER PANEL MODAL -->
+<div class="modal-overlay" id="owner-panel-modal">
+  <div class="modal-box" style="max-width:480px;text-align:left">
+    <h3 style="text-align:center;margin-bottom:0.25rem">👑 Owner Panel</h3>
+    <p style="text-align:center;margin-bottom:1.25rem">Manage who has admin access to your website.</p>
+    <div style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.1em;color:var(--green-mid);margin-bottom:0.5rem">Current Admin Passwords</div>
+    <div id="admin-list" style="margin-bottom:1.25rem;min-height:2rem"></div>
+    <div style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.1em;color:var(--green-mid);margin-bottom:0.5rem">Add New Admin</div>
+    <input class="modal-input" type="text" id="new-admin-label" placeholder="Their name (e.g. Sister Fatima)…" style="text-align:left">
+    <input class="modal-input" type="text" id="new-admin-pw" placeholder="Password to give them…" style="text-align:left" onkeydown="if(event.key==='Enter')addAdmin()">
+    <div class="modal-error" id="new-admin-error" style="margin-top:-0.5rem"></div>
+    <div class="modal-btns" style="margin-top:0.75rem">
+      <button class="btn btn-gold" onclick="addAdmin()">Add Admin</button>
+      <button id="manage-admins-btn" class="btn btn-outline" onclick="closeOwnerPanel()" style="display:none">Close</button>
+      <button class="btn btn-outline" onclick="closeOwnerPanel()">Close</button>
+      <button class="btn btn-danger" onclick="ownerLogout()">Log Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="del-modal">
+  <div class="modal-box">
+    <h3>Delete this post?</h3>
+    <p>This cannot be undone. The post will be permanently removed.</p>
+    <div class="modal-btns">
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+      <button class="btn btn-outline" onclick="closeModal('del-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SALAWAT MODAL -->
+<div class="modal-overlay" id="add-salawat-modal">
+  <div class="modal-box" style="max-width:520px;text-align:left">
+    <h3 style="text-align:center;margin-bottom:1rem">✨ Add Salawat</h3>
+    <div class="form-group">
+      <label class="form-label">Name *</label>
+      <input class="modal-input" type="text" id="sw-name" placeholder="e.g. Darood Ibrahim…" style="text-align:left">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Subtitle / Attribution</label>
+      <input class="modal-input" type="text" id="sw-sub" placeholder="e.g. From the Habaib…" style="text-align:left">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Icon (emoji)</label>
+      <input class="modal-input" type="text" id="sw-icon" placeholder="☽ 🌟 ✨ 💚 etc." style="text-align:left;max-width:120px">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Attach a PDF <span style="font-weight:400;font-style:italic;color:var(--text-light)">— or enter a URL below</span></label>
+      <div class="upload-area" id="sw-upload-area" style="padding:1rem">
+        <input type="file" id="sw-file-input" accept=".pdf" onchange="handleSalawatFile(this.files)">
+        <div class="upload-icon">📄</div>
+        <div class="upload-label">Click or drop a PDF here</div>
+      </div>
+      <div id="sw-file-name" style="font-size:0.8rem;font-style:italic;color:var(--green-mid);margin-top:0.35rem"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Or paste a PDF URL</label>
+      <input class="modal-input" type="text" id="sw-url" placeholder="https://…" style="text-align:left">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Or write the salawat text</label>
+      <textarea class="form-textarea" id="sw-text" style="min-height:120px" placeholder="Write the full salawat text here…"></textarea>
+    </div>
+    <div class="modal-error" id="sw-error"></div>
+    <div class="modal-btns" style="margin-top:0.75rem">
+      <button class="btn btn-gold" onclick="saveSalawat()">Save Salawat</button>
+      <button class="btn btn-outline" onclick="closeModal('add-salawat-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PDF MODAL -->
+<div class="modal-overlay" id="add-pdf-modal">
+  <div class="modal-box" style="max-width:520px;text-align:left">
+    <h3 style="text-align:center;margin-bottom:1rem">📄 Add PDF</h3>
+    <div class="form-group">
+      <label class="form-label">Name *</label>
+      <input class="modal-input" type="text" id="pw-name" placeholder="e.g. Surah al-Waqiah…" style="text-align:left">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Author</label>
+      <input class="modal-input" type="text" id="pw-meta" placeholder="e.g. Sacred Surah — PDF…" style="text-align:left">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Attach a PDF <span style="font-weight:400;font-style:italic;color:var(--text-light)">— or enter a URL below</span></label>
+      <div class="upload-area" id="pw-upload-area" style="padding:1rem">
+        <input type="file" id="pw-file-input" accept=".pdf" onchange="handlePdfFile(this.files)">
+        <div class="upload-icon">📄</div>
+        <div class="upload-label">Click or drop a PDF here</div>
+      </div>
+      <div id="pw-file-name" style="font-size:0.8rem;font-style:italic;color:var(--green-mid);margin-top:0.35rem"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Or paste a PDF URL</label>
+      <input class="modal-input" type="text" id="pw-url" placeholder="https://…" style="text-align:left">
+    </div>
+    <div class="modal-error" id="pw-error"></div>
+    <div class="modal-btns" style="margin-top:0.75rem">
+      <button class="btn btn-gold" onclick="savePdf()">Save PDF</button>
+      <button class="btn btn-outline" onclick="closeModal('add-pdf-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE SALAWAT / PDF CONFIRM -->
+<div class="modal-overlay" id="del-resource-modal">
+  <div class="modal-box">
+    <h3 id="del-resource-title">Delete this item?</h3>
+    <p>This cannot be undone.</p>
+    <div class="modal-btns">
+      <button class="btn btn-danger" onclick="confirmDeleteResource()">Delete</button>
+      <button class="btn btn-outline" onclick="closeModal('del-resource-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SALAWAT TEXT VIEWER MODAL -->
+<div class="modal-overlay" id="salawat-text-modal">
+  <div class="modal-box" style="max-width:560px;text-align:left;max-height:80vh;overflow-y:auto">
+    <h3 id="salawat-text-modal-title" style="margin-bottom:1rem;font-family:'Cinzel',serif;color:var(--green-deep)"></h3>
+    <div id="salawat-text-modal-body" style="font-family:'Amiri',serif;font-size:1.05rem;line-height:1.9;white-space:pre-wrap;color:var(--text-dark)"></div>
+    <div class="modal-btns" style="margin-top:1.25rem">
+      <button class="btn btn-outline" onclick="closeModal('salawat-text-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<footer>
+  <p class="footer-arabic">صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ</p>
+  <p class="footer-name">Khaak al Na'layn Sharif</p>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════
+// STORAGE KEYS
+// ════════════════════════════════════════════════
+const STORAGE_KEY      = 'khaak_posts_v2';
+const ADMIN_KEY        = 'khaak_admins_v1';
+const SESSION_KEY      = 'khaak_admin_session';
+const SESSION_OWNER_KEY= 'khaak_owner_session';
+const LIKES_KEY        = 'khaak_likes_v1';
+const OWNER_PASSWORD   = 'nalaynepaak786';
+
+let posts = [], editingId = null, deleteTargetId = null;
+let currentCats = [], activeFilter = 'all', pendingAttachments = [];
+let currentPostId = null;
+
+// ════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════
+function isOwner(){ return sessionStorage.getItem(SESSION_OWNER_KEY)==='1'; }
+function isLoggedIn(){ return isOwner()||sessionStorage.getItem(SESSION_KEY)==='1'; }
+function getAdmins(){ try{ return JSON.parse(localStorage.getItem(ADMIN_KEY))||[]; }catch(e){ return []; } }
+function saveAdmins(list){ localStorage.setItem(ADMIN_KEY,JSON.stringify(list)); }
+function checkPassword(pw){
+  if(pw===OWNER_PASSWORD) return 'owner';
+  if(getAdmins().some(a=>a.pw===pw)) return 'admin';
+  return null;
+}
+function updateAdminUI(){
+  const loggedIn=isLoggedIn(), owner=isOwner();
+  const btn=document.getElementById('admin-btn');
+  btn.textContent=loggedIn?(owner?'👑 Owner  ▾':'🔓 Admin  ▾'):'🔒 Admin Login';
+  btn.classList.toggle('logged-in',loggedIn);
+  const nw=document.getElementById('menu-write');
+  if(nw) nw.style.display=loggedIn?'flex':'none';
+  document.getElementById('write-fab').classList.toggle('show',loggedIn);
+  document.getElementById('admin-bar').textContent=owner
+    ?'👑 Owner Mode — Full control: write, edit, delete posts and manage admin access'
+    :'🔑 Admin Mode — You can write, edit and delete posts';
+  document.getElementById('admin-bar').classList.toggle('show',loggedIn);
+  const mb=document.getElementById('manage-admins-btn');
+  if(mb) mb.style.display=owner?'inline-block':'none';
+  if(typeof updateThemePanelUI==='function') updateThemePanelUI();
+}
+function handleAdminBtn(){
+  if(isLoggedIn()){
+    if(isOwner()){ openModal('owner-panel-modal'); renderAdminList(); }
+    else { if(confirm('Log out of admin?')){ sessionStorage.removeItem(SESSION_KEY); updateAdminUI(); notify('Logged out.'); showHome(); } }
+  } else {
+    document.getElementById('login-password-input').value='';
+    document.getElementById('login-error').classList.remove('show');
+    openModal('login-modal');
+    setTimeout(()=>document.getElementById('login-password-input').focus(),100);
+  }
+}
+function submitLogin(){
+  const pw=document.getElementById('login-password-input').value;
+  const err=document.getElementById('login-error');
+  const role=checkPassword(pw);
+  if(role==='owner'){
+    sessionStorage.setItem(SESSION_OWNER_KEY,'1'); sessionStorage.setItem(SESSION_KEY,'1');
+    closeModal('login-modal'); updateAdminUI(); notify('Welcome back, Owner 👑');
+  } else if(role==='admin'){
+    sessionStorage.setItem(SESSION_KEY,'1');
+    closeModal('login-modal'); updateAdminUI(); notify('Welcome back, Admin ✓');
+  } else {
+    err.classList.add('show');
+    document.getElementById('login-password-input').value='';
+    document.getElementById('login-password-input').focus();
+  }
+}
+function renderAdminList(){
+  const admins=getAdmins(), cont=document.getElementById('admin-list');
+  if(!admins.length){ cont.innerHTML='<p style="font-style:italic;font-size:0.85rem;color:var(--text-light);text-align:center;padding:0.5rem 0">No admin passwords added yet.</p>'; return; }
+  cont.innerHTML=admins.map((a,i)=>`<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid var(--border-gold)"><span style="flex:1;font-family:'Cinzel',serif;font-size:0.75rem;color:var(--green-deep)">${esc(a.label)}</span><span style="font-size:0.78rem;color:var(--text-light);font-style:italic">${esc(a.pw)}</span><button class="btn btn-danger" style="padding:2px 8px;font-size:0.62rem" onclick="removeAdmin(${i})">Remove</button></div>`).join('');
+}
+function addAdmin(){
+  const label=document.getElementById('new-admin-label').value.trim();
+  const pw=document.getElementById('new-admin-pw').value.trim();
+  const err=document.getElementById('new-admin-error');
+  if(!label){ err.textContent='Please enter a name.'; err.classList.add('show'); return; }
+  if(!pw||pw.length<4){ err.textContent='Password must be at least 4 characters.'; err.classList.add('show'); return; }
+  if(pw===OWNER_PASSWORD){ err.textContent='That password is reserved.'; err.classList.add('show'); return; }
+  const admins=getAdmins();
+  if(admins.some(a=>a.pw===pw)){ err.textContent='That password is already in use.'; err.classList.add('show'); return; }
+  admins.push({label,pw}); saveAdmins(admins);
+  document.getElementById('new-admin-label').value=''; document.getElementById('new-admin-pw').value='';
+  err.classList.remove('show'); renderAdminList(); notify(`Admin access added for ${label} ✓`);
+}
+function removeAdmin(i){ const admins=getAdmins(); const name=admins[i].label; admins.splice(i,1); saveAdmins(admins); renderAdminList(); notify(`Removed admin access for ${name}.`); }
+function closeOwnerPanel(){ closeModal('owner-panel-modal'); }
+function ownerLogout(){ sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_OWNER_KEY); closeModal('owner-panel-modal'); updateAdminUI(); notify('Logged out.'); showHome(); }
+
+// ════════════════════════════════════════════════
+// HAMBURGER MENU
+// ════════════════════════════════════════════════
+function toggleMenu(){
+  const m=document.getElementById('side-menu'), o=document.getElementById('menu-overlay'), h=document.getElementById('hamburger');
+  const isOpen=m.classList.contains('open');
+  m.classList.toggle('open',!isOpen); o.classList.toggle('show',!isOpen); h.classList.toggle('open',!isOpen);
+}
+function closeMenu(){
+  document.getElementById('side-menu').classList.remove('open');
+  document.getElementById('menu-overlay').classList.remove('show');
+  document.getElementById('hamburger').classList.remove('open');
+}
+function setMenuActive(id){
+  ['menu-home','menu-all','menu-write','menu-salawat','menu-pdfs','menu-prayer'].forEach(i=>{
+    const el=document.getElementById(i); if(el) el.classList.toggle('active',i===id);
+  });
+}
+
+// ════════════════════════════════════════════════
+// SUPABASE
+// ════════════════════════════════════════════════
+const SUPA_URL='https://tmahoeriamlhkimkdqpd.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtYWhvZXJpYW1saGtpbWtkcXBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NDY1NDcsImV4cCI6MjA5NTEyMjU0N30.d30n3D1ES3FwWCVRfj18-CByAu4vBWvJCM-ogN0hqIY';
+async function supa(method,path,body){
+  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'},body:body?JSON.stringify(body):undefined});
+  if(method==='DELETE'||(method==='PATCH'&&res.status===204)) return null;
+  return res.json();
+}
+async function loadPosts(){
+  showLoading(true);
+  try { const data=await supa('GET','posts?order=date.desc'); posts=data||[]; }
+  catch(e){ posts=[]; notify('Could not load posts. Check your connection.'); }
+  showLoading(false); renderList(); renderSidebarCats();
+}
+function showLoading(on){
+  let el=document.getElementById('loading-indicator');
+  if(!el){ el=document.createElement('div'); el.id='loading-indicator'; el.style.cssText='text-align:center;padding:2rem;font-family:Cinzel,serif;font-size:0.75rem;letter-spacing:0.1em;color:var(--text-light);display:none'; el.textContent='☽  Loading posts…'; document.getElementById('blog-list').before(el); }
+  el.style.display=on?'block':'none'; document.getElementById('blog-list').style.display=on?'none':'block';
+}
+
+// ════════════════════════════════════════════════
+// LIKES (localStorage per browser)
+// ════════════════════════════════════════════════
+function getLikes(){ try{ return JSON.parse(localStorage.getItem(LIKES_KEY))||{}; }catch(e){ return {}; } }
+function saveLikes(obj){ localStorage.setItem(LIKES_KEY,JSON.stringify(obj)); }
+function getLikeCount(postId){ const l=getLikes(); return l[postId]||0; }
+function hasLiked(postId){ return !!getLikes()['liked_'+postId]; }
+function togglePostLike(){
+  if(!currentPostId) return;
+  const likes=getLikes();
+  const key='liked_'+currentPostId;
+  if(likes[key]){ delete likes[key]; likes[currentPostId]=Math.max(0,(likes[currentPostId]||0)-1); }
+  else { likes[key]=true; likes[currentPostId]=(likes[currentPostId]||0)+1; }
+  saveLikes(likes); renderPostLike(currentPostId);
+}
+function renderPostLike(postId){
+  const btn=document.getElementById('post-like-btn');
+  const cnt=document.getElementById('post-like-count');
+  if(!btn) return;
+  const liked=hasLiked(postId), count=getLikeCount(postId);
+  btn.textContent=liked?'❤ Liked':'❤ Like this post';
+  btn.classList.toggle('liked',liked);
+  cnt.textContent=count>0?`${count} ${count===1?'like':'likes'}`:'';
+}
+function getCardLikeCount(postId){ return getLikeCount(postId); }
+
+// ════════════════════════════════════════════════
+// NOTIFY / MODAL
+// ════════════════════════════════════════════════
+function notify(msg){ const n=document.getElementById('notif'); n.textContent=msg; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),2800); }
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+// ════════════════════════════════════════════════
+// NAV / VIEWS
+// ════════════════════════════════════════════════
+function hideAllViews(){
+  document.getElementById('blog-list-view').style.display='none';
+  document.getElementById('post-view').classList.remove('active');
+  document.getElementById('write-view').classList.remove('active');
+  document.querySelectorAll('.section-view').forEach(v=>v.classList.remove('active'));
+}
+function showHome(){
+  hideAllViews();
+  document.getElementById('blog-list-view').style.display='block';
+  setMenuActive('menu-home'); activeFilter='all';
+  document.getElementById('search-input').value='';
+  document.getElementById('main-search-input').value='';
+  document.getElementById('main-search-clear').classList.remove('show');
+  document.getElementById('search-results-label').classList.remove('show');
+  renderList(); renderFilterBar(); window.scrollTo(0,0);
+}
+function showAllPosts(){ showHome(); setMenuActive('menu-all'); }
+function cancelWrite(){ showHome(); }
+function backToList(){ showHome(); }
+
+function showSection(name){
+  hideAllViews();
+  const el=document.getElementById('section-'+name);
+  if(el) el.classList.add('active');
+  setMenuActive('menu-'+name);
+  window.scrollTo(0,0);
+  if(name==='prayer') renderPrayerPage();
+}
+
+function showWrite(editId){
+  if(!isLoggedIn()){ handleAdminBtn(); return; }
+  hideAllViews();
+  document.getElementById('write-view').classList.add('active');
+  setMenuActive('menu-write');
+  editingId=editId||null; currentCats=[]; pendingAttachments=[];
+  document.getElementById('cat-pills').innerHTML='';
+  document.getElementById('cat-input').value='';
+  document.getElementById('att-previews').innerHTML='';
+  if(editId){
+    const p=posts.find(x=>x.id===editId);
+    document.getElementById('write-view-title').textContent='Edit Post';
+    document.getElementById('f-title').value=p.title;
+    document.getElementById('f-body').value=p.body;
+    currentCats=[...(p.categories||[])];
+    pendingAttachments=(p.attachments||[]).map(a=>({type:a.type,name:a.name,size:a.size,url:a.url||null,dataUrl:a.dataUrl||null}));
+    renderCatPills(); renderAttPreviews();
+  } else {
+    document.getElementById('write-view-title').textContent='Write New Post';
+    document.getElementById('f-title').value='';
+    document.getElementById('f-body').value='';
+  }
+  window.scrollTo(0,0);
+}
+
+// ════════════════════════════════════════════════
+// CATEGORIES
+// ════════════════════════════════════════════════
+function addCat(){ const inp=document.getElementById('cat-input'); const val=inp.value.trim(); if(!val) return; if(!currentCats.includes(val)) currentCats.push(val); inp.value=''; renderCatPills(); }
+function removeCat(i){ currentCats.splice(i,1); renderCatPills(); }
+function renderCatPills(){ document.getElementById('cat-pills').innerHTML=currentCats.map((c,i)=>`<span class="cat-pill">${esc(c)}<button class="cat-pill-remove" onclick="removeCat(${i})">×</button></span>`).join(''); }
+
+// ════════════════════════════════════════════════
+// FILE ATTACHMENTS
+// ════════════════════════════════════════════════
+function handleFiles(files){
+  Array.from(files).forEach(file=>{
+    const isImg=/^image\//.test(file.type);
+    const reader=new FileReader();
+    reader.onload=e=>{ pendingAttachments.push({type:isImg?'image':'file',name:file.name,size:file.size,dataUrl:e.target.result,file}); renderAttPreviews(); };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('file-input').value='';
+}
+function removeAtt(i){ pendingAttachments.splice(i,1); renderAttPreviews(); }
+function renderAttPreviews(){
+  document.getElementById('att-previews').innerHTML=pendingAttachments.map((a,i)=>{
+    if(a.type==='image') return `<div class="att-preview"><img src="${a.url||a.dataUrl}" alt="${esc(a.name)}"><button class="att-remove" onclick="removeAtt(${i})">✕</button></div>`;
+    return `<div class="att-preview file-prev">📄<span title="${esc(a.name)}">${esc(a.name.length>18?a.name.substring(0,16)+'…':a.name)}</span><button class="att-remove" style="position:static;margin-left:auto" onclick="removeAtt(${i})">✕</button></div>`;
+  }).join('');
+}
+async function uploadToStorage(file){
+  const ext=file.name.split('.').pop().toLowerCase();
+  const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const mimeMap={pdf:'application/pdf',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',txt:'text/plain',mp3:'audio/mpeg',mp4:'video/mp4',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',gif:'image/gif',webp:'image/webp'};
+  const contentType=file.type||mimeMap[ext]||'application/octet-stream';
+  const res=await fetch(`${SUPA_URL}/storage/v1/object/attachments/${path}`,{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':contentType,'x-upsert':'true'},body:file});
+  if(!res.ok){ const e=await res.text().catch(()=>''); throw new Error(`Upload failed (${res.status}): ${e}`); }
+  return `${SUPA_URL}/storage/v1/object/public/attachments/${path}`;
+}
+async function processAttachments(){
+  const processed=[];
+  for(const a of pendingAttachments){
+    if(a.url) processed.push({type:a.type,name:a.name,size:a.size,url:a.url});
+    else if(a.file){ try{ const url=await uploadToStorage(a.file); processed.push({type:a.type,name:a.name,size:a.size,url}); }catch(e){ console.error('Upload error',a.name,e); throw new Error(`Failed to upload "${a.name}": ${e.message}`); } }
+    else if(a.dataUrl) processed.push({type:a.type,name:a.name,size:a.size,dataUrl:a.dataUrl});
+  }
+  return processed;
+}
+// Drag & drop
+const ua=document.getElementById('upload-area');
+ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('dragover')});
+ua.addEventListener('dragleave',()=>ua.classList.remove('dragover'));
+ua.addEventListener('drop',e=>{e.preventDefault();ua.classList.remove('dragover');handleFiles(e.dataTransfer.files)});
+
+// ════════════════════════════════════════════════
+// SAVE POST
+// ════════════════════════════════════════════════
+async function savePost(){
+  const title=document.getElementById('f-title').value.trim();
+  const body=document.getElementById('f-body').value.trim();
+  if(!title){ notify('Please enter a title.'); return; }
+  if(!body){ notify('Please write some content.'); return; }
+  notify('Uploading attachments…');
+  let attachments;
+  try { attachments=await processAttachments(); } catch(e){ notify(e.message||'Error uploading file.'); return; }
+  notify('Saving post…');
+  try {
+    if(editingId){
+      await supa('PATCH',`posts?id=eq.${editingId}`,{title,body,categories:currentCats,attachments,edited:new Date().toISOString()});
+      const id=editingId; editingId=null; await loadPosts(); notify('Post updated ✓'); openPost(id);
+    } else {
+      const id=Date.now().toString();
+      await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date().toISOString()});
+      await loadPosts(); notify('Post published ✓'); showHome();
+    }
+  } catch(e){ notify('Error saving post. Please try again.'); }
+}
+
+// ════════════════════════════════════════════════
+// RENDER LIST
+// ════════════════════════════════════════════════
+function renderList(filtered){
+  const list=filtered!==undefined?filtered:posts;
+  const cont=document.getElementById('blog-list');
+  if(!list.length){
+    cont.innerHTML=`<div class="empty-state"><div class="big-ornament">☽</div><p>No posts yet${isLoggedIn()?' — write your first post above':' — check back soon'}.</p>${isLoggedIn()?'<button class="btn btn-gold" onclick="showWrite()">Write First Post</button>':''}</div>`;
+    return;
+  }
+  cont.innerHTML=list.map(p=>{
+    const thumb=(p.attachments||[]).find(a=>a.type==='image');
+    const thumbSrc=thumb?(thumb.url||thumb.dataUrl):null;
+    const likes=getLikeCount(p.id);
+    return `<div class="blog-card" onclick="openPost('${p.id}')">
+      ${thumbSrc?`<img class="blog-card-thumb" src="${thumbSrc}" alt="">`:'' }
+      <div class="blog-card-category">${(p.categories&&p.categories.length)?p.categories.join(' · '):'General'}</div>
+      <div class="blog-card-title">${esc(p.title)}</div>
+      <div class="blog-card-meta">${fmtDate(p.date)}${p.edited?' · Edited '+fmtDate(p.edited):''}</div>
+      <div class="blog-card-excerpt">${esc(p.body.substring(0,280))}${p.body.length>280?'…':''}</div>
+      <div class="blog-card-footer">
+        <span class="read-more">Read more →</span>
+        <button class="like-btn ${hasLiked(p.id)?'liked':''}" onclick="event.stopPropagation();cardLike('${p.id}',this)">
+          <span class="heart">${hasLiked(p.id)?'❤':'♡'}</span> ${likes||'Like'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cardLike(postId, btn){
+  const likes=getLikes(), key='liked_'+postId;
+  if(likes[key]){ delete likes[key]; likes[postId]=Math.max(0,(likes[postId]||0)-1); }
+  else { likes[key]=true; likes[postId]=(likes[postId]||0)+1; }
+  saveLikes(likes);
+  const count=likes[postId]||0, liked=!!likes[key==='liked_'+postId?key:'liked_'+postId];
+  const isLiked=!!getLikes()['liked_'+postId];
+  btn.innerHTML=`<span class="heart">${isLiked?'❤':'♡'}</span> ${count||'Like'}`;
+  btn.classList.toggle('liked',isLiked);
+}
+
+// ════════════════════════════════════════════════
+// OPEN POST
+// ════════════════════════════════════════════════
+function openPost(id){
+  const p=posts.find(x=>x.id===id); if(!p) return;
+  currentPostId=id;
+  hideAllViews();
+  document.getElementById('post-view').classList.add('active');
+  document.getElementById('post-title').textContent=p.title;
+  const cats=(p.categories&&p.categories.length)?p.categories:['General'];
+  document.getElementById('post-meta').innerHTML=
+    `<span>${fmtDate(p.date)}</span>`+
+    cats.map(c=>`<span class="post-category-badge">${esc(c)}</span>`).join('')+
+    (p.edited?`<span style="font-style:italic">Edited ${fmtDate(p.edited)}</span>`:'');
+  document.getElementById('post-body').innerHTML=renderBody(p.body);
+  const imgs=(p.attachments||[]).filter(a=>a.type==='image');
+  document.getElementById('post-images').innerHTML=imgs.map(a=>{
+    const src=a.url||a.dataUrl;
+    return `<img class="post-img" src="${src}" alt="${esc(a.name)}" onclick="openLightbox('${src}')">`;
+  }).join('');
+  document.getElementById('post-images').style.display=imgs.length?'grid':'none';
+  const files=(p.attachments||[]).filter(a=>a.type==='file');
+  document.getElementById('post-files').innerHTML=files.map(a=>{
+    const src=a.url||a.dataUrl;
+    return `<a class="file-attachment" href="${src}" download="${esc(a.name)}" target="_blank"><span class="file-icon">📄</span><span class="file-name">${esc(a.name)}</span><span class="file-size">${fmtSize(a.size)} · Download</span></a>`;
+  }).join('');
+  document.getElementById('post-edit-bar').innerHTML=isLoggedIn()?`<button class="btn btn-outline" onclick="showWrite('${id}')">Edit Post</button><button class="btn btn-danger" onclick="promptDelete('${id}')">Delete Post</button>`:'';
+  renderPostLike(id);
+  window.scrollTo(0,0);
+}
+
+function renderBody(text){
+  return text.split(/\n\n+/).map(para=>{
+    const t=para.trim();
+    if(t.startsWith('> ')) return `<blockquote>${esc(t.slice(2))}</blockquote>`;
+    return `<p>${esc(t).replace(/\n/g,'<br>')}</p>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
+// LIGHTBOX
+// ════════════════════════════════════════════════
+function openLightbox(src){ document.getElementById('lightbox-img').src=src; document.getElementById('lightbox').classList.add('show'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('show'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
+
+// ════════════════════════════════════════════════
+// FILTER / SEARCH
+// ════════════════════════════════════════════════
+function filterCat(cat,btn){
+  activeFilter=cat;
+  document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else document.querySelectorAll('.filter-tag').forEach(b=>{const t=b.textContent.trim();if((cat==='all'&&t==='All')||t===cat)b.classList.add('active');});
+  const filtered=cat==='all'?posts:posts.filter(p=>(p.categories||[]).includes(cat));
+  showHome(); renderList(filtered);
+}
+function doMainSearch(q){
+  const clearBtn=document.getElementById('main-search-clear');
+  const label=document.getElementById('search-results-label');
+  document.getElementById('search-input').value=q;
+  clearBtn.classList.toggle('show',q.trim().length>0);
+  if(!q.trim()){ label.classList.remove('show'); renderList(); return; }
+  const lq=q.toLowerCase();
+  const results=posts.filter(p=>p.title.toLowerCase().includes(lq)||p.body.toLowerCase().includes(lq)||(p.categories||[]).join(' ').toLowerCase().includes(lq));
+  label.textContent=results.length?`${results.length} post${results.length===1?'':'s'} found for "${q}"` :`No posts found for "${q}"`;
+  label.classList.add('show'); renderList(results);
+}
+function clearMainSearch(){ document.getElementById('main-search-input').value=''; document.getElementById('main-search-clear').classList.remove('show'); document.getElementById('search-results-label').classList.remove('show'); document.getElementById('search-input').value=''; renderList(); }
+function doSearch(q){ document.getElementById('main-search-input').value=q; doMainSearch(q); }
+function renderSidebarCats(){
+  const allCats={};
+  posts.forEach(p=>(p.categories&&p.categories.length?p.categories:['General']).forEach(c=>allCats[c]=(allCats[c]||0)+1));
+  document.getElementById('sidebar-cats').innerHTML=`<li><button onclick="filterCat('all',null)">All Posts <span class="cat-count">${posts.length}</span></button></li>`+Object.entries(allCats).map(([c,n])=>`<li><button onclick="filterCat('${esc(c)}',null)">${esc(c)} <span class="cat-count">${n}</span></button></li>`).join('');
+  renderFilterBar();
+}
+function renderFilterBar(){
+  const allCats={};
+  posts.forEach(p=>(p.categories&&p.categories.length?p.categories:['General']).forEach(c=>allCats[c]=(allCats[c]||0)+1));
+  document.getElementById('filter-bar').innerHTML=`<span class="filter-label">Filter:</span><button class="filter-tag ${activeFilter==='all'?'active':''}" onclick="filterCat('all',this)">All</button>`+Object.keys(allCats).map(c=>`<button class="filter-tag ${activeFilter===c?'active':''}" onclick="filterCat('${esc(c)}',this)">${esc(c)}</button>`).join('');
+}
+
+// ════════════════════════════════════════════════
+// DELETE
+// ════════════════════════════════════════════════
+function promptDelete(id){ deleteTargetId=id; openModal('del-modal'); }
+async function confirmDelete(){
+  closeModal('del-modal'); notify('Deleting…');
+  try { await supa('DELETE',`posts?id=eq.${deleteTargetId}`); await loadPosts(); notify('Post deleted.'); showHome(); }
+  catch(e){ notify('Error deleting post. Please try again.'); }
+}
+
+// ════════════════════════════════════════════════
+// PRAYER TIMES DATA (Ghamkol Sharif May 2026)
+// ════════════════════════════════════════════════
+const PRAYER_DATA = {
+  month: 'May', year: 2026,
+  rows: [
+    {day:'FRI',date:1,hijri:'14',fajrS:'4:01',fajrJ:'4:45',sunrise:'5:36',zuharS:'1:10',zuharJ:'2:00',asrS:'6:12',asrJ:'7:15',maghrib:'8:37',ishaS:'10:05',ishaJ:'10:30'},
+    {day:'SAT',date:2,hijri:'15',fajrS:'3:58',fajrJ:'4:45',sunrise:'5:34',zuharS:'1:10',zuharJ:'2:00',asrS:'6:14',asrJ:'7:15',maghrib:'8:39',ishaS:'10:08',ishaJ:'10:30'},
+    {day:'SUN',date:3,hijri:'16',fajrS:'3:55',fajrJ:'4:45',sunrise:'5:33',zuharS:'1:09',zuharJ:'2:00',asrS:'6:15',asrJ:'7:15',maghrib:'8:40',ishaS:'10:10',ishaJ:'10:30'},
+    {day:'MON',date:4,hijri:'17',fajrS:'3:53',fajrJ:'4:45',sunrise:'5:31',zuharS:'1:09',zuharJ:'2:00',asrS:'6:16',asrJ:'7:15',maghrib:'8:42',ishaS:'10:13',ishaJ:'10:30'},
+    {day:'TUE',date:5,hijri:'18',fajrS:'3:50',fajrJ:'4:45',sunrise:'5:29',zuharS:'1:09',zuharJ:'2:00',asrS:'6:17',asrJ:'7:15',maghrib:'8:44',ishaS:'10:15',ishaJ:'10:30'},
+    {day:'WED',date:6,hijri:'19',fajrS:'3:47',fajrJ:'4:45',sunrise:'5:27',zuharS:'1:09',zuharJ:'2:00',asrS:'6:18',asrJ:'7:15',maghrib:'8:45',ishaS:'10:17',ishaJ:'10:30'},
+    {day:'THU',date:7,hijri:'20',fajrS:'3:45',fajrJ:'4:45',sunrise:'5:25',zuharS:'1:09',zuharJ:'2:00',asrS:'6:19',asrJ:'7:15',maghrib:'8:47',ishaS:'10:20',ishaJ:'10:30'},
+    {day:'FRI',date:8,hijri:'21',fajrS:'3:42',fajrJ:'4:30',sunrise:'5:23',zuharS:'1:09',zuharJ:'2:00',asrS:'6:20',asrJ:'7:15',maghrib:'8:49',ishaS:'10:22',ishaJ:'10:45'},
+    {day:'SAT',date:9,hijri:'22',fajrS:'3:39',fajrJ:'4:30',sunrise:'5:22',zuharS:'1:09',zuharJ:'2:00',asrS:'6:21',asrJ:'7:15',maghrib:'8:50',ishaS:'10:25',ishaJ:'10:45'},
+    {day:'SUN',date:10,hijri:'23',fajrS:'3:37',fajrJ:'4:30',sunrise:'5:20',zuharS:'1:09',zuharJ:'2:00',asrS:'6:22',asrJ:'7:15',maghrib:'8:52',ishaS:'10:27',ishaJ:'10:45'},
+    {day:'MON',date:11,hijri:'24',fajrS:'3:34',fajrJ:'4:30',sunrise:'5:18',zuharS:'1:09',zuharJ:'2:00',asrS:'6:23',asrJ:'7:15',maghrib:'8:54',ishaS:'10:30',ishaJ:'10:45'},
+    {day:'TUE',date:12,hijri:'25',fajrS:'3:31',fajrJ:'4:30',sunrise:'5:16',zuharS:'1:09',zuharJ:'2:00',asrS:'6:24',asrJ:'7:15',maghrib:'8:55',ishaS:'10:33',ishaJ:'10:45'},
+    {day:'WED',date:13,hijri:'26',fajrS:'3:29',fajrJ:'4:30',sunrise:'5:15',zuharS:'1:09',zuharJ:'2:00',asrS:'6:24',asrJ:'7:15',maghrib:'8:57',ishaS:'10:35',ishaJ:'10:45'},
+    {day:'THU',date:14,hijri:'27',fajrS:'3:26',fajrJ:'4:30',sunrise:'5:13',zuharS:'1:09',zuharJ:'2:00',asrS:'6:25',asrJ:'7:15',maghrib:'8:58',ishaS:'10:38',ishaJ:'10:45'},
+    {day:'FRI',date:15,hijri:'28',fajrS:'3:23',fajrJ:'4:30',sunrise:'5:12',zuharS:'1:09',zuharJ:'2:00',asrS:'6:26',asrJ:'7:15',maghrib:'9:00',ishaS:'10:40',ishaJ:'11:00'},
+    {day:'SAT',date:16,hijri:'29',fajrS:'3:21',fajrJ:'4:30',sunrise:'5:10',zuharS:'1:09',zuharJ:'2:00',asrS:'6:27',asrJ:'7:15',maghrib:'9:02',ishaS:'10:43',ishaJ:'11:00'},
+    {day:'SUN',date:17,hijri:'30',fajrS:'3:18',fajrJ:'4:30',sunrise:'5:09',zuharS:'1:09',zuharJ:'2:00',asrS:'6:28',asrJ:'7:15',maghrib:'9:03',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'MON',date:18,hijri:"Dhu'l Hijjah",fajrS:'3:16',fajrJ:'4:30',sunrise:'5:07',zuharS:'1:09',zuharJ:'2:00',asrS:'6:29',asrJ:'7:15',maghrib:'9:05',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'TUE',date:19,hijri:'2',fajrS:'3:13',fajrJ:'4:30',sunrise:'5:06',zuharS:'1:09',zuharJ:'2:00',asrS:'6:30',asrJ:'7:15',maghrib:'9:06',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'WED',date:20,hijri:'3',fajrS:'3:11',fajrJ:'4:30',sunrise:'5:04',zuharS:'1:09',zuharJ:'2:00',asrS:'6:31',asrJ:'7:15',maghrib:'9:08',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'THU',date:21,hijri:'4',fajrS:'3:08',fajrJ:'4:30',sunrise:'5:03',zuharS:'1:09',zuharJ:'2:00',asrS:'6:32',asrJ:'7:15',maghrib:'9:09',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'FRI',date:22,hijri:'5',fajrS:'3:06',fajrJ:'4:15',sunrise:'5:02',zuharS:'1:09',zuharJ:'2:00',asrS:'6:33',asrJ:'7:15',maghrib:'9:11',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SAT',date:23,hijri:'6',fajrS:'3:03',fajrJ:'4:15',sunrise:'5:00',zuharS:'1:09',zuharJ:'2:00',asrS:'6:33',asrJ:'7:15',maghrib:'9:12',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SUN',date:24,hijri:'7',fajrS:'3:01',fajrJ:'4:15',sunrise:'4:59',zuharS:'1:09',zuharJ:'2:00',asrS:'6:34',asrJ:'7:15',maghrib:'9:13',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'MON',date:25,hijri:'8',fajrS:'2:58',fajrJ:'4:15',sunrise:'4:58',zuharS:'1:10',zuharJ:'2:00',asrS:'6:35',asrJ:'7:15',maghrib:'9:15',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'TUE',date:26,hijri:'9',fajrS:'2:56',fajrJ:'4:15',sunrise:'4:57',zuharS:'1:10',zuharJ:'2:00',asrS:'6:36',asrJ:'7:15',maghrib:'9:16',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'WED',date:27,hijri:'10',fajrS:'2:54',fajrJ:'4:15',sunrise:'4:56',zuharS:'1:10',zuharJ:'2:00',asrS:'6:37',asrJ:'7:15',maghrib:'9:17',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'THU',date:28,hijri:'11',fajrS:'2:51',fajrJ:'4:15',sunrise:'4:55',zuharS:'1:10',zuharJ:'2:00',asrS:'6:37',asrJ:'7:15',maghrib:'9:19',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'FRI',date:29,hijri:'12',fajrS:'2:49',fajrJ:'4:00',sunrise:'4:54',zuharS:'1:10',zuharJ:'2:00',asrS:'6:38',asrJ:'7:15',maghrib:'9:20',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SAT',date:30,hijri:'13',fajrS:'2:47',fajrJ:'4:00',sunrise:'4:53',zuharS:'1:10',zuharJ:'2:00',asrS:'6:39',asrJ:'7:15',maghrib:'9:21',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SUN',date:31,hijri:'14',fajrS:'2:45',fajrJ:'4:00',sunrise:'4:52',zuharS:'1:10',zuharJ:'2:00',asrS:'6:39',asrJ:'7:15',maghrib:'9:22',ishaS:'10:45',ishaJ:'11:00'},
+  ]
+};
+
+function getTodayRow(){
+  const today=new Date(); const d=today.getDate();
+  return PRAYER_DATA.rows.find(r=>r.date===d)||PRAYER_DATA.rows[PRAYER_DATA.rows.length-1];
+}
+
+function to24(timeStr){
+  // Convert 12h-style to minutes since midnight for comparison (all times here are already 24h-ish, just need to handle >12 = pm)
+  if(!timeStr||timeStr==='-') return 0;
+  const parts=timeStr.split(':');
+  let h=parseInt(parts[0],10), m=parseInt(parts[1],10)||0;
+  return h*60+m;
+}
+
+function getCurrentPrayerIndex(row){
+  const now=new Date(); const nowMins=now.getHours()*60+now.getMinutes();
+  const times=[to24(row.fajrS),to24(row.zuharS),to24(row.asrS),to24(row.maghrib),to24(row.ishaS)];
+  // find which prayer we're in (between this and next)
+  let current=4; // default isha
+  for(let i=0;i<4;i++){
+    if(nowMins>=times[i]&&nowMins<times[i+1]){ current=i; break; }
+  }
+  if(nowMins<times[0]) current=4; // before fajr, still isha from yesterday
+  return current;
+}
+
+function initPrayerBar(){
+  const row=getTodayRow();
+  const fields=[
+    {id:'pb-fajr',el:'pb-fajr-t',val:row.fajrS},
+    {id:'pb-zuhar',el:'pb-zuhar-t',val:row.zuharS},
+    {id:'pb-asr',el:'pb-asr-t',val:row.asrS},
+    {id:'pb-maghrib',el:'pb-maghrib-t',val:row.maghrib},
+    {id:'pb-isha',el:'pb-isha-t',val:row.ishaS},
+  ];
+  fields.forEach(f=>{ document.getElementById(f.el).textContent=f.val; });
+
+  // Side menu mini
+  document.getElementById('pm-fajr').textContent=row.fajrS;
+  document.getElementById('pm-zuhar').textContent=row.zuharS;
+  document.getElementById('pm-asr').textContent=row.asrS;
+  document.getElementById('pm-maghrib').textContent=row.maghrib;
+  document.getElementById('pm-isha').textContent=row.ishaS;
+
+  // Sidebar widget
+  const pnames=['Fajr','Zuhar','Asr','Maghrib','Isha'];
+  const pvals=[row.fajrS,row.zuharS,row.asrS,row.maghrib,row.ishaS];
+  document.getElementById('sidebar-prayer-widget').innerHTML=pnames.map((n,i)=>
+    `<div style="display:flex;justify-content:space-between;padding:0.2rem 0;border-bottom:1px solid var(--border-gold);font-size:0.85rem"><span style="color:var(--text-mid)">${n}</span><span style="font-family:'Cinzel',serif;font-size:0.82rem;color:var(--green-deep)">${pvals[i]}</span></div>`
+  ).join('')+'<div style="font-size:0.72rem;color:var(--text-light);font-style:italic;margin-top:0.4rem;text-align:center">Ghamkol Sharif — Start times</div>';
+
+  // Highlight current prayer
+  const pillIds=['pb-fajr','pb-zuhar','pb-asr','pb-maghrib','pb-isha'];
+  const curr=getCurrentPrayerIndex(row);
+  pillIds.forEach((id,i)=>document.getElementById(id).classList.toggle('active-prayer',i===curr));
+}
+
+function renderPrayerPage(){
+  const today=new Date();
+  const todayDate=today.getDate();
+  const todayRow=getTodayRow();
+  const curr=getCurrentPrayerIndex(todayRow);
+
+  // Full date label
+  document.getElementById('prayer-full-date').textContent=`Central Jamia Mosque Ghamkol Sharif · ${today.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}`;
+  document.getElementById('timetable-month-label').textContent=`${PRAYER_DATA.month} ${PRAYER_DATA.year} — Full Timetable`;
+
+  // Today cards
+  const prayers=[
+    {name:'Fajr',start:todayRow.fajrS,jamat:todayRow.fajrJ},
+    {name:'Zuhar',start:todayRow.zuharS,jamat:todayRow.zuharJ},
+    {name:'Asr',start:todayRow.asrS,jamat:todayRow.asrJ},
+    {name:'Maghrib',start:todayRow.maghrib,jamat:'-'},
+    {name:'Isha',start:todayRow.ishaS,jamat:todayRow.ishaJ},
+  ];
+  document.getElementById('prayer-today-cards').innerHTML=prayers.map((p,i)=>
+    `<div class="prayer-today-card ${i===curr?'is-current':''}">
+      <div class="prayer-today-name">${p.name}</div>
+      <div class="prayer-today-start">${p.start}</div>
+      <div class="prayer-today-jamat">Jamat <span>${p.jamat}</span></div>
+      ${i===curr?'<div class="prayer-now-label">▲ NOW</div>':''}
+    </div>`
+  ).join('');
+
+  // Full table
+  document.getElementById('prayer-tbody').innerHTML=PRAYER_DATA.rows.map(r=>
+    `<tr class="${r.date===todayDate?'today-row':''}">
+      <td class="day-col">${r.day}</td>
+      <td>${r.date}</td>
+      <td>${r.hijri}</td>
+      <td>${r.fajrS}</td><td class="jamat-col">${r.fajrJ}</td>
+      <td>${r.sunrise}</td>
+      <td>${r.zuharS}</td><td class="jamat-col">${r.zuharJ}</td>
+      <td>${r.asrS}</td><td class="jamat-col">${r.asrJ}</td>
+      <td>${r.maghrib}</td>
+      <td>${r.ishaS}</td><td class="jamat-col">${r.ishaJ}</td>
+    </tr>`
+  ).join('');
+
+  // Scroll today's row into view after a tick
+  setTimeout(()=>{
+    const todayTr=document.querySelector('#prayer-tbody .today-row');
+    if(todayTr) todayTr.scrollIntoView({behavior:'smooth',block:'center'});
+  },150);
+}
+
+// ════════════════════════════════════════════════
+// THEME  —  owner sets site default (Supabase),
+//           viewers override locally only
+// ════════════════════════════════════════════════
+const THEME_PERSONAL_KEY     = 'khaak_theme_personal';    // viewer's own choice
+const THEME_PERSONAL_SET_KEY = 'khaak_theme_personal_set';// flag: viewer has chosen
+const CARD_PERSONAL_KEY      = 'khaak_cardvars_personal';  // viewer card colours
+const CARD_PERSONAL_SET_KEY  = 'khaak_cardvars_set';
+
+// Site default is stored in Supabase: table "settings", row id="theme"
+// shape: { id:'theme', theme_name:'', card_bg:'#ffffff', card_accent:'#C9A84C', card_title:'#0D3B1F' }
+
+let _siteDefault = { theme_name:'', card_bg:'#ffffff', card_accent:'#C9A84C', card_title:'#0D3B1F' };
+
+async function fetchSiteDefault(){
+  try {
+    const data = await supa('GET','settings?id=eq.theme');
+    if(data && data[0]) _siteDefault = { theme_name: data[0].theme_name||'', card_bg: data[0].card_bg||'#ffffff', card_accent: data[0].card_accent||'#C9A84C', card_title: data[0].card_title||'#0D3B1F' };
+  } catch(e){ /* silent – fallback to built-in default */ }
+}
+
+async function saveOwnerDefault(){
+  // current visible theme is the new site default
+  const name = (document.body.className.replace('theme-',''))||'';
+  const bg   = document.getElementById('cc-bg').value;
+  const acc  = document.getElementById('cc-accent').value;
+  const ttl  = document.getElementById('cc-title').value;
+  _siteDefault = { theme_name:name, card_bg:bg, card_accent:acc, card_title:ttl };
+  try {
+    // upsert the settings row
+    await fetch(SUPA_URL+'/rest/v1/settings',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:'theme',theme_name:name,card_bg:bg,card_accent:acc,card_title:ttl})});
+    // Clear owner's own personal override — they ARE the default now
+    localStorage.removeItem(THEME_PERSONAL_SET_KEY);
+    localStorage.removeItem(CARD_PERSONAL_SET_KEY);
+    notify('Site default saved ✓  All new visitors will see this theme.');
+  } catch(e){ notify('Could not save default — check connection.'); }
+}
+
+async function resetToSiteDefault(){
+  localStorage.removeItem(THEME_PERSONAL_KEY);
+  localStorage.removeItem(THEME_PERSONAL_SET_KEY);
+  localStorage.removeItem(CARD_PERSONAL_KEY);
+  localStorage.removeItem(CARD_PERSONAL_SET_KEY);
+  applyTheme(_siteDefault.theme_name, _siteDefault.card_bg, _siteDefault.card_accent, _siteDefault.card_title, false);
+  updateThemePanelUI();
+  notify('Reset to site default.');
+}
+
+// Apply theme visually (no storage writes)
+function applyTheme(name, bg, acc, ttl, updateInputs){
+  document.body.className = name ? 'theme-'+name : '';
+  document.documentElement.style.setProperty('--card-bg', bg);
+  document.documentElement.style.setProperty('--card-accent', acc);
+  document.documentElement.style.setProperty('--card-title', ttl);
+  ['default','midnight','rose','ocean'].forEach(t=>{
+    const sw=document.getElementById('swatch-'+t);
+    if(sw) sw.classList.toggle('active',(name===''?'default':name)===t);
+  });
+  if(updateInputs){
+    const b=document.getElementById('cc-bg'); if(b) b.value=bg;
+    const a=document.getElementById('cc-accent'); if(a) a.value=acc;
+    const t=document.getElementById('cc-title'); if(t) t.value=ttl;
+  }
+}
+
+// Called when user picks a theme swatch
+function setTheme(name){
+  const bg  = document.getElementById('cc-bg').value;
+  const acc = document.getElementById('cc-accent').value;
+  const ttl = document.getElementById('cc-title').value;
+  applyTheme(name, bg, acc, ttl, false);
+  if(isOwner()){
+    // owner: just apply visually; they press "Save as site default" to persist
+  } else {
+    // viewer: save as personal override
+    localStorage.setItem(THEME_PERSONAL_KEY, name);
+    localStorage.setItem(THEME_PERSONAL_SET_KEY, '1');
+    saveViewerCardVars(bg, acc, ttl);
+  }
+  updateThemePanelUI();
+}
+
+// Called when viewer tweaks card colour inputs
+function setCardVar(prop, val){
+  document.documentElement.style.setProperty(prop, val);
+  if(!isOwner()){
+    const bg  = document.getElementById('cc-bg').value;
+    const acc = document.getElementById('cc-accent').value;
+    const ttl = document.getElementById('cc-title').value;
+    saveViewerCardVars(bg, acc, ttl);
+    localStorage.setItem(THEME_PERSONAL_SET_KEY,'1');
+    updateThemePanelUI();
+  }
+}
+
+function saveViewerCardVars(bg, acc, ttl){
+  localStorage.setItem(CARD_PERSONAL_KEY, JSON.stringify({bg,acc,ttl}));
+  localStorage.setItem(CARD_PERSONAL_SET_KEY,'1');
+}
+
+function updateThemePanelUI(){
+  const owner = isOwner();
+  const hasPersonal = !!localStorage.getItem(THEME_PERSONAL_SET_KEY);
+  document.getElementById('theme-owner-notice').style.display    = owner ? 'block' : 'none';
+  document.getElementById('theme-personal-notice').style.display = (!owner && hasPersonal) ? 'block' : 'none';
+  document.getElementById('theme-owner-actions').style.display   = owner ? 'block' : 'none';
+  document.getElementById('theme-viewer-actions').style.display  = (!owner && hasPersonal) ? 'block' : 'none';
+}
+
+function toggleThemePanel(){
+  document.getElementById('theme-panel').classList.toggle('show');
+  updateThemePanelUI();
+}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('theme-panel').contains(e.target)&&e.target.id!=='theme-btn'){
+    document.getElementById('theme-panel').classList.remove('show');
+  }
+});
+
+async function loadSavedTheme(){
+  await fetchSiteDefault();
+  const personalSet = localStorage.getItem(THEME_PERSONAL_SET_KEY);
+  if(personalSet){
+    // viewer has their own override
+    const name = localStorage.getItem(THEME_PERSONAL_KEY)||'';
+    let bg='#ffffff', acc='#C9A84C', ttl='#0D3B1F';
+    try { const cv=JSON.parse(localStorage.getItem(CARD_PERSONAL_KEY)||'{}'); bg=cv.bg||bg; acc=cv.acc||acc; ttl=cv.ttl||ttl; } catch(e){}
+    applyTheme(name, bg, acc, ttl, true);
+  } else {
+    // use site default
+    applyTheme(_siteDefault.theme_name, _siteDefault.card_bg, _siteDefault.card_accent, _siteDefault.card_title, true);
+  }
+}
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+function fmtDate(iso){ if(!iso) return ''; return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}); }
+function fmtSize(b){ if(!b) return ''; if(b<1024) return b+'B'; if(b<1048576) return (b/1024).toFixed(1)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// SALAWAT & PDF MANAGEMENT (Owner/Admin)
+// ════════════════════════════════════════════════
+const SALAWAT_KEY = 'khaak_salawat_v1';
+const PDF_KEY = 'khaak_pdfs_v1';
+
+let salawatPendingFile = null;
+let pdfPendingFile = null;
+let deleteResourceTarget = null; // {type:'salawat'|'pdf', id}
+
+function getSalawatItems(){ try{ return JSON.parse(localStorage.getItem(SALAWAT_KEY))||[]; }catch(e){ return []; } }
+function saveSalawatItems(arr){ localStorage.setItem(SALAWAT_KEY,JSON.stringify(arr)); }
+function getPdfItems(){ try{ return JSON.parse(localStorage.getItem(PDF_KEY))||[]; }catch(e){ return []; } }
+function savePdfItems(arr){ localStorage.setItem(PDF_KEY,JSON.stringify(arr)); }
+
+// Show/hide admin buttons when section is shown
+const _origShowSection = showSection;
+showSection = function(name){
+  _origShowSection(name);
+  const salBtn = document.getElementById('add-salawat-btn-wrap');
+  const pdfBtn = document.getElementById('add-pdf-btn-wrap');
+  if(salBtn) salBtn.style.display = (name==='salawat' && isLoggedIn()) ? 'block' : 'none';
+  if(pdfBtn) pdfBtn.style.display = (name==='pdfs' && isLoggedIn()) ? 'block' : 'none';
+  if(name==='salawat') renderSalawatGrid();
+  if(name==='pdfs') renderPdfList();
+};
+
+// ── SALAWAT ──
+function openAddSalawat(){
+  document.getElementById('sw-name').value='';
+  document.getElementById('sw-sub').value='';
+  document.getElementById('sw-icon').value='☽';
+  document.getElementById('sw-url').value='';
+  document.getElementById('sw-text').value='';
+  document.getElementById('sw-file-name').textContent='';
+  document.getElementById('sw-error').classList.remove('show');
+  salawatPendingFile=null;
+  openModal('add-salawat-modal');
+}
+function handleSalawatFile(files){
+  if(!files||!files[0]) return;
+  salawatPendingFile=files[0];
+  document.getElementById('sw-file-name').textContent='Selected: '+files[0].name;
+  document.getElementById('sw-file-input').value='';
+}
+async function saveSalawat(){
+  const name=document.getElementById('sw-name').value.trim();
+  const sub=document.getElementById('sw-sub').value.trim();
+  const icon=document.getElementById('sw-icon').value.trim()||'☽';
+  const urlField=document.getElementById('sw-url').value.trim();
+  const text=document.getElementById('sw-text').value.trim();
+  const err=document.getElementById('sw-error');
+  if(!name){ err.textContent='Please enter a name.'; err.classList.add('show'); return; }
+  if(!salawatPendingFile && !urlField && !text){ err.textContent='Please attach a PDF, enter a URL, or write the text.'; err.classList.add('show'); return; }
+  err.classList.remove('show');
+  let finalUrl = urlField;
+  if(salawatPendingFile){
+    try { notify('Uploading…'); finalUrl = await uploadToStorage(salawatPendingFile); }
+    catch(e){ err.textContent='Upload failed: '+e.message; err.classList.add('show'); return; }
+  }
+  const items=getSalawatItems();
+  items.push({id:Date.now().toString(),name,sub,icon,url:finalUrl||null,text:text||null});
+  saveSalawatItems(items);
+  closeModal('add-salawat-modal');
+  renderSalawatGrid();
+  notify('Salawat added ✓');
+}
+function renderSalawatGrid(){
+  const items=getSalawatItems();
+  const grid=document.getElementById('salawat-grid');
+  if(!grid) return;
+  const adminExtra=items.map((item,i)=>{
+    const deleteBtn=isLoggedIn()?`<button onclick="event.preventDefault();event.stopPropagation();promptDeleteResource('salawat','${item.id}')" style="position:absolute;top:4px;right:4px;background:rgba(139,26,26,0.8);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>`:'';
+    if(item.text && !item.url){
+      return `<div class="salawat-card" style="position:relative;cursor:pointer" onclick="openSalawatText('${item.id}')">
+        ${deleteBtn}
+        <span class="salawat-icon">${esc(item.icon)}</span>
+        <span class="salawat-name">${esc(item.name)}</span>
+        <span class="salawat-sub">${esc(item.sub||'')}</span>
+        <span style="font-size:0.65rem;font-family:'Cinzel',serif;color:var(--gold-dark);margin-top:3px;letter-spacing:0.06em">VIEW TEXT</span>
+      </div>`;
+    }
+    return `<a class="salawat-card" href="${esc(item.url)}" target="_blank" style="position:relative">
+      ${deleteBtn}
+      <span class="salawat-icon">${esc(item.icon)}</span>
+      <span class="salawat-name">${esc(item.name)}</span>
+      <span class="salawat-sub">${esc(item.sub||'')}</span>
+    </a>`;
+  }).join('');
+  // Prepend admin items to the grid (existing static cards remain in HTML after)
+  const staticCards=grid.getAttribute('data-static')||'';
+  if(!grid.getAttribute('data-static')){
+    grid.setAttribute('data-static', grid.innerHTML);
+  }
+  grid.innerHTML=adminExtra+grid.getAttribute('data-static');
+}
+function openSalawatText(id){
+  const item=getSalawatItems().find(x=>x.id===id);
+  if(!item) return;
+  document.getElementById('salawat-text-modal-title').textContent=item.name+(item.sub?' — '+item.sub:'');
+  document.getElementById('salawat-text-modal-body').textContent=item.text||'';
+  openModal('salawat-text-modal');
+}
+
+// ── PDFs ──
+function openAddPdf(){
+  document.getElementById('pw-name').value='';
+  document.getElementById('pw-meta').value='';
+  document.getElementById('pw-url').value='';
+  document.getElementById('pw-file-name').textContent='';
+  document.getElementById('pw-error').classList.remove('show');
+  pdfPendingFile=null;
+  openModal('add-pdf-modal');
+}
+function handlePdfFile(files){
+  if(!files||!files[0]) return;
+  pdfPendingFile=files[0];
+  document.getElementById('pw-file-name').textContent='Selected: '+files[0].name;
+  document.getElementById('pw-file-input').value='';
+}
+async function savePdf(){
+  const name=document.getElementById('pw-name').value.trim();
+  const meta=document.getElementById('pw-meta').value.trim();
+  const urlField=document.getElementById('pw-url').value.trim();
+  const err=document.getElementById('pw-error');
+  if(!name){ err.textContent='Please enter a name.'; err.classList.add('show'); return; }
+  if(!pdfPendingFile && !urlField){ err.textContent='Please attach a PDF or enter a URL.'; err.classList.add('show'); return; }
+  err.classList.remove('show');
+  let finalUrl = urlField;
+  if(pdfPendingFile){
+    try { notify('Uploading…'); finalUrl = await uploadToStorage(pdfPendingFile); }
+    catch(e){ err.textContent='Upload failed: '+e.message; err.classList.add('show'); return; }
+  }
+  const items=getPdfItems();
+  items.push({id:Date.now().toString(),name,meta,url:finalUrl});
+  savePdfItems(items);
+  closeModal('add-pdf-modal');
+  renderPdfList();
+  notify('PDF added ✓');
+}
+function renderPdfList(){
+  const items=getPdfItems();
+  const container=document.getElementById('pdf-list-dynamic');
+  if(!container) return;
+  container.innerHTML=items.map(item=>{
+    const deleteBtn=isLoggedIn()?`<button onclick="event.preventDefault();event.stopPropagation();promptDeleteResource('pdf','${item.id}')" style="background:rgba(139,26,26,0.8);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:0.72rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">✕</button>`:'';
+    return `<a class="pdf-item" href="${esc(item.url)}" target="_blank" download style="align-items:center">
+      <span class="pdf-icon">📄</span>
+      <div class="pdf-info"><div class="pdf-name">${esc(item.name)}</div><div class="pdf-meta">${esc(item.meta||'')}</div></div>
+      <span class="pdf-badge">PDF</span>
+      ${deleteBtn}
+    </a>`;
+  }).join('');
+}
+
+// ── DELETE RESOURCE ──
+function promptDeleteResource(type, id){
+  deleteResourceTarget={type,id};
+  document.getElementById('del-resource-title').textContent=type==='salawat'?'Delete this salawat?':'Delete this PDF?';
+  openModal('del-resource-modal');
+}
+function confirmDeleteResource(){
+  if(!deleteResourceTarget) return;
+  const {type,id}=deleteResourceTarget;
+  if(type==='salawat'){
+    const items=getSalawatItems().filter(x=>x.id!==id);
+    saveSalawatItems(items);
+    renderSalawatGrid();
+  } else {
+    const items=getPdfItems().filter(x=>x.id!==id);
+    savePdfItems(items);
+    renderPdfList();
+  }
+  closeModal('del-resource-modal');
+  deleteResourceTarget=null;
+  notify('Deleted ✓');
+}
+
+// Drag & drop for salawat/pdf upload areas
+const swua=document.getElementById('sw-upload-area');
+if(swua){ swua.addEventListener('dragover',e=>{e.preventDefault();swua.classList.add('dragover')}); swua.addEventListener('dragleave',()=>swua.classList.remove('dragover')); swua.addEventListener('drop',e=>{e.preventDefault();swua.classList.remove('dragover');handleSalawatFile(e.dataTransfer.files)}); }
+const pwua=document.getElementById('pw-upload-area');
+if(pwua){ pwua.addEventListener('dragover',e=>{e.preventDefault();pwua.classList.add('dragover')}); pwua.addEventListener('dragleave',()=>pwua.classList.remove('dragover')); pwua.addEventListener('drop',e=>{e.preventDefault();pwua.classList.remove('dragover');handlePdfFile(e.dataTransfer.files)}); }
+
+(async()=>{
+  await loadSavedTheme();
+  updateAdminUI();
+  initPrayerBar();
+  loadPosts();
+})();
+
+</script>
+</body>
+</html>

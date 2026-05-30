@@ -1976,9 +1976,15 @@ const _adminUIBase=updateAdminUI;
 updateAdminUI=function(){
   _adminUIBase();
   const btn=document.getElementById('admin-btn');
+  const zone=document.getElementById('admin-secret-zone');
   if(btn){
     if(isLoggedIn()){ btn.classList.add('revealed'); }
     else { btn.classList.remove('revealed'); }
+  }
+  // Hide the secret zone when logged in so it doesn't intercept button clicks
+  if(zone){
+    zone.style.pointerEvents = isLoggedIn() ? 'none' : '';
+    zone.style.zIndex = isLoggedIn() ? '0' : '';
   }
   if(typeof updateNotifBell==='function') updateNotifBell();
 };

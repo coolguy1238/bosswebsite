@@ -551,6 +551,17 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
               <input class="comment-name-input" id="comment-name" type="text" placeholder="Your name…" maxlength="60">
               <input class="comment-text-input" id="comment-text" type="text" placeholder="Write your comment…" style="flex:1;max-width:none;min-height:unset">
             </div>
+            <!-- Honeypot: invisible to real users, bots fill it in -->
+            <input type="text" id="comment-honeypot" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;height:0;width:0;opacity:0;pointer-events:none" aria-hidden="true">
+            <!-- Captcha: appears after 3 comments from this device -->
+            <div id="captcha-wrap" style="display:none;margin-bottom:0.6rem">
+              <label style="font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gold);display:block;margin-bottom:0.35rem" id="captcha-question"></label>
+              <div style="display:flex;gap:0.5rem;align-items:center">
+                <input type="number" id="captcha-input" placeholder="Your answer..." style="width:120px;padding:0.4rem 0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(201,168,76,0.3);border-radius:2px;color:var(--gold-light);font-size:0.82rem" min="0">
+                <button class="btn btn-outline" style="font-size:0.65rem;padding:0.3rem 0.7rem" type="button" onclick="refreshCaptcha()">New question</button>
+              </div>
+              <div id="captcha-error" style="color:#e74c3c;font-size:0.7rem;margin-top:0.25rem;display:none">Incorrect answer, please try again.</div>
+            </div>
             <div class="comment-submit-row">
               <button class="btn btn-gold" style="font-size:0.68rem;padding:0.35rem 1rem" onclick="submitComment()">Post Comment</button>
               <span id="comment-submit-error" style="font-size:0.78rem;color:#8B1A1A;font-style:italic"></span>
@@ -1183,18 +1194,19 @@ function showLoading(on){
 // ════════════════════════════════════════════════
 function hasLiked(postId){ try{ return !!JSON.parse(localStorage.getItem(LIKES_KEY)||'{}')['liked_'+postId]; }catch(e){ return false; } }
 function setLikedLocally(postId, val){ try{ const l=JSON.parse(localStorage.getItem(LIKES_KEY)||'{}'); if(val) l['liked_'+postId]=true; else delete l['liked_'+postId]; localStorage.setItem(LIKES_KEY,JSON.stringify(l)); }catch(e){} }
-function getLikeCount(postId){ const p=posts.find(x=>x.id===postId); return (p&&p.likes)||0; }
+function getLikeCount(postId){ const p=posts.find(x=>x.id===postId); return (p&&p.likes!=null)?parseInt(p.likes)||0:0; }
 
 async function togglePostLike(){
   if(!currentPostId) return;
   const post=posts.find(p=>p.id===currentPostId); if(!post) return;
   const liked=hasLiked(currentPostId);
-  const newCount=Math.max(0,(post.likes||0)+(liked?-1:1));
+  const currentLikes=parseInt(post.likes)||0;
+  const newCount=Math.max(0,currentLikes+(liked?-1:1));
   setLikedLocally(currentPostId,!liked);
   post.likes=newCount;
   renderPostLike(currentPostId);
   try{ await supa('PATCH','posts?id=eq.'+currentPostId,{likes:newCount}); }
-  catch(e){ /* revert on failure */ setLikedLocally(currentPostId,liked); post.likes=(post.likes||0)+(liked?1:-1); renderPostLike(currentPostId); }
+  catch(e){ /* revert on failure */ setLikedLocally(currentPostId,liked); post.likes=currentLikes; renderPostLike(currentPostId); }
 }
 
 function renderPostLike(postId){
@@ -1379,14 +1391,15 @@ function renderList(filtered){
 async function cardLike(postId, btn){
   const post=posts.find(p=>p.id===postId); if(!post) return;
   const liked=hasLiked(postId);
-  const newCount=Math.max(0,(post.likes||0)+(liked?-1:1));
+  const currentLikes=parseInt(post.likes)||0;
+  const newCount=Math.max(0,currentLikes+(liked?-1:1));
   setLikedLocally(postId,!liked);
   post.likes=newCount;
   const isLiked=hasLiked(postId);
   btn.innerHTML='<span class="heart">'+(isLiked?'❤':'♡')+'</span> '+(newCount||'Like');
   btn.classList.toggle('liked',isLiked);
   try{ await supa('PATCH','posts?id=eq.'+postId,{likes:newCount}); }
-  catch(e){ setLikedLocally(postId,liked); post.likes=(post.likes||0)+(liked?1:-1); }
+  catch(e){ setLikedLocally(postId,liked); post.likes=currentLikes; }
 }
 
 // ════════════════════════════════════════════════
@@ -1976,15 +1989,9 @@ const _adminUIBase=updateAdminUI;
 updateAdminUI=function(){
   _adminUIBase();
   const btn=document.getElementById('admin-btn');
-  const zone=document.getElementById('admin-secret-zone');
   if(btn){
     if(isLoggedIn()){ btn.classList.add('revealed'); }
     else { btn.classList.remove('revealed'); }
-  }
-  // Hide the secret zone when logged in so it doesn't intercept button clicks
-  if(zone){
-    zone.style.pointerEvents = isLoggedIn() ? 'none' : '';
-    zone.style.zIndex = isLoggedIn() ? '0' : '';
   }
   if(typeof updateNotifBell==='function') updateNotifBell();
 };
@@ -2000,6 +2007,8 @@ updateAdminUI=function(){
 // Banned list & comments-off stay in localStorage (admin prefs only)
 // ════════════════════════════════════════════════
 const BANNED_KEY       = 'khaak_banned_v1';
+const COMMENT_COUNT_KEY= 'khaak_ccount_v1'; // per-device comment count
+const CAPTCHA_THRESHOLD= 3; // captcha required after this many comments
 const COMMENTS_OFF_KEY = 'khaak_coff_v1';
 const COMMENT_LIKES_KEY= 'khaak_clikes_v1'; // tracks which comments THIS browser liked
 
@@ -2011,6 +2020,41 @@ function setCommentsOff(arr){ localStorage.setItem(COMMENTS_OFF_KEY,JSON.stringi
 function areCommentsEnabled(postId){ return !getCommentsOff().includes(postId); }
 function getCommentLikes(){ try{ return JSON.parse(localStorage.getItem(COMMENT_LIKES_KEY))||{}; }catch(e){ return {}; } }
 function saveCommentLikes(obj){ localStorage.setItem(COMMENT_LIKES_KEY,JSON.stringify(obj)); }
+
+function getDeviceCommentCount(){ try{ return parseInt(localStorage.getItem(COMMENT_COUNT_KEY)||'0'); }catch(e){ return 0; } }
+function incrementDeviceCommentCount(){ localStorage.setItem(COMMENT_COUNT_KEY, getDeviceCommentCount()+1); }
+function needsCaptcha(){ return getDeviceCommentCount() >= CAPTCHA_THRESHOLD; }
+
+let _captchaAnswer = null;
+function generateCaptcha(){
+  const a = Math.floor(Math.random()*9)+1;
+  const b = Math.floor(Math.random()*9)+1;
+  const ops = [
+    {q: a+' + '+b, a: a+b},
+    {q: a+' × '+b, a: a*b},
+    {q: (a+b)+' - '+a, a: b}
+  ];
+  const op = ops[Math.floor(Math.random()*ops.length)];
+  _captchaAnswer = op.a;
+  return op.q;
+}
+function refreshCaptcha(){
+  const q = document.getElementById('captcha-question');
+  const inp = document.getElementById('captcha-input');
+  if(q){ q.textContent = 'What is ' + generateCaptcha() + '?'; }
+  if(inp){ inp.value=''; inp.focus(); }
+}
+function updateCaptchaVisibility(){
+  const wrap = document.getElementById('captcha-wrap');
+  if(!wrap) return;
+  if(needsCaptcha()){
+    wrap.style.display='block';
+    const q = document.getElementById('captcha-question');
+    if(q && !_captchaAnswer) q.textContent = 'What is ' + generateCaptcha() + '?';
+  } else {
+    wrap.style.display='none';
+  }
+}
 
 // In-memory cache of comments for current post
 // Stored as JSON array inside each post row (posts.comments) — no extra table needed
@@ -2067,6 +2111,7 @@ async function loadComments(postId){
 
   _currentComments = await fetchComments(postId);
   renderComments(postId);
+  updateCaptchaVisibility();
 }
 
 function toggleComments(enabled){
@@ -2166,6 +2211,23 @@ async function submitComment(){
   errEl.textContent='';
   if(isBanned(name)){ errEl.textContent='You are not permitted to comment.'; return; }
 
+  // Honeypot check — bots fill this hidden field, real users don't
+  const honeypot = document.getElementById('comment-honeypot');
+  if(honeypot && honeypot.value.trim()){ return; } // silently reject
+
+  // Captcha check
+  if(needsCaptcha()){
+    const captchaInp = document.getElementById('captcha-input');
+    const captchaErr = document.getElementById('captcha-error');
+    const userAns = parseInt((captchaInp&&captchaInp.value)||'');
+    if(isNaN(userAns)||userAns!==_captchaAnswer){
+      if(captchaErr) captchaErr.style.display='block';
+      refreshCaptcha();
+      return;
+    }
+    if(captchaErr) captchaErr.style.display='none';
+  }
+
   try{
     const freshComments = await fetchComments(currentPostId);
     const newComment = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:null, likes:0};
@@ -2176,6 +2238,9 @@ async function submitComment(){
     _currentComments = freshComments;
     renderComments(currentPostId);
     notify('Comment posted ✓');
+    incrementDeviceCommentCount();
+    updateCaptchaVisibility();
+    if(needsCaptcha()) refreshCaptcha();
     const post = posts.find(p=>p.id===currentPostId);
     addOwnerNotif('comment', currentPostId, post?post.title:'Post', name, body);
   }catch(e){ errEl.textContent='Could not post comment: '+(e.message||'Please try again.'); }

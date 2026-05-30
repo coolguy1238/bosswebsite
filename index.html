@@ -19,12 +19,12 @@
 }
 /* ── THEMES ── */
 body.theme-midnight{
-  --cream:#0f1117;--text-dark:#e8dfc5;--text-mid:#c5b68a;--text-light:#8a7a5a;
+  --cream:#0f1117;--text-dark:#f0e8d0;--text-mid:#d4c49a;--text-light:#a89870;
   --green-deep:#c9a84c;--green-mid:#e8c97a;--green-light:#f5edd0;--green-pale:#1e2030;
   --gold:#e8c97a;--gold-light:#f5edd0;--gold-pale:#1e2030;--gold-dark:#c9a84c;
   --border-gold:rgba(201,168,76,0.25);
-  --card-bg:#1a1d2e;--card-border:rgba(201,168,76,0.2);--card-accent:#c9a84c;
-  --card-title:#e8c97a;--card-meta:#8a7a5a;
+  --card-bg:#1a1d2e;--card-border:rgba(201,168,76,0.3);--card-accent:#c9a84c;
+  --card-title:#f0dfa0;--card-meta:#b8a878;
 }
 body.theme-rose{
   --cream:#fdf6f0;--text-dark:#2a1212;--text-mid:#5c2a2a;--text-light:#8a5555;
@@ -398,7 +398,16 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
 <body>
 
 <div class="notif" id="notif"></div>
-<div class="admin-badge-bar" id="admin-bar">🔑 Admin Mode Active — You can write, edit and delete posts</div>
+<div class="admin-badge-bar" id="admin-bar" style="display:flex;align-items:center;justify-content:center;gap:1.25rem;flex-wrap:wrap">
+  <span>🔑 Admin Mode Active — You can write, edit and delete posts</span>
+  <span style="display:flex;align-items:center;gap:0.5rem;font-size:0.62rem">
+    <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;letter-spacing:0.06em">
+      <input type="checkbox" id="global-comments-toggle" onchange="setCommentsGlobal(this.checked)" style="accent-color:var(--gold-dark);width:13px;height:13px">
+      Global Comments
+    </label>
+    <span id="global-comments-status" style="font-style:italic;opacity:0.7">(comments on for all posts)</span>
+  </span>
+</div>
 
 <!-- SIDE MENU OVERLAY -->
 <div class="side-menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
@@ -1113,9 +1122,12 @@ async function submitLogin(){
   const role=await checkPassword(pw);
   if(role==='owner'){
     sessionStorage.setItem(SESSION_OWNER_KEY,'1'); sessionStorage.setItem(SESSION_KEY,'1');
+    sessionStorage.setItem('khaak_author','SMZ');
     closeModal('login-modal'); updateAdminUI(); notify('Welcome back, Owner 👑');
   } else if(role==='admin'){
     sessionStorage.setItem(SESSION_KEY,'1');
+    const matchedAdmin=getAdmins().find(a=>a.pw===pw)||null;
+    sessionStorage.setItem('khaak_author', matchedAdmin?matchedAdmin.label:'Admin');
     closeModal('login-modal'); updateAdminUI(); notify('Welcome back, Admin ✓');
   } else {
     err.classList.add('show');
@@ -1352,7 +1364,8 @@ async function savePost(){
       const id=editingId; editingId=null; await loadPosts(); notify('Post updated ✓'); openPost(id);
     } else {
       const id=Date.now().toString();
-      await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date().toISOString()});
+      const author=sessionStorage.getItem('khaak_author')||'SMZ';
+      await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date().toISOString(),author});
       await loadPosts(); notify('Post published ✓'); showHome();
     }
   } catch(e){ notify('Error saving post. Please try again.'); }
@@ -1414,6 +1427,7 @@ function openPost(id){
   const cats=(p.categories&&p.categories.length)?p.categories:['General'];
   document.getElementById('post-meta').innerHTML=
     `<span>${fmtDate(p.date)}</span>`+
+    (p.author?`<span style="font-style:italic;opacity:0.7">by ${esc(p.author)}</span>`:'<span style="font-style:italic;opacity:0.7">by SMZ</span>')+
     cats.map(c=>`<span class="post-category-badge">${esc(c)}</span>`).join('')+
     (p.edited?`<span style="font-style:italic">Edited ${fmtDate(p.edited)}</span>`:'');
   document.getElementById('post-body').innerHTML=renderBody(p.body);
@@ -1993,6 +2007,10 @@ updateAdminUI=function(){
     if(isLoggedIn()){ btn.classList.add('revealed'); }
     else { btn.classList.remove('revealed'); }
   }
+  const gcToggle=document.getElementById('global-comments-toggle');
+  if(gcToggle) gcToggle.checked=areCommentsGloballyEnabled();
+  const gcStatus=document.getElementById('global-comments-status');
+  if(gcStatus) gcStatus.textContent=areCommentsGloballyEnabled()?'(comments on for all posts)':'(comments off for all posts)';
   if(typeof updateNotifBell==='function') updateNotifBell();
 };
 
@@ -2010,6 +2028,7 @@ const BANNED_KEY       = 'khaak_banned_v1';
 const COMMENT_COUNT_KEY= 'khaak_ccount_v1'; // per-device comment count
 const CAPTCHA_THRESHOLD= 3; // captcha required after this many comments
 const COMMENTS_OFF_KEY = 'khaak_coff_v1';
+const COMMENTS_GLOBAL_KEY = 'khaak_cglobal_v1'; // global comments off switch
 const COMMENT_LIKES_KEY= 'khaak_clikes_v1'; // tracks which comments THIS browser liked
 
 function getBanned(){ try{ return JSON.parse(localStorage.getItem(BANNED_KEY))||[]; }catch(e){ return []; } }
@@ -2017,7 +2036,15 @@ function saveBanned(arr){ localStorage.setItem(BANNED_KEY,JSON.stringify(arr)); 
 function isBanned(name){ return getBanned().map(b=>b.toLowerCase()).includes((name||'').toLowerCase().trim()); }
 function getCommentsOff(){ try{ return JSON.parse(localStorage.getItem(COMMENTS_OFF_KEY))||[]; }catch(e){ return []; } }
 function setCommentsOff(arr){ localStorage.setItem(COMMENTS_OFF_KEY,JSON.stringify(arr)); }
-function areCommentsEnabled(postId){ return !getCommentsOff().includes(postId); }
+function areCommentsGloballyEnabled(){ return localStorage.getItem(COMMENTS_GLOBAL_KEY)!=='off'; }
+function areCommentsEnabled(postId){ return areCommentsGloballyEnabled() && !getCommentsOff().includes(postId); }
+function setCommentsGlobal(enabled){
+  localStorage.setItem(COMMENTS_GLOBAL_KEY, enabled?'on':'off');
+  if(currentPostId) loadComments(currentPostId);
+  const lbl=document.getElementById('global-comments-status');
+  if(lbl) lbl.textContent=enabled?'(comments on for all posts)':'(comments off for all posts)';
+  notify(enabled?'Comments enabled for all posts ✓':'Comments disabled for all posts.');
+}
 function getCommentLikes(){ try{ return JSON.parse(localStorage.getItem(COMMENT_LIKES_KEY))||{}; }catch(e){ return {}; } }
 function saveCommentLikes(obj){ localStorage.setItem(COMMENT_LIKES_KEY,JSON.stringify(obj)); }
 

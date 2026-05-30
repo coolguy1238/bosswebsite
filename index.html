@@ -1972,54 +1972,55 @@ updateAdminUI=function(){
 // ════════════════════════════════════════════════
 // COMMENTS STORAGE KEYS & HELPERS
 // ════════════════════════════════════════════════
-const COMMENTS_KEY      = 'khaak_comments_v1';
-const BANNED_KEY        = 'khaak_banned_v1';
-const COMMENT_LIKES_KEY = 'khaak_clikes_v1';
-const COMMENTS_OFF_KEY  = 'khaak_coff_v1';  // set of post IDs with comments disabled
+// ════════════════════════════════════════════════
+// COMMENTS — stored in Supabase so everyone sees them
+// Table: comments  (id text PK, post_id text, author text,
+//                   body text, date timestamptz,
+//                   parent_id text nullable, likes int default 0)
+// Banned list & comments-off stay in localStorage (admin prefs only)
+// ════════════════════════════════════════════════
+const BANNED_KEY       = 'khaak_banned_v1';
+const COMMENTS_OFF_KEY = 'khaak_coff_v1';
+const COMMENT_LIKES_KEY= 'khaak_clikes_v1'; // tracks which comments THIS browser liked
 
-function getComments(postId){
-  try{ const all=JSON.parse(localStorage.getItem(COMMENTS_KEY))||{}; return all[postId]||[]; }catch(e){ return []; }
-}
-function saveComments(postId,arr){
-  try{ const all=JSON.parse(localStorage.getItem(COMMENTS_KEY))||{}; all[postId]=arr; localStorage.setItem(COMMENTS_KEY,JSON.stringify(all)); }catch(e){}
-}
-function getBanned(){
-  try{ return JSON.parse(localStorage.getItem(BANNED_KEY))||[]; }catch(e){ return []; }
-}
+function getBanned(){ try{ return JSON.parse(localStorage.getItem(BANNED_KEY))||[]; }catch(e){ return []; } }
 function saveBanned(arr){ localStorage.setItem(BANNED_KEY,JSON.stringify(arr)); }
 function isBanned(name){ return getBanned().map(b=>b.toLowerCase()).includes((name||'').toLowerCase().trim()); }
-function getCommentsOff(){
-  try{ return JSON.parse(localStorage.getItem(COMMENTS_OFF_KEY))||[]; }catch(e){ return []; }
-}
+function getCommentsOff(){ try{ return JSON.parse(localStorage.getItem(COMMENTS_OFF_KEY))||[]; }catch(e){ return []; } }
 function setCommentsOff(arr){ localStorage.setItem(COMMENTS_OFF_KEY,JSON.stringify(arr)); }
 function areCommentsEnabled(postId){ return !getCommentsOff().includes(postId); }
-
-function getCommentLikes(){
-  try{ return JSON.parse(localStorage.getItem(COMMENT_LIKES_KEY))||{}; }catch(e){ return {}; }
-}
+function getCommentLikes(){ try{ return JSON.parse(localStorage.getItem(COMMENT_LIKES_KEY))||{}; }catch(e){ return {}; } }
 function saveCommentLikes(obj){ localStorage.setItem(COMMENT_LIKES_KEY,JSON.stringify(obj)); }
+
+// In-memory cache of comments for current post
+let _currentComments = [];
+
+async function fetchComments(postId){
+  try{
+    const data = await supa('GET', `comments?post_id=eq.${encodeURIComponent(postId)}&order=date.asc`);
+    return data || [];
+  }catch(e){ return []; }
+}
 
 // ════════════════════════════════════════════════
 // COMMENTS RENDERING & CONTROLS
 // ════════════════════════════════════════════════
-function loadComments(postId){
-  const enabled=areCommentsEnabled(postId);
-  const adminControls=document.getElementById('admin-comment-controls');
-  const disabledNotice=document.getElementById('comments-disabled-notice');
-  const formWrap=document.getElementById('comment-form-wrap');
-  const toggle=document.getElementById('comments-toggle');
-  const statusLabel=document.getElementById('comments-status-label');
+async function loadComments(postId){
+  const enabled = areCommentsEnabled(postId);
+  const adminControls = document.getElementById('admin-comment-controls');
+  const disabledNotice = document.getElementById('comments-disabled-notice');
+  const formWrap       = document.getElementById('comment-form-wrap');
+  const toggle         = document.getElementById('comments-toggle');
+  const statusLabel    = document.getElementById('comments-status-label');
 
-  // Admin controls
   if(isLoggedIn()){
     adminControls.style.display='flex';
-    toggle.checked=enabled;
-    statusLabel.textContent=enabled?'(comments are open)':'(comments are closed)';
+    toggle.checked = enabled;
+    statusLabel.textContent = enabled ? '(comments are open)' : '(comments are closed)';
   } else {
     adminControls.style.display='none';
   }
 
-  // Show/hide form based on enabled state
   if(enabled){
     disabledNotice.style.display='none';
     formWrap.style.display='block';
@@ -2028,47 +2029,58 @@ function loadComments(postId){
     formWrap.style.display='none';
   }
 
+  // Show loading placeholder
+  document.getElementById('comment-list').innerHTML =
+    '<p class="comment-no-comments" style="opacity:0.5">Loading comments…</p>';
+
+  _currentComments = await fetchComments(postId);
   renderComments(postId);
 }
 
 function toggleComments(enabled){
   if(!isLoggedIn()) return;
-  const off=getCommentsOff();
+  const off = getCommentsOff();
   if(enabled){ const i=off.indexOf(currentPostId); if(i>-1) off.splice(i,1); }
   else { if(!off.includes(currentPostId)) off.push(currentPostId); }
   setCommentsOff(off);
-  const statusLabel=document.getElementById('comments-status-label');
-  statusLabel.textContent=enabled?'(comments are open)':'(comments are closed)';
-  const disabledNotice=document.getElementById('comments-disabled-notice');
-  const formWrap=document.getElementById('comment-form-wrap');
+  document.getElementById('comments-status-label').textContent =
+    enabled ? '(comments are open)' : '(comments are closed)';
+  const disabledNotice = document.getElementById('comments-disabled-notice');
+  const formWrap       = document.getElementById('comment-form-wrap');
   if(enabled){ disabledNotice.style.display='none'; formWrap.style.display='block'; }
-  else { disabledNotice.style.display='block'; formWrap.style.display='none'; }
-  notify(enabled?'Comments enabled ✓':'Comments disabled.');
+  else        { disabledNotice.style.display='block'; formWrap.style.display='none'; }
+  notify(enabled ? 'Comments enabled ✓' : 'Comments disabled.');
 }
 
 function renderComments(postId){
-  const comments=getComments(postId);
-  const cont=document.getElementById('comment-list');
-  const clikes=getCommentLikes();
-  if(!comments.length){
-    cont.innerHTML='<p class="comment-no-comments">No comments yet. Be the first to share your thoughts.</p>';
+  // Top-level comments (no parent)
+  const topLevel = _currentComments.filter(c => !c.parent_id);
+  const cont     = document.getElementById('comment-list');
+  const clikes   = getCommentLikes();
+
+  if(!topLevel.length){
+    cont.innerHTML = '<p class="comment-no-comments">No comments yet. Be the first to share your thoughts.</p>';
     return;
   }
-  cont.innerHTML=comments.map((c,ci)=>{
-    const banned=isBanned(c.author);
-    const clikeKey='c_'+postId+'_'+ci;
-    const liked=!!clikes[clikeKey];
-    const likeCount=clikes[clikeKey+'_count']||0;
-    const adminBtns=isLoggedIn()?`<div class="comment-admin-actions">
+
+  cont.innerHTML = topLevel.map((c, ci) => {
+    const banned     = isBanned(c.author);
+    const likeKey    = 'clike_' + c.id;
+    const liked      = !!clikes[likeKey];
+    const likeCount  = c.likes || 0;
+    const adminBtns  = isLoggedIn() ? `<div class="comment-admin-actions">
       <button class="comment-ban-btn" onclick="banCommenter('${esc(c.author)}')">${banned?'🔓 Unban':'🚫 Ban'}</button>
-      <button class="comment-del-btn" onclick="deleteComment(${ci})">🗑 Delete</button>
-    </div>`:'';
-    const replies=(c.replies||[]).map((r,ri)=>{
-      const rBanned=isBanned(r.author);
-      const adminReplyBtns=isLoggedIn()?`<div class="reply-admin-actions">
+      <button class="comment-del-btn" onclick="deleteComment('${c.id}')">🗑 Delete</button>
+    </div>` : '';
+
+    // Replies to this comment
+    const replies = _currentComments.filter(r => r.parent_id === c.id);
+    const repliesHtml = replies.map((r, ri) => {
+      const rBanned = isBanned(r.author);
+      const adminReplyBtns = isLoggedIn() ? `<div class="reply-admin-actions">
         <button class="comment-ban-btn" onclick="banCommenter('${esc(r.author)}')" style="font-size:0.55rem;padding:0.15rem 0.5rem">${rBanned?'🔓 Unban':'🚫 Ban'}</button>
-        <button class="comment-del-btn" onclick="deleteReply(${ci},${ri})" style="font-size:0.55rem;padding:0.15rem 0.5rem">🗑</button>
-      </div>`:'';
+        <button class="comment-del-btn" onclick="deleteComment('${r.id}')" style="font-size:0.55rem;padding:0.15rem 0.5rem">🗑</button>
+      </div>` : '';
       return `<div class="reply-item${rBanned?' banned-comment':''}">
         <span class="reply-author">${esc(r.author)}</span><span class="reply-date">${fmtDate(r.date)}</span>
         ${rBanned?'<span class="banned-badge">Banned</span>':''}
@@ -2076,7 +2088,8 @@ function renderComments(postId){
         ${adminReplyBtns}
       </div>`;
     }).join('');
-    return `<div class="comment-item${banned?' banned-comment':''}" id="comment-${ci}">
+
+    return `<div class="comment-item${banned?' banned-comment':''}" id="comment-${c.id}">
       <div class="comment-header">
         <span class="comment-author">${esc(c.author)}</span>
         <span class="comment-date">${fmtDate(c.date)}</span>
@@ -2084,113 +2097,118 @@ function renderComments(postId){
       </div>
       <div class="comment-body">${esc(c.body)}</div>
       <div class="comment-actions">
-        <button class="comment-like-btn ${liked?'liked':''}" onclick="likeComment(${ci})">${liked?'❤':'♡'} ${likeCount||'Like'}</button>
-        ${areCommentsEnabled(postId)?`<button class="comment-reply-btn" onclick="toggleReplyForm(${ci})">↩ Reply</button>`:''}
+        <button class="comment-like-btn ${liked?'liked':''}" onclick="likeComment('${c.id}')">${liked?'❤':'♡'} ${likeCount||'Like'}</button>
+        ${areCommentsEnabled(postId)?`<button class="comment-reply-btn" onclick="toggleReplyForm('${c.id}')">↩ Reply</button>`:''}
         ${adminBtns}
       </div>
-      <div class="reply-form" id="reply-form-${ci}">
+      <div class="reply-form" id="reply-form-${c.id}">
         <div class="comment-input-row" style="margin-bottom:0.4rem">
-          <input class="comment-name-input" id="reply-name-${ci}" type="text" placeholder="Your name…" maxlength="60">
-          <input class="comment-reply-input" id="reply-text-${ci}" type="text" placeholder="Write a reply…" style="flex:1;max-width:none">
+          <input class="comment-name-input" id="reply-name-${c.id}" type="text" placeholder="Your name…" maxlength="60">
+          <input class="comment-reply-input" id="reply-text-${c.id}" type="text" placeholder="Write a reply…" style="flex:1;max-width:none">
         </div>
         <div style="display:flex;gap:0.5rem">
-          <button class="btn btn-gold" style="font-size:0.65rem;padding:0.3rem 0.85rem" onclick="submitReply(${ci})">Post Reply</button>
-          <button class="btn btn-outline" style="font-size:0.65rem;padding:0.3rem 0.75rem" onclick="toggleReplyForm(${ci})">Cancel</button>
+          <button class="btn btn-gold" style="font-size:0.65rem;padding:0.3rem 0.85rem" onclick="submitReply('${c.id}')">Post Reply</button>
+          <button class="btn btn-outline" style="font-size:0.65rem;padding:0.3rem 0.75rem" onclick="toggleReplyForm('${c.id}')">Cancel</button>
         </div>
       </div>
-      ${replies?`<div class="reply-list">${replies}</div>`:''}
+      ${repliesHtml?`<div class="reply-list">${repliesHtml}</div>`:''}
     </div>`;
   }).join('');
 }
 
-function toggleReplyForm(ci){
-  const f=document.getElementById('reply-form-'+ci);
+function toggleReplyForm(commentId){
+  const f = document.getElementById('reply-form-'+commentId);
   if(!f) return;
-  const open=f.classList.toggle('open');
-  if(open) { const inp=document.getElementById('reply-name-'+ci); if(inp) inp.focus(); }
+  const open = f.classList.toggle('open');
+  if(open){ const inp = document.getElementById('reply-name-'+commentId); if(inp) inp.focus(); }
 }
 
-function submitComment(){
+async function submitComment(){
   if(!currentPostId) return;
   if(!areCommentsEnabled(currentPostId)){ notify('Comments are disabled for this post.'); return; }
-  const name=document.getElementById('comment-name').value.trim();
-  const body=document.getElementById('comment-text').value.trim();
-  const errEl=document.getElementById('comment-submit-error');
+  const name   = document.getElementById('comment-name').value.trim();
+  const body   = document.getElementById('comment-text').value.trim();
+  const errEl  = document.getElementById('comment-submit-error');
   if(!name){ errEl.textContent='Please enter your name.'; return; }
   if(!body){ errEl.textContent='Please write a comment.'; return; }
   errEl.textContent='';
   if(isBanned(name)){ errEl.textContent='You are not permitted to comment.'; return; }
-  const comments=getComments(currentPostId);
-  comments.push({author:name,body,date:new Date().toISOString(),replies:[]});
-  saveComments(currentPostId,comments);
-  document.getElementById('comment-name').value='';
-  document.getElementById('comment-text').value='';
-  renderComments(currentPostId);
-  notify('Comment posted ✓');
-  // Notify owner
-  const post = posts.find(p=>p.id===currentPostId);
-  addOwnerNotif('comment', currentPostId, post?post.title:'Post', name, body);
+
+  const id = Date.now().toString()+Math.random().toString(36).slice(2,6);
+  try{
+    await supa('POST','comments',{id, post_id:currentPostId, author:name, body, date:new Date().toISOString(), parent_id:null, likes:0});
+    document.getElementById('comment-name').value='';
+    document.getElementById('comment-text').value='';
+    _currentComments = await fetchComments(currentPostId);
+    renderComments(currentPostId);
+    notify('Comment posted ✓');
+    const post = posts.find(p=>p.id===currentPostId);
+    addOwnerNotif('comment', currentPostId, post?post.title:'Post', name, body);
+  }catch(e){ errEl.textContent='Could not post comment. Please try again.'; }
 }
 
-function submitReply(ci){
+async function submitReply(parentId){
   if(!currentPostId) return;
-  const name=document.getElementById('reply-name-'+ci).value.trim();
-  const body=document.getElementById('reply-text-'+ci).value.trim();
+  const name  = document.getElementById('reply-name-'+parentId).value.trim();
+  const body  = document.getElementById('reply-text-'+parentId).value.trim();
   if(!name||!body){ notify('Please fill in your name and reply.'); return; }
   if(isBanned(name)){ notify('You are not permitted to reply.'); return; }
-  const comments=getComments(currentPostId);
-  if(!comments[ci]) return;
-  if(!comments[ci].replies) comments[ci].replies=[];
-  comments[ci].replies.push({author:name,body,date:new Date().toISOString()});
-  saveComments(currentPostId,comments);
-  document.getElementById('reply-name-'+ci).value='';
-  document.getElementById('reply-text-'+ci).value='';
-  toggleReplyForm(ci);
-  renderComments(currentPostId);
-  notify('Reply posted ✓');
-  // Notify owner
-  const post = posts.find(p=>p.id===currentPostId);
-  addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
+
+  const id = Date.now().toString()+Math.random().toString(36).slice(2,6);
+  try{
+    await supa('POST','comments',{id, post_id:currentPostId, author:name, body, date:new Date().toISOString(), parent_id:parentId, likes:0});
+    document.getElementById('reply-name-'+parentId).value='';
+    document.getElementById('reply-text-'+parentId).value='';
+    toggleReplyForm(parentId);
+    _currentComments = await fetchComments(currentPostId);
+    renderComments(currentPostId);
+    notify('Reply posted ✓');
+    const post = posts.find(p=>p.id===currentPostId);
+    addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
+  }catch(e){ notify('Could not post reply. Please try again.'); }
 }
 
-function likeComment(ci){
-  if(!currentPostId) return;
-  const clikes=getCommentLikes();
-  const key='c_'+currentPostId+'_'+ci;
-  const countKey=key+'_count';
-  if(clikes[key]){ delete clikes[key]; clikes[countKey]=Math.max(0,(clikes[countKey]||1)-1); }
-  else { clikes[key]=true; clikes[countKey]=(clikes[countKey]||0)+1; }
+async function likeComment(commentId){
+  const clikes  = getCommentLikes();
+  const likeKey = 'clike_' + commentId;
+  const comment = _currentComments.find(c=>c.id===commentId);
+  if(!comment) return;
+
+  if(clikes[likeKey]){
+    // Unlike
+    delete clikes[likeKey];
+    const newLikes = Math.max(0,(comment.likes||1)-1);
+    try{ await supa('PATCH',`comments?id=eq.${commentId}`,{likes:newLikes}); comment.likes=newLikes; }catch(e){}
+  } else {
+    // Like
+    clikes[likeKey] = true;
+    const newLikes = (comment.likes||0)+1;
+    try{ await supa('PATCH',`comments?id=eq.${commentId}`,{likes:newLikes}); comment.likes=newLikes; }catch(e){}
+  }
   saveCommentLikes(clikes);
   renderComments(currentPostId);
 }
 
-function deleteComment(ci){
+async function deleteComment(commentId){
   if(!isLoggedIn()||!currentPostId) return;
-  if(!confirm('Delete this comment?')) return;
-  const comments=getComments(currentPostId);
-  comments.splice(ci,1);
-  saveComments(currentPostId,comments);
-  renderComments(currentPostId);
-  notify('Comment deleted.');
-}
-
-function deleteReply(ci,ri){
-  if(!isLoggedIn()||!currentPostId) return;
-  if(!confirm('Delete this reply?')) return;
-  const comments=getComments(currentPostId);
-  if(comments[ci]&&comments[ci].replies) comments[ci].replies.splice(ri,1);
-  saveComments(currentPostId,comments);
-  renderComments(currentPostId);
-  notify('Reply deleted.');
+  if(!confirm('Delete this comment and all its replies?')) return;
+  try{
+    // Delete replies first, then the comment
+    await supa('DELETE',`comments?parent_id=eq.${commentId}`);
+    await supa('DELETE',`comments?id=eq.${commentId}`);
+    _currentComments = await fetchComments(currentPostId);
+    renderComments(currentPostId);
+    notify('Comment deleted.');
+  }catch(e){ notify('Error deleting comment.'); }
 }
 
 function banCommenter(name){
   if(!isLoggedIn()) return;
-  const banned=getBanned();
-  const lower=name.toLowerCase().trim();
-  const idx=banned.findIndex(b=>b.toLowerCase()===lower);
+  const banned = getBanned();
+  const lower  = name.toLowerCase().trim();
+  const idx    = banned.findIndex(b=>b.toLowerCase()===lower);
   if(idx>-1){ banned.splice(idx,1); saveBanned(banned); notify(`${name} has been unbanned.`); }
-  else { banned.push(name); saveBanned(banned); notify(`${name} has been banned from commenting.`); }
+  else       { banned.push(name); saveBanned(banned); notify(`${name} has been banned from commenting.`); }
   if(currentPostId) renderComments(currentPostId);
 }
 

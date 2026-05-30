@@ -2962,7 +2962,6 @@ document.addEventListener('click', e=>{
 (async()=>{
   await loadSavedTheme();
   updateAdminUI();
-  // Fetch notifications from Supabase so cross-device delivery works
   if(isOwner()){
     await fetchOwnerNotifs();
   }
@@ -2975,6 +2974,91 @@ document.addEventListener('click', e=>{
   initPrayerBar();
   await loadBans();
   loadPosts();
+
+  // ── SUPABASE REALTIME — live notification delivery ──
+  // Opens a WebSocket to Supabase. When a new row is inserted into
+  // owner_notifs or viewer_notifs, the bell updates instantly.
+  const realtimeUrl = SUPA_URL.replace('https://','wss://') + '/realtime/v1/websocket?apikey=' + SUPA_KEY + '&vsn=1.0.0';
+  let ws, wsHeartbeat;
+
+  function connectRealtime(){
+    ws = new WebSocket(realtimeUrl);
+
+    ws.onopen = () => {
+      // Subscribe to INSERT events on owner_notifs
+      ws.send(JSON.stringify({
+        topic: 'realtime:public:owner_notifs',
+        event: 'phx_join',
+        payload: { config: { broadcast: { self: false }, presence: { key: '' }, postgres_changes: [{ event: 'INSERT', schema: 'public', table: 'owner_notifs' }] } },
+        ref: '1'
+      }));
+      // Subscribe to INSERT events on viewer_notifs
+      ws.send(JSON.stringify({
+        topic: 'realtime:public:viewer_notifs',
+        event: 'phx_join',
+        payload: { config: { broadcast: { self: false }, presence: { key: '' }, postgres_changes: [{ event: 'INSERT', schema: 'public', table: 'viewer_notifs' }] } },
+        ref: '2'
+      }));
+      // Keep-alive heartbeat every 25s
+      wsHeartbeat = setInterval(()=>{
+        if(ws.readyState === WebSocket.OPEN){
+          ws.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: '0' }));
+        }
+      }, 25000);
+    };
+
+    ws.onmessage = (e) => {
+      try{
+        const msg = JSON.parse(e.data);
+        if(msg.event !== 'postgres_changes') return;
+        const record = msg.payload?.data?.record;
+        if(!record) return;
+
+        if(msg.topic === 'realtime:public:owner_notifs' && isOwner()){
+          // New notification for the owner
+          if(!_ownerNotifsCache) _ownerNotifsCache = [];
+          const already = _ownerNotifsCache.find(n=>n.id===record.id);
+          if(!already){
+            _ownerNotifsCache.unshift({
+              id: record.id, type: record.type,
+              postId: record.post_id, postTitle: record.post_title,
+              author: record.author, preview: record.preview,
+              date: record.date, read: record.read
+            });
+            updateNotifBell();
+            shakeNotifBell();
+          }
+        }
+
+        if(msg.topic === 'realtime:public:viewer_notifs' && !isLoggedIn()){
+          // Only care if this notification is for this device
+          if(record.device_id !== getDeviceId()) return;
+          if(!_viewerNotifsCache) _viewerNotifsCache = [];
+          const already = _viewerNotifsCache.find(n=>n.id===record.id);
+          if(!already){
+            _viewerNotifsCache.unshift({
+              id: record.id, type: record.type,
+              postId: record.post_id, postTitle: record.post_title,
+              fromName: record.from_name, preview: record.preview,
+              date: record.date, read: record.read
+            });
+            updateViewerNotifBell();
+            shakeViewerNotifBell();
+          }
+        }
+      } catch(err){ /* ignore malformed messages */ }
+    };
+
+    ws.onclose = () => {
+      clearInterval(wsHeartbeat);
+      // Reconnect after 5s if connection drops
+      setTimeout(connectRealtime, 5000);
+    };
+
+    ws.onerror = () => ws.close();
+  }
+
+  connectRealtime();
 })();
 
 </script>

@@ -1311,6 +1311,7 @@ async function togglePostLike(){
   setLikedLocally(currentPostId,!liked);
   post.likes=newCount;
   renderPostLike(currentPostId);
+  if(!liked) addOwnerNotif('like', currentPostId, post.title, 'Someone', 'liked your post');
   try{ await supa('PATCH','posts?id=eq.'+currentPostId,{likes:newCount}); }
   catch(e){ /* revert on failure */ setLikedLocally(currentPostId,liked); post.likes=currentLikes; renderPostLike(currentPostId); }
 }
@@ -1506,6 +1507,7 @@ async function cardLike(postId, btn){
   const isLiked=hasLiked(postId);
   btn.innerHTML='<span class="heart">'+(isLiked?'❤':'♡')+'</span> '+(newCount||'Like');
   btn.classList.toggle('liked',isLiked);
+  if(isLiked) addOwnerNotif('like', postId, post.title, 'Someone', 'liked your post');
   try{ await supa('PATCH','posts?id=eq.'+postId,{likes:newCount}); }
   catch(e){ setLikedLocally(postId,liked); post.likes=currentLikes; }
 }
@@ -2473,7 +2475,7 @@ async function submitComment(){
     const freshComments = await fetchComments(currentPostId);
     const role = isOwner() ? 'owner' : isLoggedIn() ? 'admin' : null;
     const device_id = isLoggedIn() ? null : getDeviceId();
-    const newComment = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:null, likes:0, role: role||undefined, device_id: device_id||undefined};
+    const newComment = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:null, likes:0, role: role||null, device_id: device_id||null};
     freshComments.push(newComment);
     await saveCommentsToPost(currentPostId, freshComments);
     document.getElementById('comment-name').value='';
@@ -2500,7 +2502,7 @@ async function submitReply(parentId){
     const freshComments = await fetchComments(currentPostId);
     const role = isOwner() ? 'owner' : isLoggedIn() ? 'admin' : null;
     const device_id = isLoggedIn() ? null : getDeviceId();
-    const newReply = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:parentId, likes:0, role: role||undefined, device_id: device_id||undefined};
+    const newReply = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:parentId, likes:0, role: role||null, device_id: device_id||null};
     freshComments.push(newReply);
     await saveCommentsToPost(currentPostId, freshComments);
     document.getElementById('reply-name-'+parentId).value='';
@@ -2510,11 +2512,11 @@ async function submitReply(parentId){
     renderComments(currentPostId);
     notify('Reply posted ✓');
     const post = posts.find(p=>p.id===currentPostId);
-    addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
+    await addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
     // Notify the original commenter that someone replied to them
     const parentComment = freshComments.find(c=>c.id===parentId);
     if(parentComment && parentComment.device_id){
-      addViewerNotif(parentComment.device_id, 'reply', currentPostId, post?post.title:'Post', name, body);
+      await addViewerNotif(parentComment.device_id, 'reply', currentPostId, post?post.title:'Post', name, body);
     }
   }catch(e){ notify('Could not post reply: '+(e.message||'Please try again.')); }
 }
@@ -2534,7 +2536,7 @@ async function likeComment(commentId){
     // Notify the commenter if their comment got liked (viewer notif system)
     if(comment.device_id){
       const post = posts.find(p=>p.id===currentPostId);
-      addViewerNotif(comment.device_id, 'like', currentPostId, post?post.title:'Post', 'Someone', comment.body);
+      await addViewerNotif(comment.device_id, 'like', currentPostId, post?post.title:'Post', 'Someone', comment.body);
     }
   }
   saveCommentLikes(clikes);
@@ -2610,28 +2612,65 @@ const pwua=document.getElementById('pw-upload-area');
 if(pwua){ pwua.addEventListener('dragover',e=>{e.preventDefault();pwua.classList.add('dragover')}); pwua.addEventListener('dragleave',()=>pwua.classList.remove('dragover')); pwua.addEventListener('drop',e=>{e.preventDefault();pwua.classList.remove('dragover');handlePdfFile(e.dataTransfer.files)}); }
 
 // ════════════════════════════════════════════════
-// OWNER COMMENT NOTIFICATIONS
+// OWNER NOTIFICATIONS — Supabase-backed
+// Stored in Supabase so notifications created on any
+// visitor's browser are seen by the owner on theirs.
+//
+// Supabase table required:
+//   owner_notifs (
+//     id text PRIMARY KEY,
+//     type text,          -- 'comment' | 'reply' | 'like'
+//     post_id text,
+//     post_title text,
+//     author text,
+//     preview text,
+//     date timestamptz,
+//     read boolean DEFAULT false
+//   )
+// RLS: enable insert for anon; select/update for anon too
+// (only the owner can see the bell, so no privacy risk).
 // ════════════════════════════════════════════════
-const OWNER_NOTIFS_KEY = 'khaak_owner_notifs_v1';
+let _ownerNotifsCache = null;
 
-function getOwnerNotifs(){ try{ return JSON.parse(localStorage.getItem(OWNER_NOTIFS_KEY))||[]; }catch(e){ return []; } }
-function saveOwnerNotifs(arr){ localStorage.setItem(OWNER_NOTIFS_KEY, JSON.stringify(arr)); }
+async function fetchOwnerNotifs(){
+  try{
+    const rows = await supa('GET','owner_notifs?order=date.desc&limit=50');
+    _ownerNotifsCache = (rows||[]).map(r=>({
+      id: r.id,
+      type: r.type,
+      postId: r.post_id,
+      postTitle: r.post_title,
+      author: r.author,
+      preview: r.preview,
+      date: r.date,
+      read: r.read
+    }));
+  } catch(e){
+    if(!_ownerNotifsCache) _ownerNotifsCache = [];
+  }
+  return _ownerNotifsCache;
+}
 
-function addOwnerNotif(type, postId, postTitle, author, body){
-  const notifs = getOwnerNotifs();
-  notifs.unshift({
-    id: Date.now().toString(),
-    type,           // 'comment' | 'reply'
-    postId,
-    postTitle,
+function getOwnerNotifs(){ return _ownerNotifsCache || []; }
+
+async function addOwnerNotif(type, postId, postTitle, author, body){
+  const notif = {
+    id: Date.now().toString()+Math.random().toString(36).slice(2,6),
+    type,
+    post_id: postId,
+    post_title: postTitle,
     author,
     preview: body.length > 60 ? body.slice(0,60)+'…' : body,
     date: new Date().toISOString(),
     read: false
+  };
+  try{ await supa('POST','owner_notifs',notif); } catch(e){ /* table may not exist yet */ }
+  // Also update local cache so the bell reacts immediately on this browser
+  if(!_ownerNotifsCache) _ownerNotifsCache = [];
+  _ownerNotifsCache.unshift({
+    id: notif.id, type, postId, postTitle, author,
+    preview: notif.preview, date: notif.date, read: false
   });
-  // Keep max 50
-  if(notifs.length > 50) notifs.splice(50);
-  saveOwnerNotifs(notifs);
   updateNotifBell();
   shakeNotifBell();
 }
@@ -2681,28 +2720,23 @@ function renderNotifPanel(){
   ).join('');
 }
 
-function notifGoToPost(notifId, postId){
-  // Mark this notif as read
+async function notifGoToPost(notifId, postId){
   const notifs = getOwnerNotifs();
   const n = notifs.find(x=>x.id===notifId);
-  if(n) n.read = true;
-  saveOwnerNotifs(notifs);
+  if(n){ n.read = true; try{ await supa('PATCH','owner_notifs?id=eq.'+notifId,{read:true}); }catch(e){} }
   updateNotifBell();
-  // Close panel
   document.getElementById('owner-notif-panel').classList.remove('show');
-  // Navigate to post
   openPost(postId);
-  // Scroll to comments after a tick
   setTimeout(()=>{
     const cs = document.getElementById('comments-section');
     if(cs) cs.scrollIntoView({behavior:'smooth', block:'start'});
   }, 300);
 }
 
-function clearAllNotifs(){
+async function clearAllNotifs(){
   const notifs = getOwnerNotifs();
   notifs.forEach(n=>n.read=true);
-  saveOwnerNotifs(notifs);
+  try{ await supa('PATCH','owner_notifs?read=eq.false',{read:true}); }catch(e){}
   updateNotifBell();
   renderNotifPanel();
 }
@@ -2717,50 +2751,91 @@ document.addEventListener('click', e=>{
 });
 
 // ════════════════════════════════════════════════
-// VIEWER NOTIFICATIONS — device ID system
+// VIEWER NOTIFICATIONS — device ID system (Supabase-backed)
 // A random ID is generated once per browser and saved
 // in localStorage. It gets attached to every comment
-// they post. Notifications are matched by device ID,
-// not by name — so no collisions, no setup needed.
+// they post. Notifications are stored in Supabase under
+// that device_id so they survive across sessions and
+// can be sent from ANY browser (cross-device delivery).
+//
+// Supabase table required:
+//   viewer_notifs (
+//     id text PRIMARY KEY,
+//     device_id text NOT NULL,
+//     type text,         -- 'like' | 'reply'
+//     post_id text,
+//     post_title text,
+//     from_name text,
+//     preview text,
+//     date timestamptz,
+//     read boolean DEFAULT false
+//   )
+// RLS: enable insert/select/update for anon (or use service key).
 // ════════════════════════════════════════════════
-const VIEWER_NOTIF_KEY    = 'khaak_viewer_notifs_v1';
 const VIEWER_DEVICE_ID_KEY = 'khaak_device_id_v1';
+
+// In-memory cache so we don't re-fetch on every render
+let _viewerNotifsCache = null;
 
 function getDeviceId(){
   let id = localStorage.getItem(VIEWER_DEVICE_ID_KEY);
   if(!id){
-    // Generate a random ID and save it permanently
     id = 'dev_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
     localStorage.setItem(VIEWER_DEVICE_ID_KEY, id);
   }
   return id;
 }
 
-function getViewerNotifs(){
-  try{ return JSON.parse(localStorage.getItem(VIEWER_NOTIF_KEY))||[]; }catch(e){ return []; }
+async function fetchViewerNotifs(){
+  try{
+    const rows = await supa('GET', 'viewer_notifs?device_id=eq.'+encodeURIComponent(getDeviceId())+'&order=date.desc&limit=50');
+    _viewerNotifsCache = (rows||[]).map(r=>({
+      id: r.id,
+      type: r.type,
+      postId: r.post_id,
+      postTitle: r.post_title,
+      fromName: r.from_name,
+      preview: r.preview,
+      date: r.date,
+      read: r.read
+    }));
+  } catch(e){
+    // Supabase table may not exist yet — fall back to empty so the bell still works
+    if(!_viewerNotifsCache) _viewerNotifsCache = [];
+  }
+  return _viewerNotifsCache;
 }
-function saveViewerNotifs(arr){ localStorage.setItem(VIEWER_NOTIF_KEY, JSON.stringify(arr)); }
+
+function getViewerNotifs(){
+  return _viewerNotifsCache || [];
+}
 
 // Called when someone likes or replies to a comment.
 // recipientDeviceId: the device_id stored on the comment object.
-function addViewerNotif(recipientDeviceId, type, postId, postTitle, fromName, body){
-  // Only store if this browser's device ID matches the recipient's
-  if(!recipientDeviceId || recipientDeviceId !== getDeviceId()) return;
-  const notifs = getViewerNotifs();
-  notifs.unshift({
-    id: Date.now().toString(),
-    type,        // 'like' | 'reply'
-    postId,
-    postTitle,
-    fromName,
+async function addViewerNotif(recipientDeviceId, type, postId, postTitle, fromName, body){
+  if(!recipientDeviceId) return;
+  const notif = {
+    id: Date.now().toString()+Math.random().toString(36).slice(2,6),
+    device_id: recipientDeviceId,
+    type,
+    post_id: postId,
+    post_title: postTitle,
+    from_name: fromName,
     preview: body.length > 60 ? body.slice(0,60)+'…' : body,
     date: new Date().toISOString(),
     read: false
-  });
-  if(notifs.length > 50) notifs.splice(50);
-  saveViewerNotifs(notifs);
-  updateViewerNotifBell();
-  shakeViewerNotifBell();
+  };
+  try{ await supa('POST','viewer_notifs',notif); } catch(e){ /* table may not exist yet */ }
+  // If the recipient happens to be the same browser, update cache + bell immediately
+  if(recipientDeviceId === getDeviceId()){
+    if(!_viewerNotifsCache) _viewerNotifsCache = [];
+    _viewerNotifsCache.unshift({
+      id: notif.id, type, postId, postTitle, fromName,
+      preview: notif.preview, date: notif.date, read: false
+    });
+    updateViewerNotifBell();
+    shakeViewerNotifBell();
+  }
 }
 
 function updateViewerNotifBell(){
@@ -2770,7 +2845,6 @@ function updateViewerNotifBell(){
   const unread = notifs.filter(n=>!n.read).length;
   const bell   = document.getElementById('viewer-notif-bell');
   const badge  = document.getElementById('viewer-notif-badge');
-  // Always show bell for non-admins so they can see their notifications
   bell.classList.add('show');
   if(unread > 0){
     badge.style.display='flex';
@@ -2798,7 +2872,7 @@ function renderViewerNotifPanel(){
   const notifs = getViewerNotifs();
   const list   = document.getElementById('viewer-notif-list');
   if(!notifs.length){
-    list.innerHTML = '<div class="viewer-notif-empty">No notifications yet — like and reply to comments to see activity here.</div>';
+    list.innerHTML = '<div class="viewer-notif-empty">No notifications yet — post a comment to get notified when someone replies or likes it.</div>';
     return;
   }
   list.innerHTML = notifs.map(n=>{
@@ -2814,11 +2888,10 @@ function renderViewerNotifPanel(){
   }).join('');
 }
 
-function viewerNotifGoToPost(notifId, postId){
+async function viewerNotifGoToPost(notifId, postId){
   const notifs = getViewerNotifs();
   const n = notifs.find(x=>x.id===notifId);
-  if(n) n.read = true;
-  saveViewerNotifs(notifs);
+  if(n){ n.read = true; try{ await supa('PATCH','viewer_notifs?id=eq.'+notifId,{read:true}); }catch(e){} }
   updateViewerNotifBell();
   document.getElementById('viewer-notif-panel').classList.remove('show');
   openPost(postId);
@@ -2828,10 +2901,10 @@ function viewerNotifGoToPost(notifId, postId){
   }, 300);
 }
 
-function clearAllViewerNotifs(){
+async function clearAllViewerNotifs(){
   const notifs = getViewerNotifs();
   notifs.forEach(n=>n.read=true);
-  saveViewerNotifs(notifs);
+  try{ await supa('PATCH','viewer_notifs?device_id=eq.'+encodeURIComponent(getDeviceId()),{read:true}); }catch(e){}
   updateViewerNotifBell();
   renderViewerNotifPanel();
 }
@@ -2848,7 +2921,14 @@ document.addEventListener('click', e=>{
 (async()=>{
   await loadSavedTheme();
   updateAdminUI();
+  // Fetch notifications from Supabase so cross-device delivery works
+  if(isOwner()){
+    await fetchOwnerNotifs();
+  }
   updateNotifBell();
+  if(!isLoggedIn()){
+    await fetchViewerNotifs();
+  }
   updateViewerNotifBell();
   await fetchPrayerTimes();
   initPrayerBar();

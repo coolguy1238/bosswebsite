@@ -557,9 +557,9 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
           <div class="comment-form">
             <div class="comment-form-title">Leave a comment</div>
             <div class="comment-input-row">
-              <input class="comment-name-input" id="comment-name" type="text" placeholder="Your name…" maxlength="60">
-              <input class="comment-text-input" id="comment-text" type="text" placeholder="Write your comment…" style="flex:1;max-width:none;min-height:unset">
+              <input class="comment-name-input" id="comment-name" type="text" placeholder="Your name…" maxlength="60" style="max-width:160px">
             </div>
+            <textarea class="comment-text-input" id="comment-text" placeholder="Write your comment…" style="resize:vertical;min-height:100px;display:block;width:100%;margin-bottom:0.5rem;margin-top:0.5rem"></textarea>
             <!-- Honeypot: invisible to real users, bots fill it in -->
             <input type="text" id="comment-honeypot" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;height:0;width:0;opacity:0;pointer-events:none" aria-hidden="true">
             <!-- Captcha: appears after 3 comments from this device -->
@@ -2055,7 +2055,7 @@ function saveCommentLikes(obj){ localStorage.setItem(COMMENT_LIKES_KEY,JSON.stri
 
 function getDeviceCommentCount(){ try{ return parseInt(localStorage.getItem(COMMENT_COUNT_KEY)||'0'); }catch(e){ return 0; } }
 function incrementDeviceCommentCount(){ localStorage.setItem(COMMENT_COUNT_KEY, getDeviceCommentCount()+1); }
-function needsCaptcha(){ return getDeviceCommentCount() >= CAPTCHA_THRESHOLD; }
+function needsCaptcha(){ if(isOwner()||isLoggedIn()) return false; return getDeviceCommentCount() >= CAPTCHA_THRESHOLD; }
 
 let _captchaAnswer = null;
 function generateCaptcha(){

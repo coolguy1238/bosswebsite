@@ -400,6 +400,7 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
 <div class="notif" id="notif"></div>
 <div class="admin-badge-bar" id="admin-bar" style="align-items:center;justify-content:center;gap:1.25rem;flex-wrap:wrap">
   <span id="admin-bar-text">🔑 Admin Mode Active — You can write, edit and delete posts</span>
+  <button onclick="openBannedPanel()" style="background:rgba(139,26,26,0.15);border:1px solid rgba(139,26,26,0.4);border-radius:2px;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;color:#8B1A1A;padding:0.25rem 0.65rem;cursor:pointer;white-space:nowrap;transition:background 0.15s" onmouseover="this.style.background='rgba(139,26,26,0.25)'" onmouseout="this.style.background='rgba(139,26,26,0.15)'">🚫 Banned Users</button>
   <span id="global-comments-wrap" style="display:none;align-items:center;gap:0.5rem;font-size:0.62rem">
     <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;letter-spacing:0.06em">
       <input type="checkbox" id="global-comments-toggle" onchange="setCommentsGlobal(this.checked)" style="accent-color:var(--gold-dark);width:13px;height:13px">
@@ -936,6 +937,26 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
       <button class="btn btn-outline" onclick="closeOwnerPanel()">Close</button>
       <button class="btn btn-danger" onclick="ownerLogout()">Log Out</button>
     </div>
+    <!-- Banned Users section (visible to owner inside owner panel) -->
+    <hr style="border:none;border-top:1px solid var(--border-gold);margin:1.25rem 0 1rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+      <div style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.1em;color:var(--green-mid)">🚫 Banned Users</div>
+      <span id="owner-banned-count" style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--text-light);font-style:italic"></span>
+    </div>
+    <div id="owner-banned-list" style="min-height:1.5rem;max-height:200px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- BANNED USERS MODAL (admin + owner access) -->
+<div class="modal-overlay" id="banned-panel-modal">
+  <div class="modal-box" style="max-width:420px;text-align:left">
+    <h3 style="text-align:center;margin-bottom:0.25rem">🚫 Banned Users</h3>
+    <p style="text-align:center;margin-bottom:1rem;font-size:0.85rem;font-style:italic;color:var(--text-light)">Users banned from commenting. Click Unban to restore access.</p>
+    <div id="banned-panel-count" style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--text-light);margin-bottom:0.65rem;text-align:center"></div>
+    <div id="banned-panel-list" style="min-height:2rem;max-height:260px;overflow-y:auto"></div>
+    <div class="modal-btns" style="margin-top:1rem">
+      <button class="btn btn-outline" onclick="closeModal('banned-panel-modal')">Close</button>
+    </div>
   </div>
 </div>
 
@@ -1143,6 +1164,8 @@ function renderAdminList(){
   const admins=getAdmins(), cont=document.getElementById('admin-list');
   if(!admins.length){ cont.innerHTML='<p style="font-style:italic;font-size:0.85rem;color:var(--text-light);text-align:center;padding:0.5rem 0">No admin passwords added yet.</p>'; return; }
   cont.innerHTML=admins.map((a,i)=>`<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid var(--border-gold)"><span style="flex:1;font-family:'Cinzel',serif;font-size:0.75rem;color:var(--green-deep)">${esc(a.label)}</span><span style="font-size:0.78rem;color:var(--text-light);font-style:italic">${esc(a.pw)}</span><button class="btn btn-danger" style="padding:2px 8px;font-size:0.62rem" onclick="removeAdmin(${i})">Remove</button></div>`).join('');
+  // Also render banned list in owner panel
+  renderBannedPanel('owner-banned-list','owner-banned-count');
 }
 async function addAdmin(){
   const label=document.getElementById('new-admin-label').value.trim();
@@ -2338,6 +2361,42 @@ function banCommenter(name){
   const idx    = banned.findIndex(b=>b.toLowerCase()===lower);
   if(idx>-1){ banned.splice(idx,1); saveBanned(banned); notify(`${name} has been unbanned.`); }
   else       { banned.push(name); saveBanned(banned); notify(`${name} has been banned from commenting.`); }
+  if(currentPostId) renderComments(currentPostId);
+}
+
+// ════════════════════════════════════════════════
+// BANNED USERS PANEL
+// ════════════════════════════════════════════════
+function openBannedPanel(){
+  if(!isLoggedIn()) return;
+  renderBannedPanel('banned-panel-list','banned-panel-count');
+  openModal('banned-panel-modal');
+}
+
+function renderBannedPanel(listId, countId){
+  const banned = getBanned();
+  const listEl = document.getElementById(listId);
+  const countEl = document.getElementById(countId);
+  if(!listEl) return;
+  if(countEl) countEl.textContent = banned.length ? banned.length + ' user' + (banned.length===1?'':'s') + ' currently banned' : '';
+  if(!banned.length){
+    listEl.innerHTML = '<p style="font-style:italic;font-size:0.85rem;color:var(--text-light);text-align:center;padding:0.75rem 0">No users are currently banned.</p>';
+    return;
+  }
+  listEl.innerHTML = banned.map((name,i) => `
+    <div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-bottom:1px solid var(--border-gold)">
+      <span style="font-size:0.85rem">🚫</span>
+      <span style="flex:1;font-family:'Cinzel',serif;font-size:0.75rem;color:var(--text-dark)">${esc(name)}</span>
+      <button class="btn btn-outline" style="padding:2px 10px;font-size:0.62rem;border-color:var(--green-mid);color:var(--green-mid)" onclick="unbanFromPanel('${esc(name)}','${listId}','${countId}')">🔓 Unban</button>
+    </div>`).join('');
+}
+
+function unbanFromPanel(name, listId, countId){
+  const banned = getBanned();
+  const lower = name.toLowerCase().trim();
+  const idx = banned.findIndex(b=>b.toLowerCase()===lower);
+  if(idx>-1){ banned.splice(idx,1); saveBanned(banned); notify(`${name} has been unbanned.`); }
+  renderBannedPanel(listId, countId);
   if(currentPostId) renderComments(currentPostId);
 }
 

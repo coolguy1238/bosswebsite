@@ -1995,13 +1995,25 @@ function getCommentLikes(){ try{ return JSON.parse(localStorage.getItem(COMMENT_
 function saveCommentLikes(obj){ localStorage.setItem(COMMENT_LIKES_KEY,JSON.stringify(obj)); }
 
 // In-memory cache of comments for current post
+// Stored as JSON array inside each post row (posts.comments) — no extra table needed
 let _currentComments = [];
 
 async function fetchComments(postId){
   try{
-    const data = await supa('GET', `comments?post_id=eq.${encodeURIComponent(postId)}&order=date.asc`);
-    return data || [];
+    const data = await supa('GET', 'posts?id=eq.'+encodeURIComponent(postId));
+    if(data && data[0]){
+      const idx = posts.findIndex(p=>p.id===postId);
+      if(idx>-1) posts[idx] = data[0];
+      return Array.isArray(data[0].comments) ? data[0].comments : [];
+    }
+    return [];
   }catch(e){ return []; }
+}
+
+async function saveCommentsToPost(postId, commentsArr){
+  await supa('PATCH', 'posts?id=eq.'+encodeURIComponent(postId), {comments: commentsArr});
+  const idx = posts.findIndex(p=>p.id===postId);
+  if(idx>-1) posts[idx].comments = commentsArr;
 }
 
 // ════════════════════════════════════════════════
@@ -2136,12 +2148,14 @@ async function submitComment(){
   errEl.textContent='';
   if(isBanned(name)){ errEl.textContent='You are not permitted to comment.'; return; }
 
-  const id = Date.now().toString()+Math.random().toString(36).slice(2,6);
   try{
-    await supa('POST','comments',{id, post_id:currentPostId, author:name, body, date:new Date().toISOString(), parent_id:null, likes:0});
+    const freshComments = await fetchComments(currentPostId);
+    const newComment = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:null, likes:0};
+    freshComments.push(newComment);
+    await saveCommentsToPost(currentPostId, freshComments);
     document.getElementById('comment-name').value='';
     document.getElementById('comment-text').value='';
-    _currentComments = await fetchComments(currentPostId);
+    _currentComments = freshComments;
     renderComments(currentPostId);
     notify('Comment posted ✓');
     const post = posts.find(p=>p.id===currentPostId);
@@ -2156,18 +2170,20 @@ async function submitReply(parentId){
   if(!name||!body){ notify('Please fill in your name and reply.'); return; }
   if(isBanned(name)){ notify('You are not permitted to reply.'); return; }
 
-  const id = Date.now().toString()+Math.random().toString(36).slice(2,6);
   try{
-    await supa('POST','comments',{id, post_id:currentPostId, author:name, body, date:new Date().toISOString(), parent_id:parentId, likes:0});
+    const freshComments = await fetchComments(currentPostId);
+    const newReply = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:parentId, likes:0};
+    freshComments.push(newReply);
+    await saveCommentsToPost(currentPostId, freshComments);
     document.getElementById('reply-name-'+parentId).value='';
     document.getElementById('reply-text-'+parentId).value='';
     toggleReplyForm(parentId);
-    _currentComments = await fetchComments(currentPostId);
+    _currentComments = freshComments;
     renderComments(currentPostId);
     notify('Reply posted ✓');
     const post = posts.find(p=>p.id===currentPostId);
     addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
-  }catch(e){ notify('Could not post reply. Please try again.'); }
+  }catch(e){ notify('Could not post reply: '+(e.message||'Please try again.')); }
 }
 
 async function likeComment(commentId){
@@ -2177,17 +2193,14 @@ async function likeComment(commentId){
   if(!comment) return;
 
   if(clikes[likeKey]){
-    // Unlike
     delete clikes[likeKey];
-    const newLikes = Math.max(0,(comment.likes||1)-1);
-    try{ await supa('PATCH',`comments?id=eq.${commentId}`,{likes:newLikes}); comment.likes=newLikes; }catch(e){}
+    comment.likes = Math.max(0,(comment.likes||1)-1);
   } else {
-    // Like
     clikes[likeKey] = true;
-    const newLikes = (comment.likes||0)+1;
-    try{ await supa('PATCH',`comments?id=eq.${commentId}`,{likes:newLikes}); comment.likes=newLikes; }catch(e){}
+    comment.likes = (comment.likes||0)+1;
   }
   saveCommentLikes(clikes);
+  try{ await saveCommentsToPost(currentPostId, _currentComments); }catch(e){}
   renderComments(currentPostId);
 }
 
@@ -2195,13 +2208,12 @@ async function deleteComment(commentId){
   if(!isLoggedIn()||!currentPostId) return;
   if(!confirm('Delete this comment and all its replies?')) return;
   try{
-    // Delete replies first, then the comment
-    await supa('DELETE',`comments?parent_id=eq.${commentId}`);
-    await supa('DELETE',`comments?id=eq.${commentId}`);
-    _currentComments = await fetchComments(currentPostId);
+    // Remove the comment and any replies to it
+    _currentComments = _currentComments.filter(c => c.id !== commentId && c.parent_id !== commentId);
+    await saveCommentsToPost(currentPostId, _currentComments);
     renderComments(currentPostId);
     notify('Comment deleted.');
-  }catch(e){ notify('Error deleting comment.'); }
+  }catch(e){ notify('Error deleting comment: '+e.message); }
 }
 
 function banCommenter(name){

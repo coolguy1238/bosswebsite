@@ -399,7 +399,7 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
 
 <div class="notif" id="notif"></div>
 <div class="admin-badge-bar" id="admin-bar" style="display:flex;align-items:center;justify-content:center;gap:1.25rem;flex-wrap:wrap">
-  <span>🔑 Admin Mode Active — You can write, edit and delete posts</span>
+  <span id="admin-bar-text">🔑 Admin Mode Active — You can write, edit and delete posts</span>
   <span style="display:flex;align-items:center;gap:0.5rem;font-size:0.62rem">
     <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;letter-spacing:0.06em">
       <input type="checkbox" id="global-comments-toggle" onchange="setCommentsGlobal(this.checked)" style="accent-color:var(--gold-dark);width:13px;height:13px">
@@ -1099,10 +1099,12 @@ function updateAdminUI(){
   const nw=document.getElementById('menu-write');
   if(nw) nw.style.display=loggedIn?'flex':'none';
   document.getElementById('write-fab').classList.toggle('show',loggedIn);
-  document.getElementById('admin-bar').textContent=owner
+  const bar=document.getElementById('admin-bar');
+  const barMsg=owner
     ?'👑 Owner Mode — Full control: write, edit, delete posts and manage admin access'
     :'🔑 Admin Mode — You can write, edit and delete posts';
-  document.getElementById('admin-bar').classList.toggle('show',loggedIn);
+  document.getElementById('admin-bar-text').textContent=barMsg;
+  bar.classList.toggle('show',loggedIn);
   if(typeof updateThemePanelUI==='function') updateThemePanelUI();
 }
 function handleAdminBtn(){

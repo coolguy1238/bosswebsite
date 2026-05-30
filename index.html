@@ -1154,7 +1154,7 @@ function setMenuActive(id){
 const SUPA_URL='https://tmahoeriamlhkimkdqpd.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtYWhvZXJpYW1saGtpbWtkcXBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NDY1NDcsImV4cCI6MjA5NTEyMjU0N30.d30n3D1ES3FwWCVRfj18-CByAu4vBWvJCM-ogN0hqIY';
 async function supa(method,path,body){
-  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'},body:body?JSON.stringify(body):undefined});
+  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal','Accept-Profile':'public','Content-Profile':'public'},body:body?JSON.stringify(body):undefined});
   if(method==='DELETE'||(method==='PATCH'&&res.status===204)) return null;
   const data=await res.json();
   if(!res.ok){ throw new Error((data&&(data.message||data.hint||data.code))||'HTTP '+res.status); }

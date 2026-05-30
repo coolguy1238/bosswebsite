@@ -1048,7 +1048,7 @@ const ADMIN_KEY        = 'khaak_admins_v1';
 const SESSION_KEY      = 'khaak_admin_session';
 const SESSION_OWNER_KEY= 'khaak_owner_session';
 const LIKES_KEY        = 'khaak_likes_v1';
-const OWNER_PASSWORD   = 'nalaynepaak786';
+const OWNER_PASSWORD_HASH = '3a50c55aaf4d8bdff91b37ad56ccfb101319e610c56e15f33c41f975ec913830';
 
 let posts = [], editingId = null, deleteTargetId = null;
 let currentCats = [], activeFilter = 'all', pendingAttachments = [];
@@ -1061,8 +1061,13 @@ function isOwner(){ return sessionStorage.getItem(SESSION_OWNER_KEY)==='1'; }
 function isLoggedIn(){ return isOwner()||sessionStorage.getItem(SESSION_KEY)==='1'; }
 function getAdmins(){ try{ return JSON.parse(localStorage.getItem(ADMIN_KEY))||[]; }catch(e){ return []; } }
 function saveAdmins(list){ localStorage.setItem(ADMIN_KEY,JSON.stringify(list)); }
-function checkPassword(pw){
-  if(pw===OWNER_PASSWORD) return 'owner';
+async function hashPw(pw){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function checkPassword(pw){
+  const h = await hashPw(pw);
+  if(h===OWNER_PASSWORD_HASH) return 'owner';
   if(getAdmins().some(a=>a.pw===pw)) return 'admin';
   return null;
 }
@@ -1091,10 +1096,10 @@ function handleAdminBtn(){
     setTimeout(()=>document.getElementById('login-password-input').focus(),100);
   }
 }
-function submitLogin(){
+async function submitLogin(){
   const pw=document.getElementById('login-password-input').value;
   const err=document.getElementById('login-error');
-  const role=checkPassword(pw);
+  const role=await checkPassword(pw);
   if(role==='owner'){
     sessionStorage.setItem(SESSION_OWNER_KEY,'1'); sessionStorage.setItem(SESSION_KEY,'1');
     closeModal('login-modal'); updateAdminUI(); notify('Welcome back, Owner 👑');
@@ -1112,13 +1117,13 @@ function renderAdminList(){
   if(!admins.length){ cont.innerHTML='<p style="font-style:italic;font-size:0.85rem;color:var(--text-light);text-align:center;padding:0.5rem 0">No admin passwords added yet.</p>'; return; }
   cont.innerHTML=admins.map((a,i)=>`<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid var(--border-gold)"><span style="flex:1;font-family:'Cinzel',serif;font-size:0.75rem;color:var(--green-deep)">${esc(a.label)}</span><span style="font-size:0.78rem;color:var(--text-light);font-style:italic">${esc(a.pw)}</span><button class="btn btn-danger" style="padding:2px 8px;font-size:0.62rem" onclick="removeAdmin(${i})">Remove</button></div>`).join('');
 }
-function addAdmin(){
+async function addAdmin(){
   const label=document.getElementById('new-admin-label').value.trim();
   const pw=document.getElementById('new-admin-pw').value.trim();
   const err=document.getElementById('new-admin-error');
   if(!label){ err.textContent='Please enter a name.'; err.classList.add('show'); return; }
   if(!pw||pw.length<4){ err.textContent='Password must be at least 4 characters.'; err.classList.add('show'); return; }
-  if(pw===OWNER_PASSWORD){ err.textContent='That password is reserved.'; err.classList.add('show'); return; }
+  const pwHash=await hashPw(pw); if(pwHash===OWNER_PASSWORD_HASH){ err.textContent='That password is reserved.'; err.classList.add('show'); return; }
   const admins=getAdmins();
   if(admins.some(a=>a.pw===pw)){ err.textContent='That password is already in use.'; err.classList.add('show'); return; }
   admins.push({label,pw}); saveAdmins(admins);

@@ -1173,20 +1173,25 @@ function showLoading(on){
 }
 
 // ════════════════════════════════════════════════
-// LIKES (localStorage per browser)
+// LIKES — count stored in Supabase (posts.likes column)
+//         "has this browser liked" stored in localStorage only
 // ════════════════════════════════════════════════
-function getLikes(){ try{ return JSON.parse(localStorage.getItem(LIKES_KEY))||{}; }catch(e){ return {}; } }
-function saveLikes(obj){ localStorage.setItem(LIKES_KEY,JSON.stringify(obj)); }
-function getLikeCount(postId){ const l=getLikes(); return l[postId]||0; }
-function hasLiked(postId){ return !!getLikes()['liked_'+postId]; }
-function togglePostLike(){
+function hasLiked(postId){ try{ return !!JSON.parse(localStorage.getItem(LIKES_KEY)||'{}')['liked_'+postId]; }catch(e){ return false; } }
+function setLikedLocally(postId, val){ try{ const l=JSON.parse(localStorage.getItem(LIKES_KEY)||'{}'); if(val) l['liked_'+postId]=true; else delete l['liked_'+postId]; localStorage.setItem(LIKES_KEY,JSON.stringify(l)); }catch(e){} }
+function getLikeCount(postId){ const p=posts.find(x=>x.id===postId); return (p&&p.likes)||0; }
+
+async function togglePostLike(){
   if(!currentPostId) return;
-  const likes=getLikes();
-  const key='liked_'+currentPostId;
-  if(likes[key]){ delete likes[key]; likes[currentPostId]=Math.max(0,(likes[currentPostId]||0)-1); }
-  else { likes[key]=true; likes[currentPostId]=(likes[currentPostId]||0)+1; }
-  saveLikes(likes); renderPostLike(currentPostId);
+  const post=posts.find(p=>p.id===currentPostId); if(!post) return;
+  const liked=hasLiked(currentPostId);
+  const newCount=Math.max(0,(post.likes||0)+(liked?-1:1));
+  setLikedLocally(currentPostId,!liked);
+  post.likes=newCount;
+  renderPostLike(currentPostId);
+  try{ await supa('PATCH','posts?id=eq.'+currentPostId,{likes:newCount}); }
+  catch(e){ /* revert on failure */ setLikedLocally(currentPostId,liked); post.likes=(post.likes||0)+(liked?1:-1); renderPostLike(currentPostId); }
 }
+
 function renderPostLike(postId){
   const btn=document.getElementById('post-like-btn');
   const cnt=document.getElementById('post-like-count');
@@ -1194,7 +1199,7 @@ function renderPostLike(postId){
   const liked=hasLiked(postId), count=getLikeCount(postId);
   btn.textContent=liked?'❤ Liked':'❤ Like this post';
   btn.classList.toggle('liked',liked);
-  cnt.textContent=count>0?`${count} ${count===1?'like':'likes'}`:'';
+  cnt.textContent=count>0?count+' '+(count===1?'like':'likes'):'';
 }
 function getCardLikeCount(postId){ return getLikeCount(postId); }
 
@@ -1366,15 +1371,17 @@ function renderList(filtered){
   }).join('');
 }
 
-function cardLike(postId, btn){
-  const likes=getLikes(), key='liked_'+postId;
-  if(likes[key]){ delete likes[key]; likes[postId]=Math.max(0,(likes[postId]||0)-1); }
-  else { likes[key]=true; likes[postId]=(likes[postId]||0)+1; }
-  saveLikes(likes);
-  const count=likes[postId]||0, liked=!!likes[key==='liked_'+postId?key:'liked_'+postId];
-  const isLiked=!!getLikes()['liked_'+postId];
-  btn.innerHTML=`<span class="heart">${isLiked?'❤':'♡'}</span> ${count||'Like'}`;
+async function cardLike(postId, btn){
+  const post=posts.find(p=>p.id===postId); if(!post) return;
+  const liked=hasLiked(postId);
+  const newCount=Math.max(0,(post.likes||0)+(liked?-1:1));
+  setLikedLocally(postId,!liked);
+  post.likes=newCount;
+  const isLiked=hasLiked(postId);
+  btn.innerHTML='<span class="heart">'+(isLiked?'❤':'♡')+'</span> '+(newCount||'Like');
   btn.classList.toggle('liked',isLiked);
+  try{ await supa('PATCH','posts?id=eq.'+postId,{likes:newCount}); }
+  catch(e){ setLikedLocally(postId,liked); post.likes=(post.likes||0)+(liked?1:-1); }
 }
 
 // ════════════════════════════════════════════════

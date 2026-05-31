@@ -511,7 +511,17 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .cat-pill{background:var(--green-pale);color:var(--green-mid);font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;padding:3px 8px 3px 10px;border-radius:2px;display:flex;align-items:center;gap:0.4rem}
 .cat-pill-remove{background:none;border:none;color:var(--green-light);cursor:pointer;font-size:0.85rem;line-height:1;padding:0}
 .cat-pill-remove:hover{color:#8B1A1A}
-.upload-area{border:2px dashed var(--border-gold);border-radius:2px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--card-bg);position:relative}
+.format-toolbar{display:flex;align-items:center;gap:0.35rem;padding:0.4rem 0.6rem;background:var(--gold-pale);border:1px solid var(--border-gold);border-bottom:none;border-radius:2px 2px 0 0}
+.fmt-btn{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:2px;width:30px;height:28px;cursor:pointer;font-family:Georgia,serif;font-size:0.88rem;color:var(--green-deep);display:flex;align-items:center;justify-content:center;transition:background 0.15s,border-color 0.15s;flex-shrink:0}
+.fmt-btn:hover{background:var(--gold);border-color:var(--gold-dark);color:var(--green-deep)}
+.fmt-btn:active{transform:scale(0.93)}
+.fmt-divider{width:1px;height:18px;background:var(--border-gold);margin:0 0.15rem;flex-shrink:0}
+.fmt-hint{font-family:'Cinzel',serif;font-size:0.57rem;letter-spacing:0.08em;color:var(--text-light);opacity:0.75}
+.format-toolbar+.form-textarea{border-top:none;border-radius:0 0 2px 2px}
+/* ── FORMATTED TEXT IN POSTS ── */
+.post-body b,.post-body strong{font-weight:700;color:inherit}
+.post-body i,.post-body em{font-style:italic;color:inherit}
+.post-body u{text-decoration:underline;text-underline-offset:3px;color:inherit}border-radius:2px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--card-bg);position:relative}
 .upload-area:hover,.upload-area.dragover{border-color:var(--gold);background:var(--gold-pale)}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-icon{font-size:1.75rem;margin-bottom:0.4rem;opacity:0.5}
@@ -888,7 +898,15 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
       </div>
       <div class="form-group">
         <label class="form-label">Content</label>
+        <div class="format-toolbar">
+          <button type="button" class="fmt-btn" onclick="fmtWrap('**','**')" title="Bold"><b>B</b></button>
+          <button type="button" class="fmt-btn" onclick="fmtWrap('_','_')" title="Italic"><i>I</i></button>
+          <button type="button" class="fmt-btn" onclick="fmtWrap('__','__')" title="Underline"><u>U</u></button>
+          <span class="fmt-divider"></span>
+          <span class="fmt-hint">Select text then click, or click then type</span>
+        </div>
         <textarea class="form-textarea" id="f-body" placeholder="Write your post here…&#10;&#10;Leave a blank line between paragraphs.&#10;Start a line with > for a block quote (Hadith, Quranic verse, etc.)"></textarea>
+        <p class="form-hint" style="margin-top:0.35rem">Formatting: **bold** &nbsp;·&nbsp; _italic_ &nbsp;·&nbsp; __underline__ &nbsp;·&nbsp; > blockquote</p>
       </div>
       <div class="form-group">
         <label class="form-label">Attach Photos &amp; Files</label>
@@ -1812,8 +1830,23 @@ ua.addEventListener('dragleave',()=>ua.classList.remove('dragover'));
 ua.addEventListener('drop',e=>{e.preventDefault();ua.classList.remove('dragover');handleFiles(e.dataTransfer.files)});
 
 // ════════════════════════════════════════════════
-// SAVE POST
+// FORMATTING TOOLBAR
 // ════════════════════════════════════════════════
+function fmtWrap(before, after){
+  const ta = document.getElementById('f-body');
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const selected = ta.value.slice(start, end);
+  const replacement = before + (selected || 'text') + after;
+  ta.setRangeText(replacement, start, end, 'select');
+  if(!selected){
+    // Place cursor between the markers so user can type
+    ta.selectionStart = start + before.length;
+    ta.selectionEnd   = start + before.length + 4; // selects placeholder 'text'
+  }
+  ta.focus();
+}
+
+
 async function savePost(){
   const title=document.getElementById('f-title').value.trim();
   const body=document.getElementById('f-body').value.trim();
@@ -1988,10 +2021,17 @@ function openPost(id){
 }
 
 function renderBody(text){
+  function fmtInline(s){
+    // Order matters: underline __ before italic _
+    return s
+      .replace(/\*\*(.+?)\*\*/g,(_,m)=>`<strong>${m}</strong>`)
+      .replace(/__(.+?)__/g,(_,m)=>`<u>${m}</u>`)
+      .replace(/_(.+?)_/g,(_,m)=>`<em>${m}</em>`);
+  }
   return text.split(/\n\n+/).map(para=>{
     const t=para.trim();
-    if(t.startsWith('> ')) return `<blockquote>${esc(t.slice(2))}</blockquote>`;
-    return `<p>${esc(t).replace(/\n/g,'<br>')}</p>`;
+    if(t.startsWith('> ')) return `<blockquote>${fmtInline(esc(t.slice(2)))}</blockquote>`;
+    return `<p>${fmtInline(esc(t)).replace(/\n/g,'<br>')}</p>`;
   }).join('');
 }
 

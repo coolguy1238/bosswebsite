@@ -431,6 +431,9 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .post-view.pinned-open .comment-form{background:rgba(201,168,76,0.07);border-color:rgba(201,168,76,0.25)}
 .post-view.pinned-open .comment-form-title{color:var(--gold-light)}
 .post-view.pinned-open .comment-item{background:rgba(255,255,255,0.04);border-color:rgba(201,168,76,0.2)}
+.post-view.pinned-open .comment-author{color:var(--gold-light)}
+.post-view.pinned-open .comment-body{color:rgba(245,237,208,0.92)}
+.post-view.pinned-open .comment-date{color:rgba(232,201,122,0.6)}
 /* Pinned badge inside the post */
 .pinned-post-top-badge{
   display:inline-flex;align-items:center;gap:0.4rem;
@@ -1919,7 +1922,7 @@ function renderList(filtered){
         <div class="pinned-divider-top"></div>
         <div class="pinned-card-category">${(pinned.categories&&pinned.categories.length)?pinned.categories.join(' · '):'General'}</div>
         <div class="pinned-card-title">${esc(pinned.title)}</div>
-        <div class="pinned-card-meta">${fmtDate(pinned.date)}${(pinned.edited&&pinned.id!=='1748722800000')?' · Edited '+fmtDate(pinned.edited):''}</div>
+        <div class="pinned-card-meta">${fmtDate(pinned.date)}${pinned.edited?' · Edited '+fmtDate(pinned.edited):''}</div>
         <div class="pinned-card-excerpt">${esc(pinned.body.substring(0,300))}${pinned.body.length>300?'…':''}</div>
         <div class="pinned-card-footer">
           <div class="pinned-ornament">
@@ -1941,7 +1944,7 @@ function renderList(filtered){
       ${thumbSrc?`<img class="blog-card-thumb" src="${thumbSrc}" alt="" style="object-position:${thumbPos}">`:'' }
       <div class="blog-card-category">${(p.categories&&p.categories.length)?p.categories.join(' · '):'General'}</div>
       <div class="blog-card-title">${esc(p.title)}</div>
-      <div class="blog-card-meta">${fmtDate(p.date)}${(p.edited&&p.id!=='1748722800000')?' · Edited '+fmtDate(p.edited):''}</div>
+      <div class="blog-card-meta">${fmtDate(p.date)}${p.edited?' · Edited '+fmtDate(p.edited):''}</div>
       <div class="blog-card-excerpt">${esc(p.body.substring(0,280))}${p.body.length>280?'…':''}</div>
       <div class="blog-card-footer">
         <span class="read-more">Read more →</span>
@@ -1983,7 +1986,7 @@ function openPost(id){
     `<span>${fmtDate(p.date)}</span>`+
     (p.author?`<span style="font-style:italic;opacity:0.7">by ${esc(p.author)}</span>`:'<span style="font-style:italic;opacity:0.7">by SMZ</span>')+
     cats.map(c=>`<span class="post-category-badge">${esc(c)}</span>`).join('')+
-    (p.edited&&p.id!=='1748722800000'?`<span style="font-style:italic">Edited ${fmtDate(p.edited)}</span>`:'');
+    (p.edited?`<span style="font-style:italic">Edited ${fmtDate(p.edited)}</span>`:'');
   const postBodyEl = document.getElementById('post-body');
   postBodyEl.innerHTML = renderBody(p.body);
   postBodyEl.classList.toggle('fancy-prose', !!(p.fancy_prose || (p.attachments||[]).some(a=>a.fancy_prose)));

@@ -1986,9 +1986,9 @@ function openPost(id){
     (p.edited?`<span style="font-style:italic">Edited ${fmtDate(p.edited)}</span>`:'');
   const postBodyEl = document.getElementById('post-body');
   postBodyEl.innerHTML = renderBody(p.body);
-  postBodyEl.classList.toggle('fancy-prose', !!p.fancy_prose);
+  postBodyEl.classList.toggle('fancy-prose', !!(p.fancy_prose || (p.attachments||[]).some(a=>a.fancy_prose)));
   const imgs=(p.attachments||[]).filter(a=>a.type==='image');
-  const imgProtect = !!p.protected_images;
+  const imgProtect = !!(p.protected_images || imgs.some(a=>a.protected));
   document.getElementById('post-images').innerHTML=imgs.map(a=>{
     const src=a.url||a.dataUrl;
     if(imgProtect){
@@ -3598,14 +3598,13 @@ document.addEventListener('click', e=>{
 (async function seedNalaynPost(){
   const SEED_ID = '1748722800000';
   const SEED_KEY = 'khaak_seed_nalayn_v3';
-  if(localStorage.getItem(SEED_KEY)) return; // already seeded on this device
-  // Check if post exists in Supabase
+  // Check if post exists in Supabase (always check — don't rely on localStorage)
   try{
     const check = await supa('GET', 'posts?id=eq.' + SEED_ID);
     if(check && check.length > 0){
       // Update title if it changed
       if(check[0].title !== "The Na’layn Sharīf of Sayyidunā al-Muṣṭafā ﷺ"){
-        await supa('PATCH','posts?id=eq.'+SEED_ID,{title:"The Na’layn Sharīf of Sayyidunā al-Muṣṭafā ﷺ", fancy_prose:true});
+        await supa('PATCH','posts?id=eq.'+SEED_ID,{title:"The Na’layn Sharīf of Sayyidunā al-Muṣṭafā ﷺ"});
         await loadPosts();
       }
       localStorage.setItem(SEED_KEY,'1'); return;
@@ -3626,7 +3625,7 @@ document.addEventListener('click', e=>{
     const imgUrl = upRes.ok
       ? SUPA_URL + '/storage/v1/object/public/attachments/' + fname
       : b64; // fallback to dataUrl if upload fails
-    const att = [{"type":"image","name":"nalayn-sharif.png","size":66163,"url":imgUrl,"thumbPosition":"50% 50%"}];
+    const att = [{"type":"image","name":"nalayn-sharif.png","size":66163,"url":imgUrl,"thumbPosition":"50% 50%","protected":true,"fancy_prose":true}];
     const postData = {
       id: SEED_ID,
       title: "The Na'layn Sharīf of Sayyidunā al-Muṣṭafā ﷺ",
@@ -3636,8 +3635,6 @@ document.addEventListener('click', e=>{
       date: "2026-05-31T21:00:00.000Z",
       attachments: att,
       pinned: false,
-      protected_images: true,
-      fancy_prose: true,
       likes: 0
     };
     await supa('POST','posts', postData);

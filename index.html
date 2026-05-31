@@ -229,6 +229,16 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .pinned-ornament-star{color:var(--gold);font-size:0.7rem;opacity:0.7}
 @keyframes pinnedPulse{0%,100%{box-shadow:0 6px 30px rgba(13,59,31,0.35),0 0 0 1px rgba(201,168,76,0.15)}50%{box-shadow:0 6px 30px rgba(13,59,31,0.35),0 0 0 1px rgba(201,168,76,0.35),0 0 20px rgba(201,168,76,0.08)}}
 .pinned-card{animation:pinnedPulse 4s ease-in-out infinite}
+.pinned-card,.pinned-card *{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+
+/* ── PINNED POST OPEN PROTECTION ── */
+.post-view.pinned-protected,.post-view.pinned-protected *{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+.post-view.pinned-protected{position:relative}
+.pinned-watermark{
+  position:absolute;inset:0;pointer-events:none;z-index:10;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='220'%3E%3Ctext x='50%25' y='50%25' font-family='Georgia,serif' font-size='12' fill='rgba(201,168,76,0.07)' text-anchor='middle' dominant-baseline='middle' transform='rotate(-30,160,110)'%3EKhaak al Na%27layn Sharif%3C/text%3E%3C/svg%3E");
+  background-repeat:repeat;
+}
 .blog-card-category{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem}
 .blog-card-category::before{content:'◆';font-size:0.4rem;color:var(--gold)}
 .blog-card-title{font-family:'Cinzel',serif;font-size:1.15rem;color:var(--card-title);font-weight:600;margin-bottom:0.35rem;line-height:1.35}
@@ -1511,7 +1521,14 @@ function showHome(){
 }
 function showAllPosts(){ showHome(); setMenuActive('menu-all'); }
 function cancelWrite(){ showHome(); }
-function backToList(){ showHome(); }
+function backToList(){
+  const postView=document.getElementById('post-view');
+  postView.classList.remove('pinned-protected');
+  postView.oncontextmenu=null;
+  const watermark=document.getElementById('pinned-watermark-overlay');
+  if(watermark) watermark.style.display='none';
+  showHome();
+}
 
 function showSection(name){
   hideAllViews();
@@ -1808,6 +1825,19 @@ function openPost(id){
   document.getElementById('post-edit-bar').innerHTML=isLoggedIn()?`<button class="btn btn-outline" onclick="showWrite('${id}')">Edit Post</button><button class="btn btn-danger" onclick="promptDelete('${id}')">Delete Post</button>${isOwner()?`<button class="btn btn-gold" id="pin-btn-${id}" onclick="togglePin('${id}')">${p.pinned?'📌 Unpin Post':'📌 Pin Post'}</button>`:''}`:'`';
   renderPostLike(id);
   loadComments(id);
+  // Apply protection to pinned posts
+  const postView=document.getElementById('post-view');
+  let watermark=document.getElementById('pinned-watermark-overlay');
+  if(p.pinned && !isOwner()){
+    postView.classList.add('pinned-protected');
+    postView.oncontextmenu=e=>e.preventDefault();
+    if(!watermark){ watermark=document.createElement('div'); watermark.id='pinned-watermark-overlay'; watermark.className='pinned-watermark'; postView.appendChild(watermark); }
+    watermark.style.display='block';
+  } else {
+    postView.classList.remove('pinned-protected');
+    postView.oncontextmenu=null;
+    if(watermark) watermark.style.display='none';
+  }
   window.scrollTo(0,0);
 }
 

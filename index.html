@@ -210,14 +210,14 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 }
 .pinned-card:hover{box-shadow:0 10px 40px rgba(13,59,31,0.5),0 0 0 1px rgba(201,168,76,0.3);transform:translateY(-2px)}
 .pinned-card-lattice{position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 18px,rgba(201,168,76,0.03) 18px,rgba(201,168,76,0.03) 19px),repeating-linear-gradient(-45deg,transparent,transparent 18px,rgba(201,168,76,0.03) 18px,rgba(201,168,76,0.03) 19px);pointer-events:none}
-.pinned-card-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:60%;height:120px;background:radial-gradient(ellipse,rgba(201,168,76,0.12) 0%,transparent 70%);pointer-events:none}
+.pinned-card-glow{position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:80%;height:160px;background:radial-gradient(ellipse,rgba(201,168,76,0.28) 0%,rgba(201,168,76,0.08) 50%,transparent 70%);pointer-events:none;animation:pinnedInnerGlowAnim 3.5s ease-in-out infinite}
 .pinned-card-inner{position:relative;z-index:1;padding:1.5rem 1.75rem 1.25rem}
 .pinned-badge{display:inline-flex;align-items:center;gap:0.4rem;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.2em;color:var(--gold);background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);border-radius:2px;padding:3px 10px;margin-bottom:0.9rem;text-transform:uppercase}
 .pinned-badge::before{content:'📌';font-size:0.65rem}
 .pinned-divider-top{height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin-bottom:1.1rem;opacity:0.5}
 .pinned-card-category{font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.15em;color:var(--gold-light);text-transform:uppercase;margin-bottom:0.5rem;opacity:0.8;display:flex;align-items:center;gap:0.4rem}
 .pinned-card-category::before{content:'✦';font-size:0.4rem;color:var(--gold)}
-.pinned-card-title{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold-light);font-weight:700;margin-bottom:0.5rem;line-height:1.35;text-shadow:0 0 20px rgba(201,168,76,0.2)}
+.pinned-card-title{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold-light);font-weight:700;margin-bottom:0.5rem;line-height:1.35;text-shadow:0 0 20px rgba(201,168,76,0.5),0 0 45px rgba(201,168,76,0.25),0 0 80px rgba(201,168,76,0.1)}
 .pinned-card-meta{font-size:0.78rem;color:rgba(232,201,122,0.6);font-style:italic;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
 .pinned-card-excerpt{font-size:0.97rem;color:rgba(245,237,208,0.8);line-height:1.75;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .pinned-card-thumb{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block;border-bottom:1px solid rgba(201,168,76,0.3)}
@@ -227,8 +227,13 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .pinned-ornament-line{flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.4));max-width:60px}
 .pinned-ornament-line.right{background:linear-gradient(to left,transparent,rgba(201,168,76,0.4))}
 .pinned-ornament-star{color:var(--gold);font-size:0.7rem;opacity:0.7}
-@keyframes pinnedPulse{0%,100%{box-shadow:0 6px 30px rgba(13,59,31,0.35),0 0 0 1px rgba(201,168,76,0.15)}50%{box-shadow:0 6px 30px rgba(13,59,31,0.35),0 0 0 1px rgba(201,168,76,0.35),0 0 20px rgba(201,168,76,0.08)}}
-.pinned-card{animation:pinnedPulse 4s ease-in-out infinite}
+@keyframes pinnedPulse{
+  0%,100%{box-shadow:0 6px 30px rgba(13,59,31,0.4),0 0 0 1px rgba(201,168,76,0.2),0 0 18px rgba(201,168,76,0.1),0 0 40px rgba(201,168,76,0.05)}
+  50%{box-shadow:0 8px 40px rgba(13,59,31,0.55),0 0 0 1px rgba(201,168,76,0.55),0 0 35px rgba(201,168,76,0.25),0 0 70px rgba(201,168,76,0.12),0 0 110px rgba(201,168,76,0.06)}
+}
+@keyframes pinnedInnerGlowAnim{0%,100%{opacity:0.18}50%{opacity:0.45}}
+.pinned-card{animation:pinnedPulse 3.5s ease-in-out infinite}
+.pinned-card:hover{box-shadow:0 12px 50px rgba(13,59,31,0.6),0 0 0 1px rgba(201,168,76,0.7),0 0 50px rgba(201,168,76,0.32),0 0 90px rgba(201,168,76,0.14)!important;transform:translateY(-2px);animation-play-state:paused}
 .pinned-card,.pinned-card *{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
 
 /* ── PINNED POST OPEN PROTECTION ── */
@@ -303,6 +308,18 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .post-like-count{font-size:0.82rem;color:var(--text-light);font-style:italic}
 
 /* ── PINNED POST VIEW — FANCY INNER STYLING ── */
+@keyframes pinnedOpenGlow{
+  0%,100%{box-shadow:0 8px 40px rgba(0,0,0,0.4),0 0 0 1px rgba(201,168,76,0.15),0 0 30px rgba(201,168,76,0.12),0 0 60px rgba(201,168,76,0.06)}
+  50%{box-shadow:0 10px 55px rgba(0,0,0,0.5),0 0 0 1px rgba(201,168,76,0.45),0 0 55px rgba(201,168,76,0.28),0 0 100px rgba(201,168,76,0.14),0 0 160px rgba(201,168,76,0.06)}
+}
+@keyframes pinnedOpenTopGlow{
+  0%,100%{opacity:0.14}
+  50%{opacity:0.32}
+}
+@keyframes pinnedTitleGlow{
+  0%,100%{text-shadow:0 0 20px rgba(201,168,76,0.3),0 0 50px rgba(201,168,76,0.12)}
+  50%{text-shadow:0 0 30px rgba(201,168,76,0.6),0 0 70px rgba(201,168,76,0.28),0 0 120px rgba(201,168,76,0.1)}
+}
 .post-view.pinned-open{
   background:linear-gradient(160deg,var(--green-deep) 0%,#071e0f 100%);
   border:2px solid var(--gold);
@@ -310,7 +327,7 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
   padding:2rem 1.75rem 1.75rem;
   position:relative;
   overflow:hidden;
-  box-shadow:0 8px 40px rgba(0,0,0,0.35),0 0 0 1px rgba(201,168,76,0.1);
+  animation:pinnedOpenGlow 3.5s ease-in-out infinite;
 }
 .post-view.pinned-open::before{
   content:'';position:absolute;inset:0;pointer-events:none;
@@ -318,9 +335,10 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 }
 .post-view.pinned-open::after{
   content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
-  width:70%;height:160px;
-  background:radial-gradient(ellipse,rgba(201,168,76,0.1) 0%,transparent 70%);
+  width:70%;height:180px;
+  background:radial-gradient(ellipse,rgba(201,168,76,0.18) 0%,rgba(201,168,76,0.06) 50%,transparent 70%);
   pointer-events:none;
+  animation:pinnedOpenTopGlow 3.5s ease-in-out infinite;
 }
 .post-view.pinned-open .post-back{color:rgba(232,201,122,0.7);position:relative;z-index:1}
 .post-view.pinned-open .post-back:hover{color:var(--gold)}
@@ -328,9 +346,9 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
   color:var(--gold-light);
   font-size:1.9rem;
   text-align:center;
-  text-shadow:0 0 30px rgba(201,168,76,0.25);
   position:relative;z-index:1;
   margin-bottom:0.6rem;
+  animation:pinnedTitleGlow 3.5s ease-in-out infinite;
 }
 .post-view.pinned-open .post-meta{
   color:rgba(232,201,122,0.6);

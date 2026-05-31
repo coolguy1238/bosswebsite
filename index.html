@@ -3597,7 +3597,7 @@ document.addEventListener('click', e=>{
 // ════════════════════════════════════════════════
 (async function seedNalaynPost(){
   const SEED_ID = '1748722800000';
-  const SEED_KEY = 'khaak_seed_nalayn_v3';
+  const SEED_KEY = 'khaak_seed_nalayn_v4';
   // Check if post exists in Supabase (always check — don't rely on localStorage)
   try{
     const check = await supa('GET', 'posts?id=eq.' + SEED_ID);

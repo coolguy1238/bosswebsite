@@ -431,11 +431,6 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .post-view.pinned-open .comment-form{background:rgba(201,168,76,0.07);border-color:rgba(201,168,76,0.25)}
 .post-view.pinned-open .comment-form-title{color:var(--gold-light)}
 .post-view.pinned-open .comment-item{background:rgba(255,255,255,0.04);border-color:rgba(201,168,76,0.2)}
-.post-view.pinned-open .comment-author{color:var(--gold-light)}
-.post-view.pinned-open .comment-body{color:rgba(245,237,208,0.92)}
-.post-view.pinned-open .comment-date{color:rgba(232,201,122,0.6)}
-.post-view.pinned-open .reply-author{color:var(--gold-light)}
-.post-view.pinned-open .reply-date{color:rgba(232,201,122,0.6)}
 /* Pinned badge inside the post */
 .pinned-post-top-badge{
   display:inline-flex;align-items:center;gap:0.4rem;
@@ -2844,20 +2839,26 @@ let _currentComments = [];
 
 async function fetchComments(postId){
   try{
-    const data = await supa('GET', 'posts?id=eq.'+encodeURIComponent(postId));
-    if(data && data[0]){
-      const idx = posts.findIndex(p=>p.id===postId);
-      if(idx>-1) posts[idx] = data[0];
-      return Array.isArray(data[0].comments) ? data[0].comments : [];
-    }
-    return [];
+    const data = await supa('GET', 'comments?post_id=eq.'+encodeURIComponent(postId)+'&order=date.asc');
+    return Array.isArray(data) ? data : [];
   }catch(e){ return []; }
 }
 
 async function saveCommentsToPost(postId, commentsArr){
-  await supa('PATCH', 'posts?id=eq.'+encodeURIComponent(postId), {comments: commentsArr});
-  const idx = posts.findIndex(p=>p.id===postId);
-  if(idx>-1) posts[idx].comments = commentsArr;
+  // No-op: comments are now saved individually
+}
+
+async function insertComment(comment){
+  await supa('POST', 'comments', comment);
+}
+
+async function updateCommentLikes(commentId, likes){
+  await supa('PATCH', 'comments?id=eq.'+encodeURIComponent(commentId), {likes});
+}
+
+async function deleteCommentFromTable(commentId){
+  await supa('DELETE', 'comments?id=eq.'+encodeURIComponent(commentId));
+  await supa('DELETE', 'comments?parent_id=eq.'+encodeURIComponent(commentId));
 }
 
 // ════════════════════════════════════════════════
@@ -3017,15 +3018,13 @@ async function submitComment(){
   }
 
   try{
-    const freshComments = await fetchComments(currentPostId);
     const role = isOwner() ? 'owner' : isLoggedIn() ? 'admin' : null;
     const device_id = isLoggedIn() ? null : getDeviceId();
-    const newComment = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:null, likes:0, role: role||null, device_id: device_id||null};
-    freshComments.push(newComment);
-    await saveCommentsToPost(currentPostId, freshComments);
+    const newComment = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), post_id:currentPostId, author:name, body, date:new Date().toISOString(), parent_id:null, likes:0, role: role||null, device_id: device_id||null};
+    await insertComment(newComment);
     document.getElementById('comment-name').value='';
     document.getElementById('comment-text').value='';
-    _currentComments = freshComments;
+    _currentComments = await fetchComments(currentPostId);
     renderComments(currentPostId);
     notify('Comment posted ✓');
     incrementDeviceCommentCount();
@@ -3044,22 +3043,19 @@ async function submitReply(parentId){
   if(isBanned(name)){ notify('You are not permitted to reply.'); return; }
 
   try{
-    const freshComments = await fetchComments(currentPostId);
     const role = isOwner() ? 'owner' : isLoggedIn() ? 'admin' : null;
     const device_id = isLoggedIn() ? null : getDeviceId();
-    const newReply = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), author:name, body, date:new Date().toISOString(), parent_id:parentId, likes:0, role: role||null, device_id: device_id||null};
-    freshComments.push(newReply);
-    await saveCommentsToPost(currentPostId, freshComments);
+    const newReply = {id: Date.now().toString()+Math.random().toString(36).slice(2,6), post_id:currentPostId, author:name, body, date:new Date().toISOString(), parent_id:parentId, likes:0, role: role||null, device_id: device_id||null};
+    await insertComment(newReply);
     document.getElementById('reply-name-'+parentId).value='';
     document.getElementById('reply-text-'+parentId).value='';
     toggleReplyForm(parentId);
-    _currentComments = freshComments;
+    _currentComments = await fetchComments(currentPostId);
     renderComments(currentPostId);
-    notify('Reply posted ✓');
+    notify('Reply posted u2713');
     const post = posts.find(p=>p.id===currentPostId);
     await addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
-    // Notify the original commenter that someone replied to them
-    const parentComment = freshComments.find(c=>c.id===parentId);
+    const parentComment = _currentComments.find(c=>c.id===parentId);
     if(parentComment && parentComment.device_id){
       await addViewerNotif(parentComment.device_id, 'reply', currentPostId, post?post.title:'Post', name, body);
     }
@@ -3085,7 +3081,7 @@ async function likeComment(commentId){
     }
   }
   saveCommentLikes(clikes);
-  try{ await saveCommentsToPost(currentPostId, _currentComments); }catch(e){}
+  try{ await updateCommentLikes(commentId, comment.likes); }catch(e){}
   renderComments(currentPostId);
 }
 
@@ -3095,7 +3091,7 @@ async function deleteComment(commentId){
   try{
     // Remove the comment and any replies to it
     _currentComments = _currentComments.filter(c => c.id !== commentId && c.parent_id !== commentId);
-    await saveCommentsToPost(currentPostId, _currentComments);
+    await deleteCommentFromTable(commentId);
     renderComments(currentPostId);
     notify('Comment deleted.');
   }catch(e){ notify('Error deleting comment: '+e.message); }

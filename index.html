@@ -189,6 +189,23 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .blog-card-excerpt{font-size:0.95rem;color:var(--text-mid);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 /* ── IMAGE SHAPE FIX: natural aspect ratio like Dar al Zahra ── */
 .blog-card-thumb{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:2px;margin-bottom:0.75rem;border:1px solid var(--card-border);display:block}
+
+/* ── THUMB FOCUS PICKER ── */
+.thumb-focus-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem}
+.thumb-focus-overlay.hidden{display:none}
+.thumb-focus-title{font-family:'Cinzel',serif;font-size:0.78rem;letter-spacing:0.12em;color:var(--gold);margin-bottom:0.75rem;text-align:center}
+.thumb-focus-hint{font-family:'EB Garamond',serif;font-size:0.85rem;color:rgba(232,201,122,0.7);margin-bottom:1rem;text-align:center}
+.thumb-focus-stage{position:relative;display:inline-block;cursor:crosshair;user-select:none;max-width:min(90vw,700px);border:2px solid var(--gold);border-radius:2px;overflow:hidden}
+.thumb-focus-stage img{display:block;max-width:100%;max-height:55vh;width:auto;height:auto;pointer-events:none}
+.thumb-focus-crosshair{position:absolute;width:28px;height:28px;transform:translate(-50%,-50%);pointer-events:none}
+.thumb-focus-crosshair::before,.thumb-focus-crosshair::after{content:'';position:absolute;background:white;box-shadow:0 0 3px rgba(0,0,0,0.8)}
+.thumb-focus-crosshair::before{width:2px;height:100%;left:50%;transform:translateX(-50%)}
+.thumb-focus-crosshair::after{width:100%;height:2px;top:50%;transform:translateY(-50%)}
+.thumb-focus-crosshair-dot{position:absolute;width:8px;height:8px;background:var(--gold);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px white}
+.thumb-focus-preview{margin-top:1rem;text-align:center}
+.thumb-focus-preview-label{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.12em;color:var(--gold);opacity:0.7;margin-bottom:0.4rem}
+.thumb-focus-preview-img{width:240px;height:135px;object-fit:cover;border:1px solid var(--gold);border-radius:2px;display:block;margin:0 auto}
+.thumb-focus-btns{display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;justify-content:center}
 .read-more{display:inline-block;margin-top:0.75rem;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.1em;color:var(--gold-dark);border-bottom:1px solid var(--gold);padding-bottom:1px}
 
 /* ── LIKE BUTTON ── */
@@ -1209,6 +1226,26 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
   </div>
 </div>
 
+<!-- THUMBNAIL FOCUS PICKER -->
+<div class="thumb-focus-overlay hidden" id="thumb-focus-overlay">
+  <div class="thumb-focus-title">✦ Set Card Thumbnail Focus ✦</div>
+  <div class="thumb-focus-hint">Click or drag to choose what part of the photo appears on the main page</div>
+  <div class="thumb-focus-stage" id="thumb-focus-stage">
+    <img id="thumb-focus-img" src="" alt="">
+    <div class="thumb-focus-crosshair" id="thumb-focus-crosshair">
+      <div class="thumb-focus-crosshair-dot"></div>
+    </div>
+  </div>
+  <div class="thumb-focus-preview">
+    <div class="thumb-focus-preview-label">Preview on card</div>
+    <img class="thumb-focus-preview-img" id="thumb-focus-preview-img" src="" alt="">
+  </div>
+  <div class="thumb-focus-btns">
+    <button class="btn btn-gold" onclick="confirmThumbFocus()">Apply Focus</button>
+    <button class="btn btn-outline" onclick="closeThumbFocus()">Cancel</button>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -1454,7 +1491,7 @@ function showWrite(editId){
     document.getElementById('f-title').value=p.title;
     document.getElementById('f-body').value=p.body;
     currentCats=[...(p.categories||[])];
-    pendingAttachments=(p.attachments||[]).map(a=>({type:a.type,name:a.name,size:a.size,url:a.url||null,dataUrl:a.dataUrl||null}));
+    pendingAttachments=(p.attachments||[]).map(a=>({type:a.type,name:a.name,size:a.size,url:a.url||null,dataUrl:a.dataUrl||null,thumbPosition:a.thumbPosition||null}));
     renderCatPills(); renderAttPreviews();
   } else {
     document.getElementById('write-view-title').textContent='Write New Post';
@@ -1486,10 +1523,88 @@ function handleFiles(files){
 function removeAtt(i){ pendingAttachments.splice(i,1); renderAttPreviews(); }
 function renderAttPreviews(){
   document.getElementById('att-previews').innerHTML=pendingAttachments.map((a,i)=>{
-    if(a.type==='image') return `<div class="att-preview"><img src="${a.url||a.dataUrl}" alt="${esc(a.name)}"><button class="att-remove" onclick="removeAtt(${i})">✕</button></div>`;
+    if(a.type==='image'){
+      const focusLabel=a.thumbPosition?'✓ Focus set':'Set card focus';
+      const focusStyle=a.thumbPosition?'color:var(--green-mid);border-color:var(--green-mid)':'';
+      return `<div class="att-preview" style="position:relative">
+        <img src="${a.url||a.dataUrl}" alt="${esc(a.name)}" style="object-position:${a.thumbPosition||'50% 50%'}">
+        <button class="att-remove" onclick="removeAtt(${i})">✕</button>
+        <button onclick="openThumbFocus(${i})" style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.4);border-radius:2px;font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.07em;color:white;padding:2px 6px;cursor:pointer;${focusStyle}">${focusLabel}</button>
+      </div>`;
+    }
     return `<div class="att-preview file-prev">📄<span title="${esc(a.name)}">${esc(a.name.length>18?a.name.substring(0,16)+'…':a.name)}</span><button class="att-remove" style="position:static;margin-left:auto" onclick="removeAtt(${i})">✕</button></div>`;
   }).join('');
 }
+// ════════════════════════════════════════════════
+// THUMBNAIL FOCUS PICKER
+// ════════════════════════════════════════════════
+let _focusAttIdx = null;
+let _focusPos = { x: 50, y: 50 };
+
+function openThumbFocus(attIdx){
+  const att = pendingAttachments[attIdx];
+  if(!att || att.type !== 'image') return;
+  _focusAttIdx = attIdx;
+  const src = att.url || att.dataUrl;
+  if(att.thumbPosition){
+    const parts = att.thumbPosition.split(' ');
+    _focusPos = { x: parseFloat(parts[0]), y: parseFloat(parts[1]) };
+  } else {
+    _focusPos = { x: 50, y: 50 };
+  }
+  const img = document.getElementById('thumb-focus-img');
+  img.src = src;
+  document.getElementById('thumb-focus-preview-img').src = src;
+  document.getElementById('thumb-focus-overlay').classList.remove('hidden');
+  const apply = () => { updateFocusCrosshair(_focusPos.x, _focusPos.y); updateFocusPreview(); };
+  if(img.complete && img.naturalWidth) apply(); else img.onload = apply;
+}
+function closeThumbFocus(){
+  document.getElementById('thumb-focus-overlay').classList.add('hidden');
+  _focusAttIdx = null;
+}
+function confirmThumbFocus(){
+  if(_focusAttIdx === null) return;
+  pendingAttachments[_focusAttIdx].thumbPosition = `${_focusPos.x}% ${_focusPos.y}%`;
+  closeThumbFocus();
+  renderAttPreviews();
+}
+function updateFocusCrosshair(px, py){
+  const stage = document.getElementById('thumb-focus-stage');
+  const ch = document.getElementById('thumb-focus-crosshair');
+  ch.style.left = (px / 100 * stage.offsetWidth) + 'px';
+  ch.style.top  = (py / 100 * stage.offsetHeight) + 'px';
+}
+function updateFocusPreview(){
+  document.getElementById('thumb-focus-preview-img').style.objectPosition = `${_focusPos.x}% ${_focusPos.y}%`;
+}
+function thumbFocusSetPos(e){
+  const stage = document.getElementById('thumb-focus-stage');
+  const rect = stage.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  _focusPos.x = Math.round(Math.max(0, Math.min(100, (clientX - rect.left) / rect.width * 100)));
+  _focusPos.y = Math.round(Math.max(0, Math.min(100, (clientY - rect.top)  / rect.height * 100)));
+  updateFocusCrosshair(_focusPos.x, _focusPos.y);
+  updateFocusPreview();
+}
+(function(){
+  let dragging = false;
+  function initFocusPicker(){
+    const stage = document.getElementById('thumb-focus-stage');
+    if(!stage) return;
+    stage.addEventListener('mousedown',  e => { dragging=true; thumbFocusSetPos(e); });
+    document.addEventListener('mousemove', e => { if(dragging) thumbFocusSetPos(e); });
+    document.addEventListener('mouseup',   () => dragging=false);
+    stage.addEventListener('click',      thumbFocusSetPos);
+    stage.addEventListener('touchstart', e => { dragging=true; thumbFocusSetPos(e); e.preventDefault(); }, {passive:false});
+    stage.addEventListener('touchmove',  e => { if(dragging) thumbFocusSetPos(e); e.preventDefault(); }, {passive:false});
+    stage.addEventListener('touchend',   () => dragging=false);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initFocusPicker);
+  else initFocusPicker();
+})();
+
 async function uploadToStorage(file){
   const ext=file.name.split('.').pop().toLowerCase();
   const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
@@ -1502,9 +1617,9 @@ async function uploadToStorage(file){
 async function processAttachments(){
   const processed=[];
   for(const a of pendingAttachments){
-    if(a.url) processed.push({type:a.type,name:a.name,size:a.size,url:a.url});
-    else if(a.file){ try{ const url=await uploadToStorage(a.file); processed.push({type:a.type,name:a.name,size:a.size,url}); }catch(e){ console.error('Upload error',a.name,e); throw new Error(`Failed to upload "${a.name}": ${e.message}`); } }
-    else if(a.dataUrl) processed.push({type:a.type,name:a.name,size:a.size,dataUrl:a.dataUrl});
+    if(a.url) processed.push({type:a.type,name:a.name,size:a.size,url:a.url,thumbPosition:a.thumbPosition||null});
+    else if(a.file){ try{ const url=await uploadToStorage(a.file); processed.push({type:a.type,name:a.name,size:a.size,url,thumbPosition:a.thumbPosition||null}); }catch(e){ console.error('Upload error',a.name,e); throw new Error(`Failed to upload "${a.name}": ${e.message}`); } }
+    else if(a.dataUrl) processed.push({type:a.type,name:a.name,size:a.size,dataUrl:a.dataUrl,thumbPosition:a.thumbPosition||null});
   }
   return processed;
 }
@@ -1552,9 +1667,10 @@ function renderList(filtered){
   cont.innerHTML=list.map(p=>{
     const thumb=(p.attachments||[]).find(a=>a.type==='image');
     const thumbSrc=thumb?(thumb.url||thumb.dataUrl):null;
+    const thumbPos=thumb&&thumb.thumbPosition?thumb.thumbPosition:'50% 50%';
     const likes=getLikeCount(p.id);
     return `<div class="blog-card" onclick="openPost('${p.id}')">
-      ${thumbSrc?`<img class="blog-card-thumb" src="${thumbSrc}" alt="">`:'' }
+      ${thumbSrc?`<img class="blog-card-thumb" src="${thumbSrc}" alt="" style="object-position:${thumbPos}">`:'' }
       <div class="blog-card-category">${(p.categories&&p.categories.length)?p.categories.join(' · '):'General'}</div>
       <div class="blog-card-title">${esc(p.title)}</div>
       <div class="blog-card-meta">${fmtDate(p.date)}${p.edited?' · Edited '+fmtDate(p.edited):''}</div>

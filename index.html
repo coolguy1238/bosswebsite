@@ -1925,9 +1925,37 @@ function openPost(id){
   document.getElementById('post-edit-bar').innerHTML=isLoggedIn()?`<button class="btn btn-outline" onclick="showWrite('${id}')">Edit Post</button><button class="btn btn-danger" onclick="promptDelete('${id}')">Delete Post</button>${isOwner()?`<button class="btn btn-gold" id="pin-btn-${id}" onclick="togglePin('${id}')">${p.pinned?'📌 Unpin Post':'📌 Pin Post'}</button>`:''}`:'`';
   renderPostLike(id);
   loadComments(id);
-  // Apply protection to pinned posts
+  // Apply fancy styling + protection to pinned posts
   const postView=document.getElementById('post-view');
   let watermark=document.getElementById('pinned-watermark-overlay');
+  // Remove/add pinned-open for fancy inner styling
+  if(p.pinned){
+    postView.classList.add('pinned-open');
+    // Inject the ornamental divider in place of the plain <hr>
+    const hr=postView.querySelector('.post-divider');
+    if(hr && !postView.querySelector('.pinned-post-ornament')){
+      const orn=document.createElement('div');
+      orn.className='pinned-post-ornament';
+      orn.innerHTML='<span class="pinned-post-ornament-line"></span><span class="pinned-post-ornament-centre">✦ ✦ ✦</span><span class="pinned-post-ornament-line r"></span>';
+      hr.replaceWith(orn);
+    }
+    // Inject the pinned badge above the title if not already there
+    const titleEl=document.getElementById('post-title');
+    if(titleEl && !postView.querySelector('.pinned-post-top-badge')){
+      const badge=document.createElement('div');
+      badge.className='pinned-post-top-badge';
+      badge.textContent='Pinned Post';
+      titleEl.parentNode.insertBefore(badge,titleEl);
+    }
+  } else {
+    postView.classList.remove('pinned-open');
+    // Restore plain <hr> if we replaced it
+    const orn=postView.querySelector('.pinned-post-ornament');
+    if(orn){ const hr=document.createElement('hr'); hr.className='post-divider'; orn.replaceWith(hr); }
+    // Remove pinned badge
+    const badge=postView.querySelector('.pinned-post-top-badge');
+    if(badge) badge.remove();
+  }
   if(p.pinned && !isOwner()){
     postView.classList.add('pinned-protected');
     postView.oncontextmenu=e=>e.preventDefault();

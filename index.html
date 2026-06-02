@@ -861,6 +861,12 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
   </div>
 </div>
 
+<!-- ── NOTIFICATION BANNER ── -->
+<div id="notif-banner" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.55rem 1rem">
+  <button id="notif-banner-btn" onclick="subscribeToNotifications()" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.13em;color:var(--green-deep);background:var(--gold);border:none;border-radius:3px;padding:0.45rem 1.1rem;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🔔 Get Notified of New Posts</button>
+</div>
+<div id="notif-banner-subscribed" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.5rem 1rem;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold);opacity:0.8">✓ You are subscribed to notifications</div>
+
 <div class="main-wrap">
   <main class="content">
 
@@ -3795,10 +3801,20 @@ function updateNotifButton(){
   OneSignalDeferred.push(async function(OneSignal){
     const btn = document.getElementById('notif-subscribe-btn');
     const msg = document.getElementById('notif-subscribed-msg');
-    if(!btn||!msg) return;
+    const banner = document.getElementById('notif-banner');
+    const bannerSubscribed = document.getElementById('notif-banner-subscribed');
     const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
-    if(isSubscribed){ btn.style.display='none'; msg.style.display='block'; }
-    else { btn.style.display='inline-block'; msg.style.display='none'; }
+    if(isSubscribed){
+      if(btn) btn.style.display='none';
+      if(msg) msg.style.display='block';
+      if(banner) banner.style.display='none';
+      if(bannerSubscribed) bannerSubscribed.style.display='block';
+    } else {
+      if(btn) btn.style.display='inline-block';
+      if(msg) msg.style.display='none';
+      if(banner) banner.style.display='block';
+      if(bannerSubscribed) bannerSubscribed.style.display='none';
+    }
   });
 }
 window.addEventListener('load', () => setTimeout(updateNotifButton, 2000));

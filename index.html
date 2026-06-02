@@ -862,9 +862,22 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
 </div>
 
 <!-- ── NOTIFICATION BANNER ── -->
-<div id="notif-banner" style="display:block;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.55rem 1rem">
+<!-- Normal push button (non-iOS or already installed as PWA) -->
+<div id="notif-banner" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.55rem 1rem">
   <button id="notif-banner-btn" onclick="subscribeToNotifications()" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.13em;color:var(--green-deep);background:var(--gold);border:none;border-radius:3px;padding:0.45rem 1.1rem;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🔔 Get Notified of New Posts</button>
 </div>
+<!-- iOS Safari guide (compact button + expandable panel) -->
+<div id="notif-ios-guide" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.45rem 1rem">
+  <button onclick="toggleIosPanel()" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.13em;color:var(--green-deep);background:var(--gold);border:none;border-radius:3px;padding:0.45rem 1.1rem;cursor:pointer">🔔 Get Notified of New Posts</button>
+  <div id="ios-panel" style="display:none;margin-top:0.6rem;padding:0.65rem 0.75rem;background:rgba(0,0,0,0.25);border-radius:4px;text-align:left">
+    <p style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);margin-bottom:0.5rem">How to enable notifications on iPhone:</p>
+    <p style="font-family:'EB Garamond',serif;font-size:0.85rem;color:var(--gold-light);line-height:1.6;margin-bottom:0.35rem">1. Tap <strong style="color:var(--gold)">Share ⎋</strong> at the bottom of Safari</p>
+    <p style="font-family:'EB Garamond',serif;font-size:0.85rem;color:var(--gold-light);line-height:1.6;margin-bottom:0.35rem">2. Tap <strong style="color:var(--gold)">"Add to Home Screen"</strong></p>
+    <p style="font-family:'EB Garamond',serif;font-size:0.85rem;color:var(--gold-light);line-height:1.6;margin-bottom:0.5rem">3. Open the site from the Home Screen icon, then tap the 🔔 button to subscribe</p>
+    <span onclick="document.getElementById('notif-ios-guide').style.display='none'" style="font-family:'Cinzel',serif;font-size:0.58rem;color:var(--gold);opacity:0.5;cursor:pointer;text-decoration:underline">Dismiss</span>
+  </div>
+</div>
+<script>function toggleIosPanel(){var p=document.getElementById('ios-panel');p.style.display=p.style.display==='none'?'block':'none';}</script>
 <div id="notif-banner-subscribed" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.5rem 1rem;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold);">✓ You are subscribed to notifications &nbsp;·&nbsp; <span onclick="unsubscribeFromNotifications()" style="cursor:pointer;opacity:0.6;text-decoration:underline;font-size:0.58rem" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Unsubscribe</span></div>
 
 <div class="main-wrap">
@@ -3798,9 +3811,22 @@ async function unsubscribeFromNotifications(){
   });
 }
 async function subscribeToNotifications(){
-  if(!window.OneSignal) return;
+  if(!window.OneSignalDeferred) {
+    alert('Notifications are not available yet — please try again in a moment.');
+    return;
+  }
   OneSignalDeferred.push(async function(OneSignal){
-    await OneSignal.Slidedown.promptPush();
+    try {
+      const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
+      if(isSubscribed){
+        updateNotifButton();
+        return;
+      }
+      await OneSignal.Slidedown.promptPush();
+      setTimeout(updateNotifButton, 2000);
+    } catch(e){
+      console.error('OneSignal subscribe error:', e);
+    }
   });
 }
 function updateNotifButton(){
@@ -3824,7 +3850,16 @@ function updateNotifButton(){
     }
   });
 }
-window.addEventListener('load', () => setTimeout(updateNotifButton, 2000));
+window.addEventListener('load', () => {
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandaloneMode = ('standalone' in navigator) && navigator.standalone;
+  if(isIos && !isInStandaloneMode){
+    document.getElementById('notif-ios-guide').style.display = 'block';
+  } else {
+    document.getElementById('notif-banner').style.display = 'block';
+    setTimeout(updateNotifButton, 2000);
+  }
+});
 </script>
 </body>
 </html>

@@ -3852,8 +3852,10 @@ function updateNotifButton(){
 }
 window.addEventListener('load', () => {
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isInStandaloneMode = ('standalone' in navigator) && navigator.standalone;
-  if(isIos && !isInStandaloneMode){
+  const isStandalone = window.navigator.standalone === true
+    || window.matchMedia('(display-mode: standalone)').matches
+    || window.matchMedia('(display-mode: fullscreen)').matches;
+  if(isIos && !isStandalone){
     document.getElementById('notif-ios-guide').style.display = 'block';
   } else {
     document.getElementById('notif-banner').style.display = 'block';

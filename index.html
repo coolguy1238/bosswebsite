@@ -862,10 +862,10 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
 </div>
 
 <!-- ── NOTIFICATION BANNER ── -->
-<div id="notif-banner" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.55rem 1rem">
+<div id="notif-banner" style="display:block;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.55rem 1rem">
   <button id="notif-banner-btn" onclick="subscribeToNotifications()" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.13em;color:var(--green-deep);background:var(--gold);border:none;border-radius:3px;padding:0.45rem 1.1rem;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🔔 Get Notified of New Posts</button>
 </div>
-<div id="notif-banner-subscribed" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.5rem 1rem;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold);opacity:0.8">✓ You are subscribed to notifications</div>
+<div id="notif-banner-subscribed" style="display:none;background:var(--green-deep);border-bottom:1px solid var(--border-gold);text-align:center;padding:0.5rem 1rem;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold);">✓ You are subscribed to notifications &nbsp;·&nbsp; <span onclick="unsubscribeFromNotifications()" style="cursor:pointer;opacity:0.6;text-decoration:underline;font-size:0.58rem" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">Unsubscribe</span></div>
 
 <div class="main-wrap">
   <main class="content">
@@ -3790,6 +3790,13 @@ document.addEventListener('click', e=>{
 <script>document.getElementById('footer-year').textContent=new Date().getFullYear();</script>
 
 <script>
+async function unsubscribeFromNotifications(){
+  if(!window.OneSignalDeferred) return;
+  OneSignalDeferred.push(async function(OneSignal){
+    await OneSignal.User.PushSubscription.optOut();
+    updateNotifButton();
+  });
+}
 async function subscribeToNotifications(){
   if(!window.OneSignal) return;
   OneSignalDeferred.push(async function(OneSignal){

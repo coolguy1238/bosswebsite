@@ -1118,7 +1118,7 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
       <div class="page-title" style="font-size:0.85rem;margin-bottom:0.75rem">Today's Prayer Times</div>
       <div class="prayer-today" id="prayer-today-cards"></div>
 
-      <div class="timetable-month-label" id="timetable-month-label">May 2026 — Full Timetable</div>
+      <div class="timetable-month-label" id="timetable-month-label">June 2026 — Full Timetable</div>
       <div class="prayer-table-wrap">
         <table class="prayer-table" id="prayer-table">
           <thead>
@@ -2162,41 +2162,40 @@ async function togglePin(id){
 // Falls back to built-in data if Supabase unavailable.
 // ════════════════════════════════════════════════
 
-// Built-in fallback: May 2026 (Ghamkol Sharif)
+// Built-in fallback: June 2026 (Ghamkol Sharif — official)
 const PRAYER_FALLBACK = {
-  month: 'May', year: 2026,
+  month: 'June', year: 2026,
   rows: [
-    {day:'FRI',date:1,hijri:'14',fajrS:'4:01',fajrJ:'4:45',sunrise:'5:36',zuharS:'1:10',zuharJ:'2:00',asrS:'6:12',asrJ:'7:15',maghrib:'8:37',ishaS:'10:05',ishaJ:'10:30'},
-    {day:'SAT',date:2,hijri:'15',fajrS:'3:58',fajrJ:'4:45',sunrise:'5:34',zuharS:'1:10',zuharJ:'2:00',asrS:'6:14',asrJ:'7:15',maghrib:'8:39',ishaS:'10:08',ishaJ:'10:30'},
-    {day:'SUN',date:3,hijri:'16',fajrS:'3:55',fajrJ:'4:45',sunrise:'5:33',zuharS:'1:09',zuharJ:'2:00',asrS:'6:15',asrJ:'7:15',maghrib:'8:40',ishaS:'10:10',ishaJ:'10:30'},
-    {day:'MON',date:4,hijri:'17',fajrS:'3:53',fajrJ:'4:45',sunrise:'5:31',zuharS:'1:09',zuharJ:'2:00',asrS:'6:16',asrJ:'7:15',maghrib:'8:42',ishaS:'10:13',ishaJ:'10:30'},
-    {day:'TUE',date:5,hijri:'18',fajrS:'3:50',fajrJ:'4:45',sunrise:'5:29',zuharS:'1:09',zuharJ:'2:00',asrS:'6:17',asrJ:'7:15',maghrib:'8:44',ishaS:'10:15',ishaJ:'10:30'},
-    {day:'WED',date:6,hijri:'19',fajrS:'3:47',fajrJ:'4:45',sunrise:'5:27',zuharS:'1:09',zuharJ:'2:00',asrS:'6:18',asrJ:'7:15',maghrib:'8:45',ishaS:'10:17',ishaJ:'10:30'},
-    {day:'THU',date:7,hijri:'20',fajrS:'3:45',fajrJ:'4:45',sunrise:'5:25',zuharS:'1:09',zuharJ:'2:00',asrS:'6:19',asrJ:'7:15',maghrib:'8:47',ishaS:'10:20',ishaJ:'10:30'},
-    {day:'FRI',date:8,hijri:'21',fajrS:'3:42',fajrJ:'4:30',sunrise:'5:23',zuharS:'1:09',zuharJ:'2:00',asrS:'6:20',asrJ:'7:15',maghrib:'8:49',ishaS:'10:22',ishaJ:'10:45'},
-    {day:'SAT',date:9,hijri:'22',fajrS:'3:39',fajrJ:'4:30',sunrise:'5:22',zuharS:'1:09',zuharJ:'2:00',asrS:'6:21',asrJ:'7:15',maghrib:'8:50',ishaS:'10:25',ishaJ:'10:45'},
-    {day:'SUN',date:10,hijri:'23',fajrS:'3:37',fajrJ:'4:30',sunrise:'5:20',zuharS:'1:09',zuharJ:'2:00',asrS:'6:22',asrJ:'7:15',maghrib:'8:52',ishaS:'10:27',ishaJ:'10:45'},
-    {day:'MON',date:11,hijri:'24',fajrS:'3:34',fajrJ:'4:30',sunrise:'5:18',zuharS:'1:09',zuharJ:'2:00',asrS:'6:23',asrJ:'7:15',maghrib:'8:54',ishaS:'10:30',ishaJ:'10:45'},
-    {day:'TUE',date:12,hijri:'25',fajrS:'3:31',fajrJ:'4:30',sunrise:'5:16',zuharS:'1:09',zuharJ:'2:00',asrS:'6:24',asrJ:'7:15',maghrib:'8:55',ishaS:'10:33',ishaJ:'10:45'},
-    {day:'WED',date:13,hijri:'26',fajrS:'3:29',fajrJ:'4:30',sunrise:'5:15',zuharS:'1:09',zuharJ:'2:00',asrS:'6:24',asrJ:'7:15',maghrib:'8:57',ishaS:'10:35',ishaJ:'10:45'},
-    {day:'THU',date:14,hijri:'27',fajrS:'3:26',fajrJ:'4:30',sunrise:'5:13',zuharS:'1:09',zuharJ:'2:00',asrS:'6:25',asrJ:'7:15',maghrib:'8:58',ishaS:'10:38',ishaJ:'10:45'},
-    {day:'FRI',date:15,hijri:'28',fajrS:'3:23',fajrJ:'4:30',sunrise:'5:12',zuharS:'1:09',zuharJ:'2:00',asrS:'6:26',asrJ:'7:15',maghrib:'9:00',ishaS:'10:40',ishaJ:'11:00'},
-    {day:'SAT',date:16,hijri:'29',fajrS:'3:21',fajrJ:'4:30',sunrise:'5:10',zuharS:'1:09',zuharJ:'2:00',asrS:'6:27',asrJ:'7:15',maghrib:'9:02',ishaS:'10:43',ishaJ:'11:00'},
-    {day:'SUN',date:17,hijri:'30',fajrS:'3:18',fajrJ:'4:30',sunrise:'5:09',zuharS:'1:09',zuharJ:'2:00',asrS:'6:28',asrJ:'7:15',maghrib:'9:03',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'MON',date:18,hijri:"Dhu'l Hijjah",fajrS:'3:16',fajrJ:'4:30',sunrise:'5:07',zuharS:'1:09',zuharJ:'2:00',asrS:'6:29',asrJ:'7:15',maghrib:'9:05',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'TUE',date:19,hijri:'2',fajrS:'3:13',fajrJ:'4:30',sunrise:'5:06',zuharS:'1:09',zuharJ:'2:00',asrS:'6:30',asrJ:'7:15',maghrib:'9:06',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'WED',date:20,hijri:'3',fajrS:'3:11',fajrJ:'4:30',sunrise:'5:04',zuharS:'1:09',zuharJ:'2:00',asrS:'6:31',asrJ:'7:15',maghrib:'9:08',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'THU',date:21,hijri:'4',fajrS:'3:08',fajrJ:'4:30',sunrise:'5:03',zuharS:'1:09',zuharJ:'2:00',asrS:'6:32',asrJ:'7:15',maghrib:'9:09',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'FRI',date:22,hijri:'5',fajrS:'3:06',fajrJ:'4:15',sunrise:'5:02',zuharS:'1:09',zuharJ:'2:00',asrS:'6:33',asrJ:'7:15',maghrib:'9:11',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'SAT',date:23,hijri:'6',fajrS:'3:03',fajrJ:'4:15',sunrise:'5:00',zuharS:'1:09',zuharJ:'2:00',asrS:'6:33',asrJ:'7:15',maghrib:'9:12',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'SUN',date:24,hijri:'7',fajrS:'3:01',fajrJ:'4:15',sunrise:'4:59',zuharS:'1:09',zuharJ:'2:00',asrS:'6:34',asrJ:'7:15',maghrib:'9:13',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'MON',date:25,hijri:'8',fajrS:'2:58',fajrJ:'4:15',sunrise:'4:58',zuharS:'1:10',zuharJ:'2:00',asrS:'6:35',asrJ:'7:15',maghrib:'9:15',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'TUE',date:26,hijri:'9',fajrS:'2:56',fajrJ:'4:15',sunrise:'4:57',zuharS:'1:10',zuharJ:'2:00',asrS:'6:36',asrJ:'7:15',maghrib:'9:16',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'WED',date:27,hijri:'10',fajrS:'2:54',fajrJ:'4:15',sunrise:'4:56',zuharS:'1:10',zuharJ:'2:00',asrS:'6:37',asrJ:'7:15',maghrib:'9:17',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'THU',date:28,hijri:'11',fajrS:'2:51',fajrJ:'4:15',sunrise:'4:55',zuharS:'1:10',zuharJ:'2:00',asrS:'6:37',asrJ:'7:15',maghrib:'9:19',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'FRI',date:29,hijri:'12',fajrS:'2:49',fajrJ:'4:00',sunrise:'4:54',zuharS:'1:10',zuharJ:'2:00',asrS:'6:38',asrJ:'7:15',maghrib:'9:20',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'SAT',date:30,hijri:'13',fajrS:'2:47',fajrJ:'4:00',sunrise:'4:53',zuharS:'1:10',zuharJ:'2:00',asrS:'6:39',asrJ:'7:15',maghrib:'9:21',ishaS:'10:45',ishaJ:'11:00'},
-    {day:'SUN',date:31,hijri:'14',fajrS:'2:45',fajrJ:'4:00',sunrise:'4:52',zuharS:'1:10',zuharJ:'2:00',asrS:'6:39',asrJ:'7:15',maghrib:'9:22',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'MON',date:1,hijri:'15',fajrS:'2:43',fajrJ:'4:00',sunrise:'4:51',zuharS:'1:10',zuharJ:'2:00',asrS:'6:40',asrJ:'7:15',maghrib:'9:23',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'TUE',date:2,hijri:'16',fajrS:'2:41',fajrJ:'4:00',sunrise:'4:50',zuharS:'1:11',zuharJ:'2:00',asrS:'6:41',asrJ:'7:15',maghrib:'9:25',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'WED',date:3,hijri:'17',fajrS:'2:39',fajrJ:'4:00',sunrise:'4:49',zuharS:'1:11',zuharJ:'2:00',asrS:'6:41',asrJ:'7:15',maghrib:'9:26',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'THU',date:4,hijri:'18',fajrS:'2:37',fajrJ:'4:00',sunrise:'4:49',zuharS:'1:11',zuharJ:'2:00',asrS:'6:42',asrJ:'7:15',maghrib:'9:27',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'FRI',date:5,hijri:'19',fajrS:'2:35',fajrJ:'4:00',sunrise:'4:48',zuharS:'1:11',zuharJ:'2:00',asrS:'6:43',asrJ:'7:15',maghrib:'9:28',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SAT',date:6,hijri:'20',fajrS:'2:33',fajrJ:'4:00',sunrise:'4:47',zuharS:'1:11',zuharJ:'2:00',asrS:'6:43',asrJ:'7:15',maghrib:'9:29',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SUN',date:7,hijri:'21',fajrS:'2:32',fajrJ:'4:00',sunrise:'4:47',zuharS:'1:11',zuharJ:'2:00',asrS:'6:44',asrJ:'7:15',maghrib:'9:29',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'MON',date:8,hijri:'22',fajrS:'2:30',fajrJ:'4:00',sunrise:'4:46',zuharS:'1:12',zuharJ:'2:00',asrS:'6:44',asrJ:'7:15',maghrib:'9:30',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'TUE',date:9,hijri:'23',fajrS:'2:29',fajrJ:'4:00',sunrise:'4:46',zuharS:'1:12',zuharJ:'2:00',asrS:'6:45',asrJ:'7:15',maghrib:'9:31',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'WED',date:10,hijri:'24',fajrS:'2:27',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:12',zuharJ:'2:00',asrS:'6:45',asrJ:'7:15',maghrib:'9:32',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'THU',date:11,hijri:'25',fajrS:'2:26',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:12',zuharJ:'2:00',asrS:'6:46',asrJ:'7:15',maghrib:'9:33',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'FRI',date:12,hijri:'26',fajrS:'2:25',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:12',zuharJ:'2:00',asrS:'6:46',asrJ:'7:15',maghrib:'9:33',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SAT',date:13,hijri:'27',fajrS:'2:24',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:13',zuharJ:'2:00',asrS:'6:47',asrJ:'7:15',maghrib:'9:34',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SUN',date:14,hijri:'28',fajrS:'2:23',fajrJ:'4:00',sunrise:'4:44',zuharS:'1:13',zuharJ:'2:00',asrS:'6:47',asrJ:'7:15',maghrib:'9:35',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'MON',date:15,hijri:'29',fajrS:'2:22',fajrJ:'4:00',sunrise:'4:44',zuharS:'1:13',zuharJ:'2:00',asrS:'6:48',asrJ:'7:15',maghrib:'9:35',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'TUE',date:16,hijri:'30',fajrS:'2:22',fajrJ:'4:00',sunrise:'4:44',zuharS:'1:13',zuharJ:'2:00',asrS:'6:48',asrJ:'7:15',maghrib:'9:36',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'WED',date:17,hijri:'Muharram',fajrS:'2:21',fajrJ:'4:00',sunrise:'4:44',zuharS:'1:14',zuharJ:'2:00',asrS:'6:48',asrJ:'7:15',maghrib:'9:36',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'THU',date:18,hijri:'2',fajrS:'2:21',fajrJ:'4:00',sunrise:'4:44',zuharS:'1:14',zuharJ:'2:00',asrS:'6:49',asrJ:'7:15',maghrib:'9:36',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'FRI',date:19,hijri:'3',fajrS:'2:21',fajrJ:'4:00',sunrise:'4:44',zuharS:'1:14',zuharJ:'2:00',asrS:'6:49',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SAT',date:20,hijri:'4',fajrS:'2:21',fajrJ:'4:00',sunrise:'4:44',zuharS:'1:14',zuharJ:'2:00',asrS:'6:49',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SUN',date:21,hijri:'5',fajrS:'2:21',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:14',zuharJ:'2:00',asrS:'6:49',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'MON',date:22,hijri:'6',fajrS:'2:21',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:15',zuharJ:'2:00',asrS:'6:49',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'TUE',date:23,hijri:'7',fajrS:'2:21',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:15',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:38',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'WED',date:24,hijri:'8',fajrS:'2:22',fajrJ:'4:00',sunrise:'4:45',zuharS:'1:15',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:38',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'THU',date:25,hijri:'9',fajrS:'2:23',fajrJ:'4:00',sunrise:'4:46',zuharS:'1:15',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:38',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'FRI',date:26,hijri:'10',fajrS:'2:24',fajrJ:'4:00',sunrise:'4:46',zuharS:'1:15',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:38',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SAT',date:27,hijri:'11',fajrS:'2:25',fajrJ:'4:00',sunrise:'4:47',zuharS:'1:16',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'SUN',date:28,hijri:'12',fajrS:'2:26',fajrJ:'4:00',sunrise:'4:47',zuharS:'1:16',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'MON',date:29,hijri:'13',fajrS:'2:27',fajrJ:'4:00',sunrise:'4:48',zuharS:'1:16',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
+    {day:'TUE',date:30,hijri:'14',fajrS:'2:28',fajrJ:'4:00',sunrise:'4:49',zuharS:'1:16',zuharJ:'2:00',asrS:'6:50',asrJ:'7:15',maghrib:'9:37',ishaS:'10:45',ishaJ:'11:00'},
   ]
 };
 

@@ -1,0 +1,16 @@
+{
+  "name": "Khaak al Na'layn Sharif",
+  "short_name": "Khaak al Na'layn",
+  "description": "Dust of the Blessed Sandal — Sacred knowledge, Salawat, and the path of the Awliya Allah.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D3B1F",
+  "theme_color": "#0D3B1F",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

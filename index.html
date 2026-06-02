@@ -1946,7 +1946,7 @@ async function savePost(){
       await loadPosts(); notify('Post published ✓'); showHome();
       // Send push notification to all subscribers
       try {
-        await fetch('https://api.onesignal.com/api/v1/notifications', {
+        const pushRes = await fetch('https://api.onesignal.com/api/v1/notifications', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer os_v2_app_xisjeavlujfijndtx2ofgtr2e23pso5dp7kuyq4s3hljelqvkcotnsw6vx4hybqqy7ikuobnzicu5rg47l43rfsocp6h7qxzr6z35qi' },
           body: JSON.stringify({
@@ -1957,7 +1957,11 @@ async function savePost(){
             web_url: 'https://khaakenalayn.uk'
           })
         });
-      } catch(e){ console.warn('Push notification failed:', e); }
+        const pushData = await pushRes.json();
+        console.log('OneSignal response:', JSON.stringify(pushData));
+        if(pushData.errors){ notify('Push error: ' + JSON.stringify(pushData.errors)); }
+        else { notify('Push sent ✓'); }
+      } catch(e){ console.warn('Push notification failed:', e); notify('Push failed: ' + e.message); }
     }
   } catch(e){ notify('Error saving post. Please try again.'); }
 }

@@ -79,6 +79,32 @@
 }
 </script>
 
+<!-- ── OneSignal Web Push ── -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "ba249202-aba2-4a84-b473-be9c534e3a26",
+      safari_web_id: "web.onesignal.auto.ba249202-aba2-4a84-b473-be9c534e3a26",
+      notifyButton: { enable: false },
+      promptOptions: {
+        slidedown: {
+          prompts: [{
+            type: "push",
+            autoPrompt: false,
+            text: {
+              actionMessage: "Get notified when new posts are published on Khaak al Na'layn Sharif.",
+              acceptButton: "Allow",
+              cancelButton: "No thanks"
+            }
+          }]
+        }
+      }
+    });
+  });
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1894,6 +1920,20 @@ async function savePost(){
       const author=sessionStorage.getItem('khaak_author')||'SMZ';
       await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date().toISOString(),author});
       await loadPosts(); notify('Post published ✓'); showHome();
+      // Send push notification to all subscribers
+      try {
+        await fetch('https://api.onesignal.com/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            app_id: 'ba249202-aba2-4a84-b473-be9c534e3a26',
+            included_segments: ['Total Subscribed'],
+            headings: { en: "Khaak al Na'layn Sharif" },
+            contents: { en: title },
+            url: 'https://khaakenalayn.uk'
+          })
+        });
+      } catch(e){ console.warn('Push notification failed:', e); }
     }
   } catch(e){ notify('Error saving post. Please try again.'); }
 }
@@ -3732,9 +3772,36 @@ document.addEventListener('click', e=>{
     <p style="font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.1em;color:var(--gold);opacity:0.4">
       &copy; <span id="footer-year"></span> &nbsp;·&nbsp; All Rights Reserved
     </p>
+  <!-- Notification Subscribe Button -->
+  <div style="margin-top:1.4rem">
+    <button id="notif-subscribe-btn" onclick="subscribeToNotifications()" style="display:none;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;color:var(--green-deep);background:var(--gold);border:none;border-radius:4px;padding:0.55rem 1.2rem;cursor:pointer;opacity:0.85;transition:opacity 0.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85">
+      🔔 Get Notified of New Posts
+    </button>
+    <p id="notif-subscribed-msg" style="display:none;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.1em;color:var(--gold);opacity:0.7">✓ You are subscribed to notifications</p>
+  </div>
   </div>
 </footer>
 <script>document.getElementById('footer-year').textContent=new Date().getFullYear();</script>
 
+<script>
+async function subscribeToNotifications(){
+  if(!window.OneSignal) return;
+  OneSignalDeferred.push(async function(OneSignal){
+    await OneSignal.Slidedown.promptPush();
+  });
+}
+function updateNotifButton(){
+  if(!window.OneSignalDeferred) return;
+  OneSignalDeferred.push(async function(OneSignal){
+    const btn = document.getElementById('notif-subscribe-btn');
+    const msg = document.getElementById('notif-subscribed-msg');
+    if(!btn||!msg) return;
+    const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
+    if(isSubscribed){ btn.style.display='none'; msg.style.display='block'; }
+    else { btn.style.display='inline-block'; msg.style.display='none'; }
+  });
+}
+window.addEventListener('load', () => setTimeout(updateNotifButton, 2000));
+</script>
 </body>
 </html>

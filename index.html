@@ -1948,7 +1948,7 @@ async function savePost(){
       try {
         await fetch('https://api.onesignal.com/notifications', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Key os_v2_app_xisjeavlujfijndtx2ofgtr2e23pso5dp7kuyq4s3hljelqvkcotnsw6vx4hybqqy7ikuobnzicu5rg47l43rfsocp6h7qxzr6z35qi' },
           body: JSON.stringify({
             app_id: 'ba249202-aba2-4a84-b473-be9c534e3a26',
             included_segments: ['Total Subscribed'],

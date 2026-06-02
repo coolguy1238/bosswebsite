@@ -3812,23 +3812,25 @@ async function unsubscribeFromNotifications(){
   });
 }
 async function subscribeToNotifications(){
-  if(!window.OneSignalDeferred) {
-    alert('Notifications are not available yet — please try again in a moment.');
-    return;
-  }
-  OneSignalDeferred.push(async function(OneSignal){
-    try {
-      const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
-      if(isSubscribed){
-        updateNotifButton();
-        return;
+  try {
+    const permission = await Notification.requestPermission();
+    if(permission === 'granted'){
+      if(window.OneSignalDeferred){
+        OneSignalDeferred.push(async function(OneSignal){
+          try { await OneSignal.User.PushSubscription.optIn(); setTimeout(updateNotifButton,1500); }
+          catch(e){ console.error('OneSignal optIn error:',e); }
+        });
       }
-      await OneSignal.Slidedown.promptPush();
-      setTimeout(updateNotifButton, 2000);
-    } catch(e){
-      console.error('OneSignal subscribe error:', e);
+      var g=document.getElementById('notif-ios-guide'); if(g) g.style.display='none';
+      var b=document.getElementById('notif-banner'); if(b) b.style.display='none';
+      var s=document.getElementById('notif-banner-subscribed'); if(s) s.style.display='block';
+    } else if(permission === 'denied'){
+      alert('Notifications are blocked. Please go to your browser settings and allow notifications for this site.');
     }
-  });
+  } catch(e){
+    console.error('Notification error:',e);
+    alert('Unable to request permission. Make sure you opened this site from your Home Screen icon.');
+  }
 }
 function updateNotifButton(){
   if(!window.OneSignalDeferred) return;

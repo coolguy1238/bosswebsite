@@ -997,8 +997,16 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
         </div>
         <div class="attachment-previews" id="att-previews"></div>
       </div>
+      <div style="margin-bottom:0.75rem">
+        <label style="display:flex;align-items:center;gap:0.5rem;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.1em;color:var(--text-light);cursor:pointer">
+          <input type="checkbox" id="schedule-toggle" onchange="toggleSchedule()" style="accent-color:var(--gold)"> SCHEDULE FOR LATER
+        </label>
+        <div id="schedule-picker" style="display:none;margin-top:0.5rem">
+          <input type="datetime-local" id="schedule-time" style="font-family:'EB Garamond',serif;font-size:0.9rem;background:var(--cream);border:1px solid var(--border-gold);border-radius:3px;padding:0.4rem 0.6rem;color:var(--text-dark);width:100%">
+        </div>
+      </div>
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
-        <button class="btn btn-gold" onclick="savePost()">Publish Post</button>
+        <button class="btn btn-gold" onclick="savePost()" id="publish-btn">Publish Post</button>
         <button class="btn btn-outline" onclick="cancelWrite()">Cancel</button>
       </div>
     </div>
@@ -1926,15 +1934,25 @@ function fmtWrap(before, after){
 }
 
 
+function toggleSchedule(){
+  const on = document.getElementById('schedule-toggle').checked;
+  document.getElementById('schedule-picker').style.display = on ? 'block' : 'none';
+  document.getElementById('publish-btn').textContent = on ? 'Schedule Post' : 'Publish Post';
+}
+
 async function savePost(){
   const title=document.getElementById('f-title').value.trim();
   const body=document.getElementById('f-body').value.trim();
   if(!title){ notify('Please enter a title.'); return; }
   if(!body){ notify('Please write some content.'); return; }
+  const isScheduled = document.getElementById('schedule-toggle').checked;
+  const scheduleTime = isScheduled ? document.getElementById('schedule-time').value : null;
+  if(isScheduled && !scheduleTime){ notify('Please choose a date and time to schedule.'); return; }
+  if(isScheduled && new Date(scheduleTime) <= new Date()){ notify('Scheduled time must be in the future.'); return; }
   notify('Uploading attachments…');
   let attachments;
   try { attachments=await processAttachments(); } catch(e){ notify(e.message||'Error uploading file.'); return; }
-  notify('Saving post…');
+  notify(isScheduled ? 'Scheduling post…' : 'Saving post…');
   try {
     if(editingId){
       await supa('PATCH',`posts?id=eq.${editingId}`,{title,body,categories:currentCats,attachments,edited:new Date().toISOString()});
@@ -1942,20 +1960,24 @@ async function savePost(){
     } else {
       const id=Date.now().toString();
       const author=sessionStorage.getItem('khaak_author')||'SMZ';
-      await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date().toISOString(),author});
-      await loadPosts(); notify('Post published ✓'); showHome();
-      // Send push notification to all subscribers
-      try {
-        const pushRes = await fetch('https://khaak-notify.s-legend7860.workers.dev', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title })
-        });
-        const pushData = await pushRes.json();
-        console.log('OneSignal response:', JSON.stringify(pushData));
-        if(pushData.errors){ notify('Push error: ' + JSON.stringify(pushData.errors)); }
-        else { notify('Push sent ✓'); }
-      } catch(e){ console.warn('Push notification failed:', e); notify('Push failed: ' + e.message); }
+      if(isScheduled){
+        await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date(scheduleTime).toISOString(),author,scheduled:true,published:false});
+        await loadPosts(); notify('Post scheduled ✓ — will publish at '+new Date(scheduleTime).toLocaleString()); showHome();
+      } else {
+        await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date().toISOString(),author,published:true});
+        await loadPosts(); notify('Post published ✓'); showHome();
+        try {
+          const pushRes = await fetch('https://khaak-notify.s-legend7860.workers.dev', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title })
+          });
+          const pushData = await pushRes.json();
+          console.log('OneSignal response:', JSON.stringify(pushData));
+          if(pushData.errors){ notify('Push error: ' + JSON.stringify(pushData.errors)); }
+          else { notify('Push sent ✓'); }
+        } catch(e){ console.warn('Push notification failed:', e); notify('Push failed: ' + e.message); }
+      }
     }
   } catch(e){ notify('Error saving post. Please try again.'); }
 }
@@ -1964,7 +1986,9 @@ async function savePost(){
 // RENDER LIST
 // ════════════════════════════════════════════════
 function renderList(filtered){
-  const list=filtered!==undefined?filtered:posts;
+  let list=filtered!==undefined?filtered:posts;
+  // Hide scheduled posts that haven't published yet (unless owner)
+  if(!isLoggedIn()) list=list.filter(p=>!p.scheduled || p.published);
   const cont=document.getElementById('blog-list');
   if(!list.length){
     cont.innerHTML=`<div class="empty-state"><div class="big-ornament">☽</div><p>No posts yet${isLoggedIn()?' — write your first post above':' — check back soon'}.</p>${isLoggedIn()?'<button class="btn btn-gold" onclick="showWrite()">Write First Post</button>':''}</div>`;
@@ -3867,6 +3891,45 @@ window.addEventListener('load', () => {
     setTimeout(updateNotifButton, 2000);
   }
 });
+</script>
+<script>
+// Pull to refresh for PWA
+if (window.navigator.standalone) {
+  let startY = 0;
+  let pulling = false;
+  const threshold = 80;
+
+  const indicator = document.createElement('div');
+  indicator.style.cssText = 'position:fixed;top:0;left:0;right:0;height:0;background:var(--green-deep);display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:9999;transition:height 0.1s;font-family:Cinzel,serif;font-size:0.65rem;letter-spacing:0.1em;color:var(--gold);';
+  indicator.textContent = '↓ Pull to refresh';
+  document.body.appendChild(indicator);
+
+  document.addEventListener('touchstart', e => {
+    if (window.scrollY === 0) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dist = e.touches[0].clientY - startY;
+    if (dist > 0 && dist < 120) {
+      indicator.style.height = (dist * 0.6) + 'px';
+      indicator.textContent = dist > threshold ? '↑ Release to refresh' : '↓ Pull to refresh';
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (!pulling) return;
+    const dist = e.changedTouches[0].clientY - startY;
+    indicator.style.height = '0';
+    if (dist > threshold) {
+      setTimeout(() => location.reload(), 200);
+    }
+    pulling = false;
+  });
+}
 </script>
 </body>
 </html>

@@ -334,7 +334,7 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .post-view{display:none}.post-view.active{display:block}
 .post-back{background:none;border:none;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--green-mid);cursor:pointer;padding:0;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.4rem}
 .post-back:hover{color:var(--gold-dark)}
-.post-title{font-family:'Cinzel',serif;font-size:1.7rem;color:var(--green-deep);font-weight:700;line-height:1.3;margin-bottom:0.4rem}
+.post-title{font-family:'Cinzel',serif;font-size:1.7rem;color:var(--green-deep);font-weight:700;line-height:1.3;margin-bottom:0.4rem}.scheduled-draft{opacity:0.75;border:1.5px dashed var(--border-gold)!important}
 .post-meta{font-size:0.82rem;color:var(--text-light);font-style:italic;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
 .post-category-badge{background:var(--green-pale);color:var(--green-mid);font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.12em;padding:2px 8px;border-radius:2px;font-style:normal}
 .post-divider{border:none;border-top:1px solid var(--border-gold);margin:1rem 0 1.5rem}
@@ -2029,8 +2029,10 @@ function renderList(filtered){
     const thumbSrc=thumb?(thumb.url||thumb.dataUrl):null;
     const thumbPos=thumb&&thumb.thumbPosition?thumb.thumbPosition:'50% 50%';
     const likes=getLikeCount(p.id);
-    return `<div class="blog-card" onclick="openPost('${p.id}')">
+    const isScheduledDraft = p.scheduled && !p.published;
+    return `<div class="blog-card${isScheduledDraft?' scheduled-draft':''}" onclick="openPost('${p.id}')">
       ${thumbSrc?`<img class="blog-card-thumb" src="${thumbSrc}" alt="" style="object-position:${thumbPos}">`:'' }
+      ${isScheduledDraft?`<div style="display:inline-block;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.1em;background:var(--gold);color:var(--green-deep);padding:0.2rem 0.5rem;border-radius:2px;margin-bottom:0.4rem">⏰ SCHEDULED — ${new Date(p.date).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>`:''}
       <div class="blog-card-category">${(p.categories&&p.categories.length)?p.categories.join(' · '):'General'}</div>
       <div class="blog-card-title">${esc(p.title)}</div>
       <div class="blog-card-meta">${fmtDate(p.date)}${(p.edited&&p.id!=='1748722800000')?' · Edited '+fmtDate(p.edited):''}</div>

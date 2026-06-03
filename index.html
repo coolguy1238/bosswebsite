@@ -3907,7 +3907,7 @@ if (window.navigator.standalone) {
   document.body.appendChild(indicator);
 
   document.addEventListener('touchstart', e => {
-    if (window.scrollY === 0) {
+    if (window.scrollY <= 5) {
       startY = e.touches[0].clientY;
       pulling = true;
     }

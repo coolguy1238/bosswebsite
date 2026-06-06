@@ -3440,18 +3440,22 @@ async function getOneSignalId(deviceId){
   if(!deviceId) return null;
   try {
     const rows = await supa('GET', 'push_subscriptions?device_id=eq.'+encodeURIComponent(deviceId)+'&select=onesignal_id');
+    console.log('[Push] getOneSignalId for', deviceId, ':', JSON.stringify(rows));
     return (rows && rows[0]) ? rows[0].onesignal_id : null;
-  } catch(e){ return null; }
+  } catch(e){ console.warn('[Push] getOneSignalId error:', e); return null; }
 }
 
 async function sendTargetedPush(oneSignalId, title, body){
   if(!oneSignalId) return;
+  console.log('[Push] sendTargetedPush to:', oneSignalId, 'title:', title);
   try {
-    await fetch('https://khaak-notify.s-legend7860.workers.dev', {
+    const res = await fetch('https://khaak-notify.s-legend7860.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ target_id: oneSignalId, title, body })
     });
+    const json = await res.json();
+    console.log('[Push] Worker response:', JSON.stringify(json));
   } catch(e){ console.warn('Targeted push failed:', e); }
 }
 
@@ -3461,20 +3465,40 @@ async function getOwnerDeviceId(){
   if(_ownerDeviceId) return _ownerDeviceId;
   try {
     const rows = await supa('GET','settings?id=eq.owner_device&select=value');
+    console.log('[Push] getOwnerDeviceId rows:', JSON.stringify(rows));
     _ownerDeviceId = (rows && rows[0]) ? rows[0].value : null;
-  } catch(e){}
+  } catch(e){ console.warn('[Push] getOwnerDeviceId error:', e); }
   return _ownerDeviceId;
 }
 // Called once when owner logs in — saves their device_id to settings so pushes can reach them
 async function registerOwnerDevice(){
   const devId = localStorage.getItem('khaak_device_id');
+  console.log('[Push] registerOwnerDevice devId:', devId);
   if(!devId) return;
   _ownerDeviceId = devId;
+  // Save owner device_id to settings so any browser can look it up
   await fetch(SUPA_URL+'/rest/v1/settings', {
     method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
     body: JSON.stringify({id:'owner_device', value: devId})
   });
+  console.log('[Push] Owner device_id saved to settings');
+  // Now grab the OneSignal subscription ID and store it
+  try {
+    OneSignalDeferred.push(async function(OneSignal){
+      const subId = OneSignal.User.PushSubscription.id;
+      const opted = await OneSignal.User.PushSubscription.optedIn;
+      console.log('[Push] Owner OneSignal subId:', subId, 'optedIn:', opted);
+      if(subId && opted){
+        const res = await fetch(SUPA_URL+'/rest/v1/push_subscriptions', {
+          method:'POST',
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+          body: JSON.stringify({device_id: devId, onesignal_id: subId, updated_at: new Date().toISOString()})
+        });
+        console.log('[Push] push_subscriptions upsert status:', res.status);
+      }
+    });
+  } catch(e){ console.warn('[Push] Could not store OneSignal sub:', e); }
 }
 
 async function addOwnerNotif(type, postId, postTitle, author, body){

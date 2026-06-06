@@ -106,6 +106,33 @@
         }
       }
     });
+    // Store this device's OneSignal subscription ID so targeted pushes can reach it
+    try {
+      const subId = OneSignal.User.PushSubscription.id;
+      const opted = await OneSignal.User.PushSubscription.optedIn;
+      if(subId && opted){
+        const devId = localStorage.getItem('khaak_device_id');
+        if(devId){
+          await fetch(SUPA_URL+'/rest/v1/push_subscriptions', {
+            method:'POST',
+            headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+            body: JSON.stringify({device_id: devId, onesignal_id: subId, updated_at: new Date().toISOString()})
+          });
+        }
+      }
+      OneSignal.User.PushSubscription.addEventListener('change', async (e)=>{
+        if(e.current && e.current.id && e.current.optedIn){
+          const devId = localStorage.getItem('khaak_device_id');
+          if(devId){
+            await fetch(SUPA_URL+'/rest/v1/push_subscriptions', {
+              method:'POST',
+              headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+              body: JSON.stringify({device_id: devId, onesignal_id: e.current.id, updated_at: new Date().toISOString()})
+            });
+          }
+        }
+      });
+    } catch(e){ console.warn('Could not store push subscription:', e); }
   });
 </script>
 
@@ -1610,6 +1637,7 @@ async function submitLogin(){
     sessionStorage.setItem(SESSION_OWNER_KEY,'1'); sessionStorage.setItem(SESSION_KEY,'1');
     sessionStorage.setItem('khaak_author','SMZ');
     closeModal('login-modal'); updateAdminUI(); notify('Welcome back, Owner 👑');
+    registerOwnerDevice(); // Store device_id + OneSignal ID so pushes can reach this device
   } else if(role==='admin'){
     sessionStorage.setItem(SESSION_KEY,'1');
     const h = await hashPw(pw);
@@ -3406,6 +3434,49 @@ async function fetchOwnerNotifs(){
 
 function getOwnerNotifs(){ return _ownerNotifsCache || []; }
 
+// ── Targeted push notifications ──
+// Looks up OneSignal ID for a device_id from Supabase, then fires a targeted push via Worker
+async function getOneSignalId(deviceId){
+  if(!deviceId) return null;
+  try {
+    const rows = await supa('GET', 'push_subscriptions?device_id=eq.'+encodeURIComponent(deviceId)+'&select=onesignal_id');
+    return (rows && rows[0]) ? rows[0].onesignal_id : null;
+  } catch(e){ return null; }
+}
+
+async function sendTargetedPush(oneSignalId, title, body){
+  if(!oneSignalId) return;
+  try {
+    await fetch('https://khaak-notify.s-legend7860.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target_id: oneSignalId, title, body })
+    });
+  } catch(e){ console.warn('Targeted push failed:', e); }
+}
+
+// Owner's device_id stored in Supabase settings under id='owner_device'
+let _ownerDeviceId = null;
+async function getOwnerDeviceId(){
+  if(_ownerDeviceId) return _ownerDeviceId;
+  try {
+    const rows = await supa('GET','settings?id=eq.owner_device&select=value');
+    _ownerDeviceId = (rows && rows[0]) ? rows[0].value : null;
+  } catch(e){}
+  return _ownerDeviceId;
+}
+// Called once when owner logs in — saves their device_id to settings so pushes can reach them
+async function registerOwnerDevice(){
+  const devId = localStorage.getItem('khaak_device_id');
+  if(!devId) return;
+  _ownerDeviceId = devId;
+  await fetch(SUPA_URL+'/rest/v1/settings', {
+    method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+    body: JSON.stringify({id:'owner_device', value: devId})
+  });
+}
+
 async function addOwnerNotif(type, postId, postTitle, author, body){
   const notif = {
     id: Date.now().toString()+Math.random().toString(36).slice(2,6),
@@ -3426,6 +3497,18 @@ async function addOwnerNotif(type, postId, postTitle, author, body){
   });
   updateNotifBell();
   shakeNotifBell();
+  // Send real phone push to owner (fire and forget)
+  try {
+    const ownerDevId = await getOwnerDeviceId();
+    if(ownerDevId && ownerDevId !== localStorage.getItem('khaak_device_id')){
+      const ownerSubId = await getOneSignalId(ownerDevId);
+      if(ownerSubId){
+        const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;
+        const pushBody  = type==='like' ? `"${postTitle}"` : `${author}: ${notif.preview}`;
+        await sendTargetedPush(ownerSubId, pushTitle, pushBody);
+      }
+    }
+  } catch(e){ /* non-critical */ }
 }
 
 function updateNotifBell(){
@@ -3605,6 +3688,15 @@ async function addViewerNotif(recipientDeviceId, type, postId, postTitle, fromNa
     updateViewerNotifBell();
     shakeViewerNotifBell();
   }
+  // Send real phone push to the recipient (fire and forget)
+  try {
+    const subId = await getOneSignalId(recipientDeviceId);
+    if(subId){
+      const pushTitle = type==='like' ? `❤ ${fromName} liked your comment` : `↩ ${fromName} replied to your comment`;
+      const pushBody  = type==='like' ? `On "${postTitle}"` : notif.preview;
+      await sendTargetedPush(subId, pushTitle, pushBody);
+    }
+  } catch(e){ /* non-critical */ }
 }
 
 function updateViewerNotifBell(){

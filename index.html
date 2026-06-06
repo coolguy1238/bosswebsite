@@ -3533,7 +3533,7 @@ async function addOwnerNotif(type, postId, postTitle, author, body){
   // Send real phone push to owner (fire and forget)
   try {
     const ownerDevId = await getOwnerDeviceId();
-    if(ownerDevId && ownerDevId !== localStorage.getItem('khaak_device_id_v1')){
+    if(ownerDevId){
       const ownerSubId = await getOneSignalId(ownerDevId);
       if(ownerSubId){
         const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;

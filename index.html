@@ -626,6 +626,13 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .filter-label{font-family:'Cinzel',serif;font-size:0.65rem;color:var(--text-light);letter-spacing:0.08em}
 .filter-tag{background:none;border:1px solid var(--border-gold);border-radius:2px;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--text-light);padding:3px 10px;cursor:pointer;transition:all 0.15s}
 .filter-tag:hover,.filter-tag.active{background:var(--green-deep);color:var(--gold-light);border-color:var(--green-deep)}
+.filter-reorder-btn{background:none;border:1px solid rgba(201,168,76,0.25);border-radius:2px;font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.08em;color:var(--gold);opacity:0.6;padding:3px 8px;cursor:pointer;transition:all 0.15s;margin-left:auto;flex-shrink:0}
+.filter-reorder-btn:hover{opacity:1;background:rgba(201,168,76,0.1)}
+.filter-reorder-btn.active{opacity:1;background:rgba(201,168,76,0.15);border-color:var(--gold)}
+.filter-bar.reorder-mode .filter-tag:not(.filter-all-btn){cursor:grab;border-style:dashed;border-color:var(--gold);opacity:0.85}
+.filter-bar.reorder-mode .filter-tag:not(.filter-all-btn):active{cursor:grabbing}
+.filter-bar.reorder-mode .filter-tag.drag-over{border-color:var(--gold-light);background:rgba(201,168,76,0.18);color:var(--gold-light)}
+.filter-bar.reorder-mode .filter-tag.dragging{opacity:0.35}
 
 /* ── SECTION PAGES ── */
 .section-view{display:none}.section-view.active{display:block}
@@ -2200,11 +2207,78 @@ function renderSidebarCats(){
   document.getElementById('sidebar-cats').innerHTML=`<li><button onclick="filterCat('all',null)">All Posts <span class="cat-count">${posts.length}</span></button></li>`+Object.entries(allCats).map(([c,n])=>`<li><button onclick="filterCat('${esc(c)}',null)">${esc(c)} <span class="cat-count">${n}</span></button></li>`).join('');
   renderFilterBar();
 }
+// ── Tag order helpers (Supabase settings table, id='tag_order') ──
+let _tagOrder = null; // null = not yet loaded
+async function loadTagOrder(){
+  try {
+    const res = await fetch(SUPA_URL+'/rest/v1/settings?id=eq.tag_order&select=tag_order',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    const rows = await res.json();
+    _tagOrder = (rows&&rows[0]&&rows[0].tag_order) ? rows[0].tag_order : null;
+  } catch(e){ _tagOrder = null; }
+}
+async function saveTagOrder(order){
+  _tagOrder = order;
+  await fetch(SUPA_URL+'/rest/v1/settings',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:'tag_order',tag_order:order})});
+}
+
 function renderFilterBar(){
   const allCats={};
   posts.forEach(p=>(p.categories&&p.categories.length?p.categories:['General']).forEach(c=>allCats[c]=(allCats[c]||0)+1));
-  document.getElementById('filter-bar').innerHTML=`<span class="filter-label">Filter:</span><button class="filter-tag ${activeFilter==='all'?'active':''}" onclick="filterCat('all',this)">All</button>`+Object.keys(allCats).map(c=>`<button class="filter-tag ${activeFilter===c?'active':''}" onclick="filterCat('${esc(c)}',this)">${esc(c)}</button>`).join('');
+  // Apply saved order: known cats first in saved order, then any new ones appended
+  let cats = Object.keys(allCats);
+  if(_tagOrder && _tagOrder.length){
+    const saved = _tagOrder.filter(c=>cats.includes(c));
+    const newOnes = cats.filter(c=>!_tagOrder.includes(c));
+    cats = [...saved, ...newOnes];
+  }
+  const bar = document.getElementById('filter-bar');
+  bar.innerHTML=`<span class="filter-label">Filter:</span><button class="filter-tag filter-all-btn ${activeFilter==='all'?'active':''}" onclick="filterCat('all',this)">All</button>`
+    +cats.map(c=>`<button class="filter-tag ${activeFilter===c?'active':''}" onclick="filterCat('${esc(c)}',this)">${esc(c)}</button>`).join('')
+    +(isOwner()?`<button class="filter-reorder-btn" id="reorder-tags-btn" onclick="toggleTagReorder()" title="Reorder tags">✦ Reorder</button>`:'');
 }
+
+let _reorderMode = false;
+let _dragSrc = null;
+function toggleTagReorder(){
+  _reorderMode = !_reorderMode;
+  const bar = document.getElementById('filter-bar');
+  const btn = document.getElementById('reorder-tags-btn');
+  bar.classList.toggle('reorder-mode', _reorderMode);
+  if(btn) btn.classList.toggle('active', _reorderMode);
+  if(_reorderMode){
+    // Make tags draggable
+    bar.querySelectorAll('.filter-tag:not(.filter-all-btn)').forEach(tag=>{
+      tag.setAttribute('draggable','true');
+      tag.addEventListener('dragstart', _onTagDragStart);
+      tag.addEventListener('dragover',  _onTagDragOver);
+      tag.addEventListener('dragleave', _onTagDragLeave);
+      tag.addEventListener('drop',      _onTagDrop);
+      tag.addEventListener('dragend',   _onTagDragEnd);
+    });
+    if(btn) btn.textContent='✦ Done';
+  } else {
+    // Save new order
+    const newOrder = [...bar.querySelectorAll('.filter-tag:not(.filter-all-btn):not(.filter-reorder-btn)')].map(b=>b.textContent.trim());
+    saveTagOrder(newOrder).then(()=>{ notify('Tag order saved.'); });
+    if(btn) btn.textContent='✦ Reorder';
+  }
+}
+function _onTagDragStart(e){ _dragSrc=this; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function _onTagDragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; if(this!==_dragSrc) this.classList.add('drag-over'); }
+function _onTagDragLeave(){ this.classList.remove('drag-over'); }
+function _onTagDrop(e){
+  e.preventDefault();
+  if(this===_dragSrc) return;
+  this.classList.remove('drag-over');
+  const bar = document.getElementById('filter-bar');
+  const tags=[...bar.querySelectorAll('.filter-tag:not(.filter-all-btn):not(.filter-reorder-btn)')];
+  const srcIdx=tags.indexOf(_dragSrc), tgtIdx=tags.indexOf(this);
+  if(srcIdx<0||tgtIdx<0) return;
+  // Reorder DOM
+  if(srcIdx<tgtIdx) this.after(_dragSrc);
+  else this.before(_dragSrc);
+}
+function _onTagDragEnd(){ this.classList.remove('dragging'); document.querySelectorAll('.filter-tag').forEach(t=>t.classList.remove('drag-over')); }
 
 // ════════════════════════════════════════════════
 // DELETE
@@ -3603,6 +3677,7 @@ document.addEventListener('click', e=>{
   await fetchPrayerTimes();
   initPrayerBar();
   await loadBans();
+  await loadTagOrder();
   loadPosts();
 
   // ── SUPABASE REALTIME — live notification delivery ──

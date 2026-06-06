@@ -3481,31 +3481,33 @@ async function registerOwnerDevice(){
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
     body: JSON.stringify({id:'owner_device', value: devId})
   });
-  // Poll for OneSignal subscription ID (SDK may not be ready instantly)
+  // Try to get OneSignal subscription ID via SDK, with fallback polling
   let attempts = 0;
-  const tryStore = async () => {
+  const tryStore = () => {
     attempts++;
-    try {
-      await new Promise(resolve => {
-        OneSignalDeferred.push(async function(OneSignal){
-          const subId = OneSignal.User.PushSubscription.id;
-          const opted = await OneSignal.User.PushSubscription.optedIn;
-          if(subId && opted){
-            const res = await fetch(SUPA_URL+'/rest/v1/push_subscriptions', {
-              method:'POST',
-              headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
-              body: JSON.stringify({device_id: devId, onesignal_id: subId, updated_at: new Date().toISOString()})
-            });
-            console.log('[Push] Stored OneSignal ID:', subId, 'status:', res.status);
-          } else if(attempts < 10){
-            setTimeout(tryStore, 2000);
-          }
-          resolve();
-        });
-      });
-    } catch(e){ if(attempts < 10) setTimeout(tryStore, 2000); }
+    OneSignalDeferred.push(async function(OneSignal){
+      try {
+        let subId = null;
+        try { subId = OneSignal.User.PushSubscription.id; } catch(e){}
+        if(!subId) try { subId = await OneSignal.User.getSubscriptionId(); } catch(e){}
+        if(!subId) try { subId = OneSignal.User.onesignalId; } catch(e){}
+        if(!subId) try { subId = await OneSignal.getUserId(); } catch(e){}
+        const opted = await OneSignal.User.PushSubscription.optedIn;
+        if(subId && opted){
+          await fetch(SUPA_URL+'/rest/v1/push_subscriptions', {
+            method:'POST',
+            headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+            body: JSON.stringify({device_id: devId, onesignal_id: subId, updated_at: new Date().toISOString()})
+          });
+        } else if(attempts < 15){
+          setTimeout(tryStore, 3000);
+        }
+      } catch(e){
+        if(attempts < 15) setTimeout(tryStore, 3000);
+      }
+    });
   };
-  setTimeout(tryStore, 1500);
+  setTimeout(tryStore, 2000);
 }
 
 async function addOwnerNotif(type, postId, postTitle, author, body){

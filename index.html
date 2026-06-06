@@ -337,6 +337,8 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .post-title{font-family:'Cinzel',serif;font-size:1.7rem;color:var(--green-deep);font-weight:700;line-height:1.3;margin-bottom:0.4rem}.scheduled-draft{opacity:0.75;border:1.5px dashed var(--border-gold)!important}
 .post-meta{font-size:0.82rem;color:var(--text-light);font-style:italic;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
 .post-category-badge{background:var(--green-pale);color:var(--green-mid);font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.12em;padding:2px 8px;border-radius:2px;font-style:normal}
+.post-category-badge.badge-ahlul-bayt{background:#1a0000;color:#e8a0a0;border:1px solid #8b1a1a;text-shadow:0 0 6px rgba(180,30,30,0.7);box-shadow:0 0 8px rgba(160,20,20,0.55),inset 0 0 6px rgba(100,0,0,0.3);animation:ahlul-glow 2.8s ease-in-out infinite alternate}
+@keyframes ahlul-glow{from{box-shadow:0 0 6px rgba(160,20,20,0.45),inset 0 0 4px rgba(100,0,0,0.25);border-color:#6b1010}to{box-shadow:0 0 14px rgba(200,30,30,0.75),inset 0 0 8px rgba(140,0,0,0.4);border-color:#c02828;color:#f0b8b8}}
 .post-divider{border:none;border-top:1px solid var(--border-gold);margin:1rem 0 1.5rem}
 .post-body{font-size:1.08rem;line-height:1.9;color:var(--text-dark)}
 .post-body p{margin-bottom:1.15rem}
@@ -2083,7 +2085,7 @@ function openPost(id){
   document.getElementById('post-meta').innerHTML=
     `<span>${fmtDate(p.date)}</span>`+
     (p.author?`<span style="font-style:italic;opacity:0.7">by ${esc(p.author)}</span>`:'<span style="font-style:italic;opacity:0.7">by SMZ</span>')+
-    cats.map(c=>`<span class="post-category-badge">${esc(c)}</span>`).join('')+
+    cats.map(c=>`<span class="post-category-badge${c.toLowerCase().replace(/\s/g,'')==='ahlulbayt'?' badge-ahlul-bayt':''}">${esc(c)}</span>`).join('')+
     (p.edited&&p.id!=='1748722800000'?`<span style="font-style:italic">Edited ${fmtDate(p.edited)}</span>`:'');
   const postBodyEl = document.getElementById('post-body');
   postBodyEl.innerHTML = renderBody(p.body);

@@ -2238,7 +2238,8 @@ function renderFilterBar(){
 }
 
 let _reorderMode = false;
-let _dragSrc = null;
+let _touchDragEl = null, _touchClone = null, _touchOffX = 0, _touchOffY = 0;
+
 function toggleTagReorder(){
   _reorderMode = !_reorderMode;
   const bar = document.getElementById('filter-bar');
@@ -2246,39 +2247,76 @@ function toggleTagReorder(){
   bar.classList.toggle('reorder-mode', _reorderMode);
   if(btn) btn.classList.toggle('active', _reorderMode);
   if(_reorderMode){
-    // Make tags draggable
-    bar.querySelectorAll('.filter-tag:not(.filter-all-btn)').forEach(tag=>{
-      tag.setAttribute('draggable','true');
-      tag.addEventListener('dragstart', _onTagDragStart);
-      tag.addEventListener('dragover',  _onTagDragOver);
-      tag.addEventListener('dragleave', _onTagDragLeave);
-      tag.addEventListener('drop',      _onTagDrop);
-      tag.addEventListener('dragend',   _onTagDragEnd);
+    bar.querySelectorAll('.filter-tag:not(.filter-all-btn):not(.filter-reorder-btn)').forEach(tag=>{
+      tag.addEventListener('touchstart', _tagTouchStart, {passive:false});
+      tag.addEventListener('touchmove',  _tagTouchMove,  {passive:false});
+      tag.addEventListener('touchend',   _tagTouchEnd,   {passive:false});
     });
     if(btn) btn.textContent='✦ Done';
   } else {
-    // Save new order
     const newOrder = [...bar.querySelectorAll('.filter-tag:not(.filter-all-btn):not(.filter-reorder-btn)')].map(b=>b.textContent.trim());
     saveTagOrder(newOrder).then(()=>{ notify('Tag order saved.'); });
     if(btn) btn.textContent='✦ Reorder';
   }
 }
-function _onTagDragStart(e){ _dragSrc=this; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
-function _onTagDragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; if(this!==_dragSrc) this.classList.add('drag-over'); }
-function _onTagDragLeave(){ this.classList.remove('drag-over'); }
-function _onTagDrop(e){
+
+function _tagTouchStart(e){
   e.preventDefault();
-  if(this===_dragSrc) return;
-  this.classList.remove('drag-over');
-  const bar = document.getElementById('filter-bar');
-  const tags=[...bar.querySelectorAll('.filter-tag:not(.filter-all-btn):not(.filter-reorder-btn)')];
-  const srcIdx=tags.indexOf(_dragSrc), tgtIdx=tags.indexOf(this);
-  if(srcIdx<0||tgtIdx<0) return;
-  // Reorder DOM
-  if(srcIdx<tgtIdx) this.after(_dragSrc);
-  else this.before(_dragSrc);
+  _touchDragEl = this;
+  const t = e.touches[0];
+  const rect = this.getBoundingClientRect();
+  _touchOffX = t.clientX - rect.left;
+  _touchOffY = t.clientY - rect.top;
+  // Create floating clone
+  _touchClone = this.cloneNode(true);
+  _touchClone.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.85;font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;padding:3px 10px;background:var(--green-deep);color:var(--gold-light);border:1px solid var(--gold);border-radius:2px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4);width:${rect.width}px;`;
+  _touchClone.style.left = (t.clientX - _touchOffX) + 'px';
+  _touchClone.style.top  = (t.clientY - _touchOffY) + 'px';
+  document.body.appendChild(_touchClone);
+  this.classList.add('dragging');
 }
-function _onTagDragEnd(){ this.classList.remove('dragging'); document.querySelectorAll('.filter-tag').forEach(t=>t.classList.remove('drag-over')); }
+
+function _tagTouchMove(e){
+  e.preventDefault();
+  if(!_touchClone) return;
+  const t = e.touches[0];
+  _touchClone.style.left = (t.clientX - _touchOffX) + 'px';
+  _touchClone.style.top  = (t.clientY - _touchOffY) + 'px';
+  // Highlight target
+  const bar = document.getElementById('filter-bar');
+  bar.querySelectorAll('.filter-tag').forEach(tg=>tg.classList.remove('drag-over'));
+  const el = _tagElementAtPoint(t.clientX, t.clientY);
+  if(el && el !== _touchDragEl) el.classList.add('drag-over');
+}
+
+function _tagTouchEnd(e){
+  e.preventDefault();
+  if(_touchClone){ _touchClone.remove(); _touchClone=null; }
+  if(!_touchDragEl) return;
+  _touchDragEl.classList.remove('dragging');
+  const t = e.changedTouches[0];
+  const bar = document.getElementById('filter-bar');
+  bar.querySelectorAll('.filter-tag').forEach(tg=>tg.classList.remove('drag-over'));
+  const target = _tagElementAtPoint(t.clientX, t.clientY);
+  if(target && target !== _touchDragEl){
+    const tags = [...bar.querySelectorAll('.filter-tag:not(.filter-all-btn):not(.filter-reorder-btn)')];
+    const srcIdx = tags.indexOf(_touchDragEl), tgtIdx = tags.indexOf(target);
+    if(srcIdx >= 0 && tgtIdx >= 0){
+      if(srcIdx < tgtIdx) target.after(_touchDragEl);
+      else target.before(_touchDragEl);
+    }
+  }
+  _touchDragEl = null;
+}
+
+function _tagElementAtPoint(x, y){
+  // Temporarily hide clone so elementFromPoint can find real elements
+  if(_touchClone) _touchClone.style.display='none';
+  const el = document.elementFromPoint(x, y);
+  if(_touchClone) _touchClone.style.display='';
+  if(!el) return null;
+  return el.closest('.filter-tag:not(.filter-all-btn):not(.filter-reorder-btn)');
+}
 
 // ════════════════════════════════════════════════
 // DELETE

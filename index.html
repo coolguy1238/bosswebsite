@@ -111,7 +111,7 @@
       const subId = OneSignal.User.PushSubscription.id;
       const opted = await OneSignal.User.PushSubscription.optedIn;
       if(subId && opted){
-        const devId = localStorage.getItem('khaak_device_id');
+        const devId = localStorage.getItem('khaak_device_id_v1');
         if(devId){
           await fetch(SUPA_URL+'/rest/v1/push_subscriptions', {
             method:'POST',
@@ -122,7 +122,7 @@
       }
       OneSignal.User.PushSubscription.addEventListener('change', async (e)=>{
         if(e.current && e.current.id && e.current.optedIn){
-          const devId = localStorage.getItem('khaak_device_id');
+          const devId = localStorage.getItem('khaak_device_id_v1');
           if(devId){
             await fetch(SUPA_URL+'/rest/v1/push_subscriptions', {
               method:'POST',
@@ -3472,7 +3472,7 @@ async function getOwnerDeviceId(){
 }
 // Called once when owner logs in — saves their device_id to settings so pushes can reach them
 async function registerOwnerDevice(){
-  const devId = localStorage.getItem('khaak_device_id');
+  const devId = localStorage.getItem('khaak_device_id_v1');
   console.log('[Push] registerOwnerDevice devId:', devId);
   if(!devId) return;
   _ownerDeviceId = devId;
@@ -3524,7 +3524,7 @@ async function addOwnerNotif(type, postId, postTitle, author, body){
   // Send real phone push to owner (fire and forget)
   try {
     const ownerDevId = await getOwnerDeviceId();
-    if(ownerDevId && ownerDevId !== localStorage.getItem('khaak_device_id')){
+    if(ownerDevId && ownerDevId !== localStorage.getItem('khaak_device_id_v1')){
       const ownerSubId = await getOneSignalId(ownerDevId);
       if(ownerSubId){
         const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;

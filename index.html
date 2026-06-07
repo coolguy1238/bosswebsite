@@ -2029,7 +2029,7 @@ async function savePost(){
           const pushRes = await fetch('https://khaak-notify.s-legend7860.workers.dev', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: "New Post on Khaak al Na'layn Sharif", message: title, url: postUrl })
+            body: JSON.stringify({ title: 'New Post', message: "Khaak e Na'layn ﷺ", url: postUrl })
           });
           const pushData = await pushRes.json();
           console.log('[Push] Worker response:', JSON.stringify(pushData));

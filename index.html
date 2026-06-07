@@ -2026,25 +2026,13 @@ async function savePost(){
         await loadPosts(); notify('Post published ✓'); showHome();
         try {
           const postUrl = 'https://khaakenalayn.uk/?post=' + id;
-          const pushRes = await fetch('https://onesignal.com/api/v1/notifications', {
+          const pushRes = await fetch('https://khaak-notify.s-legend7860.workers.dev', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Key os_v2_app_xisjeavlujfijndtx2ofgtr2e2fjpjpt23wexfmocgzy5b2m2abs46lielj3y6xfumdi2ldehunpyc67jqchdmmlt2mjf55qgves2ly'
-            },
-            body: JSON.stringify({
-              app_id: 'ba249202-aba2-4a84-b473-be9c534e3a26',
-              target_channel: 'push',
-              included_segments: ['Subscribed Users'],
-              headings: { en: "New Post — Khaak al Na'layn Sharif" },
-              contents: { en: title },
-              url: postUrl,
-              web_url: postUrl,
-              chrome_web_icon: 'https://khaakenalayn.uk/apple-touch-icon.png'
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: "New Post on Khaak al Na'layn Sharif", message: title, url: postUrl })
           });
           const pushData = await pushRes.json();
-          console.log('[Push] OneSignal response:', JSON.stringify(pushData));
+          console.log('[Push] Worker response:', JSON.stringify(pushData));
           if(pushData.errors){ notify('Post published ✓ (push error: ' + JSON.stringify(pushData.errors) + ')'); }
           else { notify('Post published & push sent ✓'); }
         } catch(e){ console.warn('[Push] Failed:', e); notify('Post published ✓ (push failed: ' + e.message + ')'); }

@@ -3316,10 +3316,10 @@ async function submitReply(parentId){
     renderComments(currentPostId);
     notify('Reply posted u2713');
     const post = posts.find(p=>p.id===currentPostId);
-    await addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
+    addOwnerNotif('reply', currentPostId, post?post.title:'Post', name, body);
     const parentComment = _currentComments.find(c=>c.id===parentId);
     if(parentComment && parentComment.device_id){
-      await addViewerNotif(parentComment.device_id, 'reply', currentPostId, post?post.title:'Post', name, body);
+      addViewerNotif(parentComment.device_id, 'reply', currentPostId, post?post.title:'Post', name, body);
     }
   }catch(e){ notify('Could not post reply: '+(e.message||'Please try again.')); }
 }
@@ -3339,7 +3339,7 @@ async function likeComment(commentId){
     // Notify the commenter if their comment got liked (viewer notif system)
     if(comment.device_id){
       const post = posts.find(p=>p.id===currentPostId);
-      await addViewerNotif(comment.device_id, 'like', currentPostId, post?post.title:'Post', 'Someone', comment.body);
+      addViewerNotif(comment.device_id, 'like', currentPostId, post?post.title:'Post', 'Someone', comment.body);
     }
   }
   saveCommentLikes(clikes);
@@ -3559,8 +3559,22 @@ async function addOwnerNotif(type, postId, postTitle, author, body){
     date: new Date().toISOString(),
     read: false
   };
-  try{ await supa('POST','owner_notifs',notif); } catch(e){ /* table may not exist yet */ }
-  // Also update local cache so the bell reacts immediately on this browser
+  // Fire push immediately before any DB work
+  try {
+    const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;
+    const pushBody  = type==='like' ? `"${postTitle}"` : `${author}: ${notif.preview}`;
+    if(_ownerOneSignalId){
+      sendTargetedPush(_ownerOneSignalId, pushTitle, pushBody, postId);
+    } else {
+      (async()=>{
+        const devId = await getOwnerDeviceId();
+        const subId = devId ? await getOneSignalId(devId) : null;
+        if(subId){ _ownerOneSignalId = subId; sendTargetedPush(subId, pushTitle, pushBody, postId); }
+      })();
+    }
+  } catch(e){ /* non-critical */ }
+  // DB insert and bell update (non-blocking)
+  supa('POST','owner_notifs',notif).catch(()=>{});
   if(!_ownerNotifsCache) _ownerNotifsCache = [];
   _ownerNotifsCache.unshift({
     id: notif.id, type, postId, postTitle, author,
@@ -3568,20 +3582,6 @@ async function addOwnerNotif(type, postId, postTitle, author, body){
   });
   updateNotifBell();
   shakeNotifBell();
-  // Send real phone push to owner (fire and forget)
-  // Use pre-cached IDs to avoid sequential DB lookups (which caused 10-15s delay)
-  try {
-    const ownerSubId = _ownerOneSignalId || await (async()=>{
-      const devId = await getOwnerDeviceId();
-      return devId ? await getOneSignalId(devId) : null;
-    })();
-    if(ownerSubId){
-      if(!_ownerOneSignalId) _ownerOneSignalId = ownerSubId; // cache for next time
-      const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;
-      const pushBody  = type==='like' ? `"${postTitle}"` : `${author}: ${notif.preview}`;
-      sendTargetedPush(ownerSubId, pushTitle, pushBody, postId);
-    }
-  } catch(e){ /* non-critical */ }
 }
 
 function updateNotifBell(){

@@ -3458,12 +3458,16 @@ function getOwnerNotifs(){ return _ownerNotifsCache || []; }
 
 // ── Targeted push notifications ──
 // Looks up OneSignal ID for a device_id from Supabase, then fires a targeted push via Worker
+const _oneSignalIdCache = {}; // device_id → onesignal_id, avoids repeated DB hits
 async function getOneSignalId(deviceId){
   if(!deviceId) return null;
+  if(_oneSignalIdCache[deviceId]) return _oneSignalIdCache[deviceId];
   try {
     const rows = await supa('GET', 'push_subscriptions?device_id=eq.'+encodeURIComponent(deviceId)+'&select=onesignal_id');
     console.log('[Push] getOneSignalId for', deviceId, ':', JSON.stringify(rows));
-    return (rows && rows[0]) ? rows[0].onesignal_id : null;
+    const id = (rows && rows[0]) ? rows[0].onesignal_id : null;
+    if(id) _oneSignalIdCache[deviceId] = id;
+    return id;
   } catch(e){ console.warn('[Push] getOneSignalId error:', e); return null; }
 }
 
@@ -3485,6 +3489,7 @@ async function sendTargetedPush(oneSignalId, title, bodyText, postId){
 
 // Owner's device_id stored in Supabase settings under id='owner_device'
 let _ownerDeviceId = null;
+let _ownerOneSignalId = null; // pre-cached so push fires instantly
 async function getOwnerDeviceId(){
   if(_ownerDeviceId) return _ownerDeviceId;
   try {
@@ -3494,6 +3499,15 @@ async function getOwnerDeviceId(){
   } catch(e){ console.warn('[Push] getOwnerDeviceId error:', e); }
   return _ownerDeviceId;
 }
+// Pre-warm owner push IDs so notifications fire without delay
+async function prewarmOwnerPushId(){
+  try {
+    const devId = await getOwnerDeviceId();
+    if(devId) _ownerOneSignalId = await getOneSignalId(devId);
+  } catch(e){ /* non-critical */ }
+}
+// Pre-warm on page load (after a short delay so it doesn't block initial render)
+setTimeout(prewarmOwnerPushId, 4000);
 // Called once when owner logs in — saves their device_id to settings so pushes can reach them
 async function registerOwnerDevice(){
   const devId = localStorage.getItem('khaak_device_id_v1');
@@ -3555,15 +3569,17 @@ async function addOwnerNotif(type, postId, postTitle, author, body){
   updateNotifBell();
   shakeNotifBell();
   // Send real phone push to owner (fire and forget)
+  // Use pre-cached IDs to avoid sequential DB lookups (which caused 10-15s delay)
   try {
-    const ownerDevId = await getOwnerDeviceId();
-    if(ownerDevId){
-      const ownerSubId = await getOneSignalId(ownerDevId);
-      if(ownerSubId){
-        const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;
-        const pushBody  = type==='like' ? `"${postTitle}"` : `${author}: ${notif.preview}`;
-        await sendTargetedPush(ownerSubId, pushTitle, pushBody, postId);
-      }
+    const ownerSubId = _ownerOneSignalId || await (async()=>{
+      const devId = await getOwnerDeviceId();
+      return devId ? await getOneSignalId(devId) : null;
+    })();
+    if(ownerSubId){
+      if(!_ownerOneSignalId) _ownerOneSignalId = ownerSubId; // cache for next time
+      const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;
+      const pushBody  = type==='like' ? `"${postTitle}"` : `${author}: ${notif.preview}`;
+      sendTargetedPush(ownerSubId, pushTitle, pushBody, postId);
     }
   } catch(e){ /* non-critical */ }
 }
@@ -3746,13 +3762,15 @@ async function addViewerNotif(recipientDeviceId, type, postId, postTitle, fromNa
     shakeViewerNotifBell();
   }
   // Send real phone push to the recipient (fire and forget)
+  // getOneSignalId result is not awaited in the outer flow — push fires as soon as ID resolves
   try {
-    const subId = await getOneSignalId(recipientDeviceId);
-    if(subId){
-      const pushTitle = type==='like' ? `❤ ${fromName} liked your comment` : `↩ ${fromName} replied to your comment`;
-      const pushBody  = type==='like' ? `On "${postTitle}"` : notif.preview;
-      await sendTargetedPush(subId, pushTitle, pushBody);
-    }
+    getOneSignalId(recipientDeviceId).then(subId => {
+      if(subId){
+        const pushTitle = type==='like' ? `❤ ${fromName} liked your comment` : `↩ ${fromName} replied to your comment`;
+        const pushBody  = type==='like' ? `On "${postTitle}"` : notif.preview;
+        sendTargetedPush(subId, pushTitle, pushBody);
+      }
+    });
   } catch(e){ /* non-critical */ }
 }
 

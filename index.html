@@ -519,6 +519,9 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .comment-name-input:focus,.comment-text-input:focus,.comment-reply-input:focus{border-color:var(--gold)}
 .comment-text-input{resize:vertical;min-height:70px;display:block;width:100%;margin-bottom:0.5rem}
 .comment-submit-row{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+.post-share-btn{background:none;border:1px solid var(--border-gold);border-radius:20px;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--text-light);padding:0.35rem 1rem;cursor:pointer;transition:all 0.2s;margin-left:0.5rem}
+.post-share-btn:hover{border-color:var(--gold);color:var(--gold-dark);background:var(--gold-pale)}
+.post-share-btn.copied{border-color:var(--green-mid);color:var(--green-mid);background:var(--green-pale)}
 .comments-disabled-notice{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.07em;color:var(--text-light);font-style:italic;text-align:center;padding:1rem;background:var(--gold-pale);border:1px solid var(--border-gold);border-radius:2px;margin-bottom:1rem}
 .comment-list{display:flex;flex-direction:column;gap:0.85rem}
 .comment-item{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:2px;padding:0.85rem 1rem}
@@ -951,6 +954,7 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
       <div class="post-like-section">
         <button class="post-like-btn" id="post-like-btn" onclick="togglePostLike()">❤ Like this post</button>
         <span class="post-like-count" id="post-like-count"></span>
+        <button class="post-share-btn" id="post-share-btn" onclick="sharePost()">⎋ Share</button>
       </div>
       <div class="post-edit-bar" id="post-edit-bar"></div>
       <!-- COMMENTS SECTION -->
@@ -1753,6 +1757,23 @@ function renderPostLike(postId){
 }
 function getCardLikeCount(postId){ return getLikeCount(postId); }
 
+async function sharePost(){
+  if(!currentPostId) return;
+  const post=posts.find(p=>p.id===currentPostId); if(!post) return;
+  const url='https://khaakenalayn.uk/?post='+currentPostId;
+  const btn=document.getElementById('post-share-btn');
+  if(navigator.share){
+    try{
+      await navigator.share({ title: post.title, text: post.title+' — Khaak al Na\'layn Sharif', url });
+    } catch(e){ if(e.name!=='AbortError') fallbackCopy(url, btn); }
+  } else { fallbackCopy(url, btn); }
+}
+function fallbackCopy(url, btn){
+  navigator.clipboard.writeText(url).then(()=>{
+    if(btn){ btn.textContent='✓ Link Copied'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='⎋ Share'; btn.classList.remove('copied'); },2200); }
+  }).catch(()=>{ prompt('Copy this link to share:', url); });
+}
+
 // ════════════════════════════════════════════════
 // NOTIFY / MODAL
 // ════════════════════════════════════════════════
@@ -2004,16 +2025,27 @@ async function savePost(){
         await supa('POST','posts',{id,title,body,categories:currentCats,attachments,date:new Date().toISOString(),author,published:true});
         await loadPosts(); notify('Post published ✓'); showHome();
         try {
+          const postUrl = 'https://khaakenalayn.uk/?post=' + id;
           const pushRes = await fetch('https://khaak-notify.s-legend7860.workers.dev', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title })
+            body: JSON.stringify({
+              title: '❖ New Post on Khaak al Na'layn Sharif',
+              message: title,
+              url: postUrl
+            })
           });
-          const pushData = await pushRes.json();
-          console.log('OneSignal response:', JSON.stringify(pushData));
-          if(pushData.errors){ notify('Push error: ' + JSON.stringify(pushData.errors)); }
-          else { notify('Push sent ✓'); }
-        } catch(e){ console.warn('Push notification failed:', e); notify('Push failed: ' + e.message); }
+          if (!pushRes.ok) {
+            const errText = await pushRes.text();
+            console.warn('[Push] Worker HTTP error:', pushRes.status, errText);
+            notify('Post published ✓ (push error ' + pushRes.status + ')');
+          } else {
+            const pushData = await pushRes.json();
+            console.log('[Push] Broadcast response:', JSON.stringify(pushData));
+            if(pushData.error){ notify('Push error: ' + (pushData.detail ? JSON.stringify(pushData.detail) : pushData.error)); }
+            else { notify('Post published & push sent ✓'); }
+          }
+        } catch(e){ console.warn('[Push] Broadcast failed:', e); notify('Post published ✓ (push failed: ' + e.message + ')'); }
       }
     }
   } catch(e){ notify('Error saving post. Please try again.'); }
@@ -3445,18 +3477,20 @@ async function getOneSignalId(deviceId){
   } catch(e){ console.warn('[Push] getOneSignalId error:', e); return null; }
 }
 
-async function sendTargetedPush(oneSignalId, title, body){
+async function sendTargetedPush(oneSignalId, title, bodyText, postId){
   if(!oneSignalId) return;
   console.log('[Push] sendTargetedPush to:', oneSignalId, 'title:', title);
   try {
+    const url = postId ? 'https://khaakenalayn.uk/?post=' + postId : 'https://khaakenalayn.uk/';
     const res = await fetch('https://khaak-notify.s-legend7860.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ target_id: oneSignalId, title, body })
+      body: JSON.stringify({ target_id: oneSignalId, title, body: bodyText, url })
     });
+    if (!res.ok) { console.warn('[Push] Targeted push HTTP error:', res.status, await res.text()); return; }
     const json = await res.json();
-    console.log('[Push] Worker response:', JSON.stringify(json));
-  } catch(e){ console.warn('Targeted push failed:', e); }
+    console.log('[Push] Targeted response:', JSON.stringify(json));
+  } catch(e){ console.warn('[Push] Targeted push failed:', e); }
 }
 
 // Owner's device_id stored in Supabase settings under id='owner_device'
@@ -3538,7 +3572,7 @@ async function addOwnerNotif(type, postId, postTitle, author, body){
       if(ownerSubId){
         const pushTitle = type==='like' ? `❤ ${author} liked your post` : type==='comment' ? `💬 New comment on "${postTitle}"` : `↩ New reply on "${postTitle}"`;
         const pushBody  = type==='like' ? `"${postTitle}"` : `${author}: ${notif.preview}`;
-        await sendTargetedPush(ownerSubId, pushTitle, pushBody);
+        await sendTargetedPush(ownerSubId, pushTitle, pushBody, postId);
       }
     }
   } catch(e){ /* non-critical */ }
@@ -3843,7 +3877,14 @@ document.addEventListener('click', e=>{
   initPrayerBar();
   await loadBans();
   await loadTagOrder();
-  loadPosts();
+  loadPosts().then(()=>{
+    // Deep-link: ?post=ID opens the post directly (used by share links)
+    const params=new URLSearchParams(window.location.search);
+    const postParam=params.get('post');
+    if(postParam && posts.find(x=>x.id===postParam)){
+      openPost(postParam);
+    }
+  });
 
   // ── SUPABASE REALTIME — live notification delivery ──
   // Opens a WebSocket to Supabase. When a new row is inserted into

@@ -1672,6 +1672,12 @@ function showHome(){
   document.getElementById('main-search-clear').classList.remove('show');
   document.getElementById('search-results-label').classList.remove('show');
   renderList(); renderFilterBar(); window.scrollTo(0,0);
+  // Clear ?post= from URL when returning to home
+  const url=new URL(window.location.href);
+  if(url.searchParams.has('post')){
+    url.searchParams.delete('post');
+    history.replaceState({},'',url.toString());
+  }
 }
 function showAllPosts(){ showHome(); setMenuActive('menu-all'); }
 function cancelWrite(){ showHome(); }
@@ -2001,6 +2007,10 @@ async function cardLike(postId, btn){
 function openPost(id){
   const p=posts.find(x=>x.id===id); if(!p) return;
   currentPostId=id;
+  // Update URL so each post has a shareable/indexable link
+  const url=new URL(window.location.href);
+  url.searchParams.set('post',id);
+  history.pushState({post:id},'',url.toString());
   hideAllViews();
   document.getElementById('post-view').classList.add('active');
   document.getElementById('post-title').textContent=p.title;
@@ -3764,6 +3774,15 @@ document.addEventListener('click', e=>{
     const postParam=params.get('post');
     if(postParam && posts.find(x=>x.id===postParam)){
       openPost(postParam);
+    }
+  });
+
+  // Handle browser back/forward buttons
+  window.addEventListener('popstate', function(e){
+    if(e.state && e.state.post){
+      openPost(e.state.post);
+    } else {
+      showHome();
     }
   });
 

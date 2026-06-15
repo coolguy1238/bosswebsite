@@ -670,40 +670,6 @@ body.theme-ocean .prayer-bar{background:rgba(10,58,90,0.96)}
 .section-view{display:none}.section-view.active{display:block}
 .section-back{background:none;border:none;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--green-mid);cursor:pointer;padding:0;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.4rem}
 .section-back:hover{color:var(--gold-dark)}
-/* ── QASAID ── */
-.qasaid-search{width:100%;padding:0.55rem 0.85rem;font-family:'EB Garamond',serif;font-size:1rem;border:1px solid var(--border-gold);background:rgba(201,168,76,0.05);color:var(--text-dark);border-radius:2px;margin-bottom:1.25rem;outline:none;transition:border-color 0.2s}
-.qasaid-search:focus{border-color:var(--gold)}
-.qasaid-list{display:flex;flex-direction:column;gap:0}
-.qasaid-item{border-bottom:1px solid rgba(201,168,76,0.15);padding:0.1rem 0}
-.qasaid-item:last-child{border-bottom:none}
-.qasaid-toggle{width:100%;background:none;border:none;text-align:right;cursor:pointer;padding:0.85rem 0.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:background 0.15s;border-radius:2px}
-.qasaid-toggle:hover{background:rgba(201,168,76,0.06)}
-.qasaid-toggle-titles{text-align:right;flex:1;min-width:0}
-.qasaid-arabic-title{font-family:'Amiri',serif;font-size:1.35rem;color:var(--gold);line-height:1.4;display:block}
-.qasaid-english-title{font-family:'EB Garamond',serif;font-size:0.88rem;font-style:italic;color:var(--text-light);display:block;margin-top:0.15rem}
-.qasaid-toggle-author{font-family:'EB Garamond',serif;font-size:0.8rem;color:var(--text-light);opacity:0.7;flex-shrink:0;text-align:left;max-width:35%}
-.qasaid-toggle-chevron{font-size:0.7rem;color:var(--gold);opacity:0.5;flex-shrink:0;transition:transform 0.2s}
-.qasaid-item.open .qasaid-toggle-chevron{transform:rotate(180deg)}
-.qasaid-body{display:none;padding:1rem 0.5rem 1.5rem}
-.qasaid-item.open .qasaid-body{display:block}
-.qasaid-verses{display:flex;flex-direction:column;gap:1.25rem}
-.qasaid-verse{border-right:2px solid rgba(201,168,76,0.3);padding-right:1rem}
-.qasaid-verse-arabic{font-family:'Amiri',serif;font-size:1.45rem;line-height:1.7;color:var(--text-dark);text-align:right;direction:rtl;display:block}
-.qasaid-verse-translit{font-family:'EB Garamond',serif;font-size:0.92rem;font-style:italic;color:var(--text-light);margin-top:0.2rem;display:block}
-.qasaid-verse-english{font-family:'EB Garamond',serif;font-size:1rem;color:var(--text-dark);margin-top:0.1rem;display:block}
-.qasaid-admin-bar{display:none;margin-top:1.25rem;padding-top:0.75rem;border-top:1px dashed rgba(201,168,76,0.3);gap:0.5rem;flex-wrap:wrap}
-.qasaid-item.open .qasaid-admin-bar{display:flex}
-.qasaid-edit-btn{background:none;border:1px solid rgba(201,168,76,0.4);border-radius:2px;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);padding:4px 12px;cursor:pointer;transition:all 0.15s}
-.qasaid-edit-btn:hover{background:rgba(201,168,76,0.12)}
-.qasaid-editor{margin-top:1rem;display:none;flex-direction:column;gap:0.75rem}
-.qasaid-item.editing .qasaid-editor{display:flex}
-.qasaid-item.editing .qasaid-verses{display:none}
-.qasaid-editor textarea{width:100%;font-family:'Amiri',serif;font-size:1rem;border:1px solid var(--border-gold);background:rgba(201,168,76,0.04);color:var(--text-dark);border-radius:2px;padding:0.6rem;resize:vertical;min-height:200px;direction:rtl;line-height:1.8}
-.qasaid-editor-label{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--text-light);margin-bottom:0.2rem}
-.qasaid-editor-field{display:flex;flex-direction:column}
-.qasaid-editor-field input{width:100%;font-family:'EB Garamond',serif;font-size:0.95rem;border:1px solid var(--border-gold);background:rgba(201,168,76,0.04);color:var(--text-dark);border-radius:2px;padding:0.45rem 0.7rem}
-.qasaid-add-btn{background:none;border:1px solid rgba(201,168,76,0.35);border-radius:2px;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);padding:5px 14px;cursor:pointer;transition:all 0.15s;display:none}
-#add-qasida-btn-wrap .qasaid-add-btn{display:inline-block}
 
 /* ── SALAWAT SECTION ── */
 .salawat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin-top:0.5rem}
@@ -869,9 +835,6 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
     <div class="side-menu-section-label">Sections</div>
     <button class="side-menu-item" id="menu-salawat" onclick="showSection('salawat');closeMenu()">
       <span class="menu-icon">🌙</span> Salawat
-    </button>
-    <button class="side-menu-item" id="menu-qasaid" onclick="showSection('qasaid');closeMenu()">
-      <span class="menu-icon">📿</span> Qasaid
     </button>
     <button class="side-menu-item" id="menu-pdfs" onclick="showSection('pdfs');closeMenu()">
       <span class="menu-icon">📖</span> PDFs & Downloads
@@ -1099,18 +1062,6 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
       <div class="salawat-grid" id="salawat-grid">
       </div>
       <p style="font-size:0.78rem;color:var(--text-light);font-style:italic;margin-top:1rem;text-align:center">More salawat will be added in sha Allah. Contact the admin to suggest additions.</p>
-    </div>
-
-    <!-- QASAID SECTION -->
-    <div class="section-view" id="section-qasaid">
-      <button class="section-back" onclick="showHome()">← Back to Home</button>
-      <div class="page-title">Qasaid</div>
-      <p style="font-size:0.9rem;color:var(--text-light);font-style:italic;margin-bottom:1.1rem">Classical Islamic poetry in praise of the Prophet ﷺ and the Awliya</p>
-      <div id="add-qasida-btn-wrap" style="display:none;margin-bottom:1rem">
-        <button class="qasaid-add-btn" onclick="openAddQasida()">＋ Add Qasida</button>
-      </div>
-      <input class="qasaid-search" type="search" placeholder="Search by title or author…" oninput="filterQasaid(this.value)" id="qasaid-search-input">
-      <div class="qasaid-list" id="qasaid-list"></div>
     </div>
 
     <!-- PDFs SECTION -->
@@ -1615,7 +1566,7 @@ function closeMenu(){
   document.getElementById('hamburger').classList.remove('open');
 }
 function setMenuActive(id){
-  ['menu-home','menu-all','menu-write','menu-salawat','menu-qasaid','menu-pdfs','menu-prayer'].forEach(i=>{
+  ['menu-home','menu-all','menu-write','menu-salawat','menu-pdfs','menu-prayer'].forEach(i=>{
     const el=document.getElementById(i); if(el) el.classList.toggle('active',i===id);
   });
 }
@@ -2693,41 +2644,17 @@ function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replac
 // ════════════════════════════════════════════════
 // SALAWAT & PDF MANAGEMENT (Owner/Admin)
 // ════════════════════════════════════════════════
+const SALAWAT_KEY = 'khaak_salawat_v1';
+const PDF_KEY = 'khaak_pdfs_v1';
+
 let salawatPendingFile = null;
 let pdfPendingFile = null;
 let deleteResourceTarget = null; // {type:'salawat'|'pdf', id}
 
-// ── Supabase-backed salawat/PDF storage ──
-// Tables needed (run once in Supabase SQL editor):
-//   create table salawat_items (id text primary key, name text, sub text, icon text, url text, text text, created_at timestamptz default now());
-//   create table pdf_items (id text primary key, name text, meta text, url text, created_at timestamptz default now());
-
-async function getSalawatItems(){
-  try{
-    const res=await fetch(SUPA_URL+'/rest/v1/salawat_items?order=created_at.asc',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    if(!res.ok) return [];
-    return await res.json();
-  }catch(e){ return []; }
-}
-async function addSalawatItem(item){
-  await fetch(SUPA_URL+'/rest/v1/salawat_items',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(item)});
-}
-async function deleteSalawatItem(id){
-  await fetch(SUPA_URL+'/rest/v1/salawat_items?id=eq.'+id,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-}
-async function getPdfItems(){
-  try{
-    const res=await fetch(SUPA_URL+'/rest/v1/pdf_items?order=created_at.asc',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    if(!res.ok) return [];
-    return await res.json();
-  }catch(e){ return []; }
-}
-async function addPdfItem(item){
-  await fetch(SUPA_URL+'/rest/v1/pdf_items',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(item)});
-}
-async function deletePdfItem(id){
-  await fetch(SUPA_URL+'/rest/v1/pdf_items?id=eq.'+id,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-}
+function getSalawatItems(){ try{ return JSON.parse(localStorage.getItem(SALAWAT_KEY))||[]; }catch(e){ return []; } }
+function saveSalawatItems(arr){ localStorage.setItem(SALAWAT_KEY,JSON.stringify(arr)); }
+function getPdfItems(){ try{ return JSON.parse(localStorage.getItem(PDF_KEY))||[]; }catch(e){ return []; } }
+function savePdfItems(arr){ localStorage.setItem(PDF_KEY,JSON.stringify(arr)); }
 
 // Show/hide admin buttons when section is shown
 const _origShowSection = showSection;
@@ -2735,13 +2662,10 @@ showSection = function(name){
   _origShowSection(name);
   const salBtn = document.getElementById('add-salawat-btn-wrap');
   const pdfBtn = document.getElementById('add-pdf-btn-wrap');
-  const qasBtn = document.getElementById('add-qasida-btn-wrap');
   if(salBtn) salBtn.style.display = (name==='salawat' && isLoggedIn()) ? 'block' : 'none';
   if(pdfBtn) pdfBtn.style.display = (name==='pdfs' && isLoggedIn()) ? 'block' : 'none';
-  if(qasBtn) qasBtn.style.display = (name==='qasaid' && isLoggedIn()) ? 'block' : 'none';
   if(name==='salawat') renderSalawatGrid();
   if(name==='pdfs') renderPdfList();
-  if(name==='qasaid') renderQasaidList();
 };
 
 // ── SALAWAT ──
@@ -2777,23 +2701,18 @@ async function saveSalawat(){
     try { notify('Uploading…'); finalUrl = await uploadToStorage(salawatPendingFile); }
     catch(e){ err.textContent='Upload failed: '+e.message; err.classList.add('show'); return; }
   }
-  try{
-    notify('Saving…');
-    await addSalawatItem({id:Date.now().toString(),name,sub,icon,url:finalUrl||null,text:text||null});
-    closeModal('add-salawat-modal');
-    await renderSalawatGrid();
-    notify('Salawat added ✓');
-  }catch(e){ err.textContent='Save failed: '+e.message; err.classList.add('show'); }
+  const items=getSalawatItems();
+  items.push({id:Date.now().toString(),name,sub,icon,url:finalUrl||null,text:text||null});
+  saveSalawatItems(items);
+  closeModal('add-salawat-modal');
+  renderSalawatGrid();
+  notify('Salawat added ✓');
 }
-async function renderSalawatGrid(){
+function renderSalawatGrid(){
+  const items=getSalawatItems();
   const grid=document.getElementById('salawat-grid');
   if(!grid) return;
-  // Preserve static HTML on first call
-  if(!grid.getAttribute('data-static')){
-    grid.setAttribute('data-static', grid.innerHTML);
-  }
-  const items=await getSalawatItems();
-  const adminExtra=items.map((item)=>{
+  const adminExtra=items.map((item,i)=>{
     const deleteBtn=isLoggedIn()?`<button onclick="event.preventDefault();event.stopPropagation();promptDeleteResource('salawat','${item.id}')" style="position:absolute;top:4px;right:4px;background:rgba(139,26,26,0.8);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>`:'';
     if(item.text && !item.url){
       return `<div class="salawat-card" style="position:relative;cursor:pointer" onclick="openSalawatText('${item.id}')">
@@ -2811,17 +2730,19 @@ async function renderSalawatGrid(){
       <span class="salawat-sub">${esc(item.sub||'')}</span>
     </a>`;
   }).join('');
+  // Prepend admin items to the grid (existing static cards remain in HTML after)
+  const staticCards=grid.getAttribute('data-static')||'';
+  if(!grid.getAttribute('data-static')){
+    grid.setAttribute('data-static', grid.innerHTML);
+  }
   grid.innerHTML=adminExtra+grid.getAttribute('data-static');
 }
-async function openSalawatText(id){
-  try{
-    const res=await fetch(SUPA_URL+'/rest/v1/salawat_items?id=eq.'+id,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    const rows=await res.json();
-    const item=rows[0]; if(!item) return;
-    document.getElementById('salawat-text-modal-title').textContent=item.name+(item.sub?' — '+item.sub:'');
-    document.getElementById('salawat-text-modal-body').textContent=item.text||'';
-    openModal('salawat-text-modal');
-  }catch(e){ notify('Could not load text.'); }
+function openSalawatText(id){
+  const item=getSalawatItems().find(x=>x.id===id);
+  if(!item) return;
+  document.getElementById('salawat-text-modal-title').textContent=item.name+(item.sub?' — '+item.sub:'');
+  document.getElementById('salawat-text-modal-body').textContent=item.text||'';
+  openModal('salawat-text-modal');
 }
 
 // ── PDFs ──
@@ -2853,18 +2774,17 @@ async function savePdf(){
     try { notify('Uploading…'); finalUrl = await uploadToStorage(pdfPendingFile); }
     catch(e){ err.textContent='Upload failed: '+e.message; err.classList.add('show'); return; }
   }
-  try{
-    notify('Saving…');
-    await addPdfItem({id:Date.now().toString(),name,meta,url:finalUrl});
-    closeModal('add-pdf-modal');
-    await renderPdfList();
-    notify('PDF added ✓');
-  }catch(e){ err.textContent='Save failed: '+e.message; err.classList.add('show'); }
+  const items=getPdfItems();
+  items.push({id:Date.now().toString(),name,meta,url:finalUrl});
+  savePdfItems(items);
+  closeModal('add-pdf-modal');
+  renderPdfList();
+  notify('PDF added ✓');
 }
-async function renderPdfList(){
+function renderPdfList(){
+  const items=getPdfItems();
   const container=document.getElementById('pdf-list-dynamic');
   if(!container) return;
-  const items=await getPdfItems();
   container.innerHTML=items.map(item=>{
     const deleteBtn=isLoggedIn()?`<button onclick="event.preventDefault();event.stopPropagation();promptDeleteResource('pdf','${item.id}')" style="background:rgba(139,26,26,0.8);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:0.72rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">✕</button>`:'';
     return `<a class="pdf-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" download style="align-items:center">
@@ -2882,21 +2802,21 @@ function promptDeleteResource(type, id){
   document.getElementById('del-resource-title').textContent=type==='salawat'?'Delete this salawat?':'Delete this PDF?';
   openModal('del-resource-modal');
 }
-async function confirmDeleteResource(){
+function confirmDeleteResource(){
   if(!deleteResourceTarget) return;
   const {type,id}=deleteResourceTarget;
-  try{
-    if(type==='salawat'){
-      await deleteSalawatItem(id);
-      await renderSalawatGrid();
-    } else {
-      await deletePdfItem(id);
-      await renderPdfList();
-    }
-    closeModal('del-resource-modal');
-    deleteResourceTarget=null;
-    notify('Deleted ✓');
-  }catch(e){ notify('Delete failed.'); }
+  if(type==='salawat'){
+    const items=getSalawatItems().filter(x=>x.id!==id);
+    saveSalawatItems(items);
+    renderSalawatGrid();
+  } else {
+    const items=getPdfItems().filter(x=>x.id!==id);
+    savePdfItems(items);
+    renderPdfList();
+  }
+  closeModal('del-resource-modal');
+  deleteResourceTarget=null;
+  notify('Deleted ✓');
 }
 
 // ════════════════════════════════════════════════
@@ -4156,384 +4076,7 @@ window.addEventListener('load', () => {
 });
 </script>
 <script>
-// ── QASAID MODULE ──
-const QASAID_KEY = 'qasaid_data';
-
-// Default qasaid data — all 168 from qasidacollection.com
-// Format per entry: { id, arabicTitle, englishTitle, author, tag, verses: [{arabic, translit, english}] }
-// Verses can be added/edited by admin. Initially just title data is stored.
-const DEFAULT_QASAID = [
-  {id:'q001',arabicTitle:'هَدَى اللهُ مَعْشُوقَ الجَمَالِ إِلَى الهُدَى',englishTitle:'May Allah Guide the Beloved of Beauty to Guidance',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q002',arabicTitle:'رَقَّتْ عَيْنَايَ شَوْقًا',englishTitle:'My Eyes Wept with Longing',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'',verses:[]},
-  {id:'q003',arabicTitle:'عَلَيْكَ صَلَّى اللهْ يَا خَيْرَ خَلْقِ اللهْ',englishTitle:'Upon You Be the Blessings of Allah, O Best of Allah\'s Creation',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'',verses:[]},
-  {id:'q004',arabicTitle:'مَا لِي سِوَاكْ هَمْ وَأَنْتَ تَعْلَمْ',englishTitle:'My Only Thought is You',author:'Sayyid Muhammad Mahdi Baha-ud-Din',tag:'Shadhili',verses:[]},
-  {id:'q005',arabicTitle:'صَلِّ يَا سَلَامْ عَلَى الْوَسِيلَةْ',englishTitle:'O Source of Peace, Send Your Prayers Upon the Great Intermediary',author:'Shaykh Mohammed Saeed Al-Kurdi',tag:'Shadhili',verses:[]},
-  {id:'q006',arabicTitle:'صَلَاةُ الْبَدْرِيَّة',englishTitle:'The Badriyyah Prayer',author:'Shaykh Muhammad ibn Yallis',tag:'',verses:[]},
-  {id:'q007',arabicTitle:'مَا مَدَّ لِخَيْرِ الْخَلْقِ يَدَا',englishTitle:'Extend Your Hand',author:'Shaykh Ali Mansur Siddiq Bashaiban',tag:'Shadhili',verses:[]},
-  {id:'q008',arabicTitle:'نَسِيْمْ هَبَّتْ عَلَيْنَا مِنْ حِمَى الْمُصْطَفَى',englishTitle:'A Breeze from the Sanctuary of the Chosen One',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q009',arabicTitle:'وَاصَلُونِي بَعْدَ بُعْدِي',englishTitle:'They Granted Me Union After My Distance',author:'Habib Umar Bin Hafiz',tag:'Shadhili',verses:[]},
-  {id:'q010',arabicTitle:'مِنْ جَمَالِ الْكَوْنِ خَمْرِي',englishTitle:'From the Beauty of the Universe Comes My Wine',author:'ʿAfīf al-Dīn al-Tilimsānī',tag:'Shadhili',verses:[]},
-  {id:'q011',arabicTitle:'يَمِّمْ نَحْوَ الْمَدِينَةْ تَرَى الْأَنْوَارْ',englishTitle:'Head Toward Madinah, and You Shall See the Lights',author:'Abd Al-Rahman Al-Shaghouri',tag:'',verses:[]},
-  {id:'q012',arabicTitle:'مَلَكَنِي هَوَاكُمْ عَذَّبَنِي',englishTitle:'Your Love Has Captivated Me',author:'Abd Al-Rahman Al-Shaghouri',tag:'',verses:[]},
-  {id:'q013',arabicTitle:'حُبُّ الْحُسَيْنْ',englishTitle:'The Love of Husayn',author:'Rashid Ghulam Al-Maghrabi',tag:'',verses:[]},
-  {id:'q014',arabicTitle:'طَابَ لِي خَلْعُ عِذَارِي',englishTitle:'My Wantonness Befits Me',author:'Sheikh Abd al-Ghani al-Nabulsi',tag:'Shadhili',verses:[]},
-  {id:'q015',arabicTitle:'رَسُولَ إِلَهِ الْعَالَمِينَ تَعَالَى',englishTitle:'The Messenger of the Lord of the Worlds, the Most High',author:'Sheikh Abd al-Ghani al-Nabulsi',tag:'',verses:[]},
-  {id:'q016',arabicTitle:'يَا رَبِّ بِهِمْ وَبِجَدِّهِمِ عَجِّلْ بِالْنَّصْرِ وَبِالْفَرَجِ',englishTitle:'O Lord, by Them and Their Forefather, Hasten Our Victory and Divine Relief',author:'Shaykh Ibrahim Niasse',tag:'',verses:[]},
-  {id:'q017',arabicTitle:'قُلْتُ لَمَّا غَابَ عَنِّي',englishTitle:'I Said, When He Disappeared from Me',author:'Shaykh Salih Al-Jaʿfari',tag:'',verses:[]},
-  {id:'q018',arabicTitle:'اَلْهِجْرَةُ رِحْلَةُ هَادِيْنَا',englishTitle:'The Hijrah Is the Journey of Our Guide',author:'Omar al-Batsh',tag:'',verses:[]},
-  {id:'q019',arabicTitle:'خُذْ مَا صَفَا وَدَعِ الْكَدَر',englishTitle:'Take What Is Pure, and Leave What Is Clouded',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q020',arabicTitle:'نَسَمَاتُ هَوَاكَ لَهَا أَرَجُ',englishTitle:'The Breezes of Your Love Carry a Fragrant Scent',author:'Sheikh Abd al-Ghani al-Nabulsi',tag:'',verses:[]},
-  {id:'q021',arabicTitle:'يَا قُبَّةَ الْخَضْرَا مَالِكْ',englishTitle:'O Green Dome, How Captivating You Are',author:'Sheikh Abd al-Ghani al-Nabulsi',tag:'',verses:[]},
-  {id:'q022',arabicTitle:'الْمُزْدَوِجَةُ الْحَسْنَاءُ فِي الْاِسْتِغَاثَةِ بِأَسْمَاءِ اللهِ الْحُسْنَى',englishTitle:'The Beautiful Couplet in Seeking Aid through the Most Beautiful Names of Allah',author:'Sheikh Yusuf bin Isma\'il al-Nabhani',tag:'Ramadan / Ba\'Alawi',verses:[]},
-  {id:'q023',arabicTitle:'مُوَدَّعْ مُوَدَّعْ يَا رَمَضَانْ',englishTitle:'Farewell, Farewell, O Ramadan',author:'',tag:'Ramadan / Ba\'Alawi',verses:[]},
-  {id:'q024',arabicTitle:'أَشْرَقَتْ أَنْوَارْ مُحَمَّد',englishTitle:'The Lights of Muhammad Shone',author:'',tag:'',verses:[]},
-  {id:'q025',arabicTitle:'مَا لِلْنِّيَاقِ إِذَا حَدَا جَمَّالُهَا',englishTitle:'What Is With the She-Camels When Their Driver Chants to Them?',author:'',tag:'',verses:[]},
-  {id:'q026',arabicTitle:'شَهْرُ الرَّبِيع وَافَانَا',englishTitle:'The Month of Rabiʿ Is Upon Us',author:'',tag:'',verses:[]},
-  {id:'q027',arabicTitle:'بَحِبَّك وَ بَرِيدَك',englishTitle:'I Love You, and Long for You',author:'Hajj Muhammad Al-Rammal',tag:'',verses:[]},
-  {id:'q028',arabicTitle:'لَمْ يَخْلُقِ الرَّحْمَانُ مِثْلَ مُحَمَّدٍ',englishTitle:'The Most Merciful Has Never Created the Like of Muhammad',author:'Munshid Zuhayr Manini',tag:'Shadhili',verses:[]},
-  {id:'q029',arabicTitle:'صَفَتِ النَّظْرَهْ',englishTitle:'Clear Was the Vision',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q030',arabicTitle:'عَطْفَةً يَا جِيرَةَ ٱلْعَلَمِ',englishTitle:'A Glance of Favor, O Neighbors of the Noble Sanctuary',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Shadhili',verses:[]},
-  {id:'q031',arabicTitle:'قَدْ بَدَا إِلَيَّ نُورُهَا عَشِياً',englishTitle:'Her Light Appeared to Me at Dusk',author:'',tag:'Shadhili',verses:[]},
-  {id:'q032',arabicTitle:'يَا أَجْمَلَ الْأَنْبِيَاء',englishTitle:'Oh Most Beautiful of Prophets',author:'',tag:'Shadhili',verses:[]},
-  {id:'q033',arabicTitle:'يَا خَلِقَا الْأَكْوَانْ بِا لْلُّطْفِ عَامِلْنِي',englishTitle:'O Creator of the Universes, Treat Me with Your Benevolence',author:'',tag:'Shadhili',verses:[]},
-  {id:'q034',arabicTitle:'لَئِنْ عَزَّنِي لُقْيَا النَّبِيِّ وَوِصَالُه',englishTitle:'I May Not Be Able to Meet the Prophet',author:'Shaykh Ibrahim Niasse',tag:'',verses:[]},
-  {id:'q035',arabicTitle:'يَا مَرْحَبًا بِالْهَاشِمِيَّةِ',englishTitle:'O Welcome to the Hashemite!',author:'Shaykh Salih Al-Jaʿfari',tag:'',verses:[]},
-  {id:'q036',arabicTitle:'جَالِيَةُ الْكَدْرِ',englishTitle:'Removal Of Distress',author:'Imam Jaʿfar bin \'Abdul Karīm al-Barzanji',tag:'',verses:[]},
-  {id:'q037',arabicTitle:'لِي فِي المَدِينَةِ أَحْبَابٌ إِذَا نَظَرُوا',englishTitle:'I Have Beloveds In Medina; When They Gaze Upon Me',author:'Sayyid Muhammad Amin Kutbi',tag:'',verses:[]},
-  {id:'q038',arabicTitle:'يَا أَيُّهَا ٱلنَّبِيُّ ٱلْكَوْكَبُ ٱلدُّرِّيُّ',englishTitle:'O Prophet! O Pearly, Radiant Star!',author:'',tag:'',verses:[]},
-  {id:'q039',arabicTitle:'أهْلِ المَحَبَّةْ قاَلُولِي',englishTitle:'The People Of Love Said To Me',author:'Abdul Rahman Al-Majdhoub',tag:'',verses:[]},
-  {id:'q040',arabicTitle:'وَنَا دَاخِلْ عَالَأعْتَابُ وَعَلَى القُبَّةِ الخَضْرَا',englishTitle:'As I Enter Upon The Thresholds And Beneath The Green Dome',author:'Abdul Rahman Al-Majdhoub',tag:'',verses:[]},
-  {id:'q041',arabicTitle:'تَشَوَّقَتْ رُوحِي لِشَطِّ الوَادِي',englishTitle:'My Soul Yearns For The Valley\'s Shore',author:'Abdul Rahman Al-Majdhoub',tag:'Shadhili',verses:[]},
-  {id:'q042',arabicTitle:'وَاللَّهِ مَا حُـولْ عَنْ حُـبِّ أَحْمَـدْ',englishTitle:'By God, I Will Not Turn Away From The Love Of Ahmad',author:'Sheikh Abd al-Ghani al-Nabulsi',tag:'Shadhili',verses:[]},
-  {id:'q043',arabicTitle:'إِنْ جَبَرْتُــمْ كَسْــرَ قَـلْـبِي',englishTitle:'If You Mend My Broken Heart',author:'Sheikh Abd al-Ghani al-Nabulsi',tag:'',verses:[]},
-  {id:'q044',arabicTitle:'صِفْهُ لِي يَا مَنْ رَأَيْتَ الحِبَّ لَيْلاً',englishTitle:'Describe Him to Me, O You Who Saw the Beloved in the Night',author:'Shaykh Jad Abu Ghay',tag:'',verses:[]},
-  {id:'q045',arabicTitle:'يَا مَنْ دَنَا وَتَدَلَّى',englishTitle:'O You Who Drew Near and Ascended',author:'Habib Abu Bakr Al \'Adny Bin Ali Al-Mashhur',tag:'',verses:[]},
-  {id:'q046',arabicTitle:'Spring\'s Gift',englishTitle:'Spring\'s Gift',author:'Hamza Yusuf',tag:'',verses:[]},
-  {id:'q047',arabicTitle:'إِنَّ فِي الْجَنَّةِ نَهْرًا مِنْ لَبَنْ',englishTitle:'Indeed, In Paradise There Is a River of Milk',author:'',tag:'Shadhili',verses:[]},
-  {id:'q048',arabicTitle:'القصيدة المضرية',englishTitle:'The Mudariyya',author:'Imam Al Busiri',tag:'',verses:[]},
-  {id:'q049',arabicTitle:'هِمْ بِالحَبِيبِ مُحَمَّدٍ وذَوِيهِ',englishTitle:'Be Enamored with the Beloved Muhammad ﷺ and His Noble Family',author:'Yahya Mahmoud Fanoon',tag:'',verses:[]},
-  {id:'q050',arabicTitle:'هَلْ مِنْ مُغِيثٍ',englishTitle:'Can Anyone Save My Soul From Grief',author:'Abdul Hakim Murad',tag:'',verses:[]},
-  {id:'q051',arabicTitle:'أَقْبَلَ السَّاقِي عَلَيْنَا',englishTitle:'The Pourer Has Drawn Near to Us',author:'Abd Al-Rahman Al-Shaghouri',tag:'',verses:[]},
-  {id:'q052',arabicTitle:'اللهُ يُحَقِّقْ لَنَا لُقْيَا النَّبِي فِي سُرُورٍ',englishTitle:'May Allah Grant Us the Joy of Meeting the Prophet',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q053',arabicTitle:'يَا أيُّهَا المُخْتَار',englishTitle:'O Chosen one',author:'Shaykh Mohammad Imran',tag:'',verses:[]},
-  {id:'q054',arabicTitle:'وِشْلُونْ أنَامَ الَّليْلْ',englishTitle:'How Am I To Sleep The Night',author:'',tag:'Shadhili',verses:[]},
-  {id:'q055',arabicTitle:'يَا سَعْدَ قَوْمٍ',englishTitle:'O How Felicitous Are A People!',author:'Sidi Shu\'ayb Boumadyan al-Tilimsani',tag:'Shadhili',verses:[]},
-  {id:'q056',arabicTitle:'أَعِـدْ لَـنَـا ذِكْـرَى الأَحْـبَـاب',englishTitle:'Recount To Us The Days Of Our Loved Ones',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q057',arabicTitle:'بِـإِحْيَاءِ عُلُومِ الدِّينِ تَحْيَا قُلُوبُنَا',englishTitle:'By "The Revival of the Religious Sciences," our Hearts are Revived',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q058',arabicTitle:'نَظَرُ المُحِبِّ إِلَى المُحِبِّ سَلام',englishTitle:'Gaze of the Lover Upon the Beloved is Peace',author:'Ṣafī al-Dīn Ahmad ibn ʿAlwān',tag:'',verses:[]},
-  {id:'q059',arabicTitle:'فِيَّ حُبٌّ فِيَّ وَجدٌ',englishTitle:'Within me is Love, within me is Passion',author:'',tag:'Shadhili',verses:[]},
-  {id:'q060',arabicTitle:'بُشْرَى لَنَا نِلْنَا المُنَى',englishTitle:'Glad Tidings To Us, Our Aim Is Fulfilled',author:'',tag:'',verses:[]},
-  {id:'q061',arabicTitle:'وَدِّيـلِـي سَـلَامِـي يَـا رَايِـحْ لِـلـحَـرَم',englishTitle:'Send My Peace, O Traveler to the Sacred Sanctuary',author:'',tag:'',verses:[]},
-  {id:'q062',arabicTitle:'حَبِيبِي يَا رَسُولَ الله',englishTitle:'My Beloved O\' Messenger of Allah',author:'',tag:'',verses:[]},
-  {id:'q063',arabicTitle:'أَحْمَدْ يَا حَـبِـيـبِي',englishTitle:'Ahmad, My Beloved',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q064',arabicTitle:'تَبَلَّغْ بِالْقَلِيلِ مِنَ الْقَلِيْل',englishTitle:'Be Content with a Portion of a Portion of this World',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q065',arabicTitle:'حَنَّ قَلْبِي إِلَيْك صَلَّى رَبِّي عَلَيْك',englishTitle:'My Heart Longs For You',author:'Mansour Zaitar',tag:'',verses:[]},
-  {id:'q066',arabicTitle:'يا رَبِّ إِنْ عَظُمَتْ ذُنُوبِيَ كَثْرَةً',englishTitle:'Oh Allah, Though My Sins Are Immense And Many',author:'Abu Uways Al-Bakatawy',tag:'',verses:[]},
-  {id:'q067',arabicTitle:'نَادَيْتُ يَا رَبِّ وَالدُّنْيَا تُكَدِّرُنِي',englishTitle:'I Called Upon You, My Lord, As The World Burdened Me',author:'Abu Uways Al-Bakatawy',tag:'',verses:[]},
-  {id:'q068',arabicTitle:'رَمَضَانُ تَجَلَّى وابْتَسَم',englishTitle:'Ramadan Appears Smiling',author:'ِAbdullah Al-Wahab Al-Shamli Al-Sabbagh',tag:'Ramadan',verses:[]},
-  {id:'q069',arabicTitle:'مَرْحَباً شَهْرَ الصِّيَامِ',englishTitle:'Welcome, O Month of Fasting',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi / Ramadan',verses:[]},
-  {id:'q070',arabicTitle:'رَمَضَانُ شَهْرُ التَّجَلِّي مِنْ إلَهيَ الْكَرِيمِ',englishTitle:'Ramadan, in it is the giving from the bounty of my great Lord',author:'Habib Umar Bin Hafiz',tag:'Ramadan / Ba\'Alawi',verses:[]},
-  {id:'q071',arabicTitle:'صَلُّوا عَلَى النُّورِ الَّذِي عَرَجَ السَّمَا',englishTitle:'Invoke Blessings Upon the Light Who Ascended the Celestial Realm',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q072',arabicTitle:'يَا رَبِّ فَرِّجْ عَلَى الأُمَّةْ جَمِيعَ الكُرُوب',englishTitle:'O Lord, Relieve The Ummah From Distress.',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q073',arabicTitle:'بِـكَ قَـدْ صَـفَتْ مِـنْ دَهْرِنَـا الأَيـَّامُ',englishTitle:'Through You, The Days of Our Lives Are Blissful',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q074',arabicTitle:'صَلَاةُ الله عَلَى طَهَ اليَمَانْي',englishTitle:'Allah\'s Prayers Upon Taha Al-Yamani',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q075',arabicTitle:'الحَبِيْبُ المُشَفَّعْ أَصْلَ كُلِّ المَوَاهِبْ',englishTitle:'The Beloved, the Intercessor, the Source of All Gifts',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q076',arabicTitle:'يَا نُوْرَ الْعَيْنِ',englishTitle:'O Light of My Eye',author:'',tag:'',verses:[]},
-  {id:'q077',arabicTitle:'إِنَّـا أَعْـطَـيْـنَـاكَ الْـكَـوْثَـر',englishTitle:'We have given you al-Kawthar (O Muhammad ﷺ)',author:'',tag:'',verses:[]},
-  {id:'q078',arabicTitle:'فِيْ لَيْلَةِ الْقُدْسِ',englishTitle:'The Holy Night',author:'',tag:'',verses:[]},
-  {id:'q079',arabicTitle:'يا مَن سَرَيْتَ لَيْلًا مُصاحِبَ جِبْرِيلَ',englishTitle:'O You Who Journeyed by Night, Accompanied by Jibreel',author:'',tag:'',verses:[]},
-  {id:'q080',arabicTitle:'يَا رَبِّي صَلِّ عَلَى النَّبِي مَنْ جَائَنَا بِالرِّسَالَةْ',englishTitle:'My Lord Send Blessings on the Prophet Who Brought Us the Message',author:'',tag:'',verses:[]},
-  {id:'q081',arabicTitle:'بَيْنَ كَتِفَيْهِ عَلَامَةْ خَاتَمُ الرُّسْلِ الكِرَامِ',englishTitle:'Between His Shoulders is a Sign',author:'Imam Al Busiri',tag:'',verses:[]},
-  {id:'q082',arabicTitle:'الْقَصِيْدَةُ الْمُحَمَّدِيَّة',englishTitle:'The Muhammadiyya',author:'Imam Al Busiri',tag:'',verses:[]},
-  {id:'q083',arabicTitle:'رسول الله قد أنزلتُ رحلي',englishTitle:'O Messenger of Allah, I have halted my mount at your doorstep',author:'Shaykh Salih Al-Jaʿfari',tag:'',verses:[]},
-  {id:'q084',arabicTitle:'هُوَ النُورُ يَهْدِي الْحَائِرِينَ ضِيَاؤُهُ',englishTitle:'He Is The Light Whose Illumination Guides The Bewildered',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q085',arabicTitle:'مَطْلَبِي مِنْ حَبِيبِ القَلْبِ رُؤْيَةْ مُحَيَّاه',englishTitle:'My Request to My Beloved is to See His Face',author:'Habib Ali bin Muhammad al-Habashi',tag:'',verses:[]},
-  {id:'q086',arabicTitle:'قَلْبِي وَ قَلْبُكَ مُشْتَبِك',englishTitle:'My Heart and Your Heart are Intertwined',author:'Sayyid Muhammad \'Ali al-Durra',tag:'',verses:[]},
-  {id:'q087',arabicTitle:'يَا أَرْحَمَ الرَّاحِمِينَ فَرِّجْ عَلَى الْمُسْلِمِين',englishTitle:'O Most Merciful of Those Who Show Mercy, Relieve the Muslims of Their Worries',author:'Habib Abdullah Ibn Husien Ibn Tahir',tag:'Ba\'Alawi',verses:[]},
-  {id:'q088',arabicTitle:'طَابَ قَلبِي وَ سُقِي كَأْسَ الهَنَا',englishTitle:'My Heart Rejoiced and Was Given the Cup of Bliss',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q089',arabicTitle:'قَمَرٌ',englishTitle:'Moon',author:'',tag:'',verses:[]},
-  {id:'q090',arabicTitle:'إِنْ قِيلَ زُرْتُمْ',englishTitle:'If It Is Said That You Have Visited',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q091',arabicTitle:'كُلَّ لَيْلَةْ ضِيَافَةْ مِنْ عَظِيمِ المَوَاهِبْ',englishTitle:'Every Night is a Guest-Hosting From the One of Great Gifts',author:'Habib Umar Bin Hafiz',tag:'Shadhili',verses:[]},
-  {id:'q092',arabicTitle:'يَا كِتَابَ الغُيُوبْ قَدْ لَجَأْنَا إِلَيْك',englishTitle:'O Book Of The Unseen, To You We Turn For Refuge',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q093',arabicTitle:'قُلْ لِطُلَّابِنَا هَبَّتْ نَسِيمُ البِشَارَةْ',englishTitle:'Tell Our Students, the Breeze of Glad Tidings Has Approached',author:'Abū Madyan al-Tilimsānī',tag:'',verses:[]},
-  {id:'q094',arabicTitle:'أَوْقَدتَّ فِي قَلْبِي هَواك',englishTitle:'You Have Kindled in My Heart Your Love',author:'Abū Madyan al-Tilimsānī',tag:'',verses:[]},
-  {id:'q095',arabicTitle:'إجْعَلْ زَمَانَكْ كُلَّهُ أَفْرَاح',englishTitle:'Make All Your Time Full of Happiness',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q096',arabicTitle:'مَــا زَمْــزَمَ الــحَــادِي وَمَــا تَــرَنَّــمْ',englishTitle:'As Long as the Camel Driver Murmurs and Sings',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q097',arabicTitle:'طَالَمَا أَشْكُو غَرَامِي',englishTitle:'How Long Will I Yearn for My Beloved',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q098',arabicTitle:'يَا عَيْنَ الرَحْمَةْ مُحَمَد',englishTitle:'O Source of Mercy, Muhammad',author:'',tag:'',verses:[]},
-  {id:'q099',arabicTitle:'يَا عُمْرِي وَيَا رُوحِي',englishTitle:'My Life and My Soul',author:'Shaykh Ahmad \'Alawi Muwashah',tag:'',verses:[]},
-  {id:'q100',arabicTitle:'رَبِـيـعْ أَقْـبَـلْ عَـلَـيْـنَـا مَرْحَـبـاً بِالـرَّبِـيـعْ',englishTitle:'The Blessed Month of Rabī Al-Awal Has Entered Upon Us!',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q101',arabicTitle:'حَسْبِي رَبِّي جَلَّ الله',englishTitle:'My Lord Is Sufficient For Me',author:'',tag:'Shadhili',verses:[]},
-  {id:'q102',arabicTitle:'لِـطَـيْـبَـةْ فِـي قُـلَـيْـبِـي شَـان',englishTitle:'Ṭaybah holds a special place in my heart',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q103',arabicTitle:'سَـاعَةُ الـدَّارِ مَا سَـاوَتْ لَهَا أَلْـفَ سَـاعَـةْ',englishTitle:'An Hour In Dar Al-Mustafa is Worth A Thousand Hours.',author:'Habib Umar Bin Hafiz',tag:'',verses:[]},
-  {id:'q104',arabicTitle:'يَاشَفِيعَ الوَرَى سَلَامٌ عَلَيْك',englishTitle:'O Intercessor of Mankind, Peace be Upon You',author:'Syed Shah Barkatullah Barkaati',tag:'Shadhili',verses:[]},
-  {id:'q105',arabicTitle:'سِرِّي لَدَيْهَا تَبَدَّى',englishTitle:'My Secret was Disclosed to Her [The She-Camel]',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q106',arabicTitle:'سَلَامُ اللهِ يَا سَادَه',englishTitle:'Peace of Allah, O Masters',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q107',arabicTitle:'الْمَشْرَبُ الْأَهْنَى',englishTitle:'The Sweetest Spring',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q108',arabicTitle:'الْحَمْدُ',englishTitle:'Praise',author:'Sidi Muhammad ibn al-Habib ash-Shadhili',tag:'Shadhili',verses:[]},
-  {id:'q109',arabicTitle:'Du\'ā Recited after Tarāwīḥ',englishTitle:'Du\'ā Recited after Tarāwīḥ',author:'Imam Aḥmad bin Ḥasan al-\'Aṭṭās',tag:'Ramadan / Ba\'Alawi',verses:[]},
-  {id:'q110',arabicTitle:'مَا فِي الوُجُودِ وَلَا فِي الْكَوْنِ مِنْ أَحَدٍ',englishTitle:'None Exists In The Realm Of Existence Nor The Vast Cosmos',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q111',arabicTitle:'طَلَعَ البَدْرُ عَلَيْنَا',englishTitle:'The Full Moon Has Risen Over Us',author:'',tag:'',verses:[
-    {arabic:'طَلَعَ البَدْرُ عَلَيْنَا\nمِنْ ثَنِيَّاتِ الوَدَاع',translit:'ṭalaʿal badru ʿalaynā\nmin thaniyyātil wadāʿ',english:'O the Full Moon has risen over us\nFrom the valley of wadāʿ'},
-    {arabic:'وَجَبَ الشُّكْرُ عَلَيْنَا\nمَا دَعَا لِلَّهِ دَاع',translit:'wajabash shukru ʿalaynā\nmā daʿā lillāhi dāʿ',english:'It is an obligation on us to show gratefulness\nWhen a caller calls to Allah'},
-    {arabic:'أَيُّهَا الْمَبْعُوثُ فِينَا\nجِئْتَ بِالْأَمْرِ الْمُطَاع',translit:'ayyuhal mabʿūthu fīnā\nji\'ta bil amril muṭāʿ',english:'O you who has been sent amongst us\nYou have come with the obeyed command'},
-    {arabic:'جِئْتَ شَرَّفْتَ الْمَدِينَة\nمَرحَباً يَا خَيْرَ دَاع',translit:'ji\'ta sharraftal madīnah\nmarḥaban yā khayra dāʿ',english:'You have come and ennobled Al-Madina\nWelcome O best of callers'},
-    {arabic:'مَرْحَباً يَا مُصْطَفَانَا\nنُورُكَ الغَالِي أَضَاء',translit:'marḥaban yā muṣṭafānā\nnūrukal ghālī aḍā\'',english:'Welcome our chosen one\nYour precious light has illuminated'},
-    {arabic:'صَلَوَاتُ اللهِ تُهْدَى\nلَكَ مِنَّا وَالسَّلَام',translit:'ṣalawātu Allahi tuhdā\nlaka minnā was salām',english:'Mercy from Allah is gifted\nTo you from us and greetings of peace'}
-  ]},
-  {id:'q112',arabicTitle:'مَنْ مِثْلُ أحمد',englishTitle:'Who is like Ahmad?',author:'',tag:'',verses:[]},
-  {id:'q113',arabicTitle:'بِي وَجْدٌ لَا يَدْرِيه',englishTitle:'I have a passion in my heart',author:'',tag:'Shadhili',verses:[]},
-  {id:'q114',arabicTitle:'آداب الطريق',englishTitle:'Etiquettes of the Path',author:'Sidi Abu Madyan al-Ghawth',tag:'',verses:[]},
-  {id:'q115',arabicTitle:'مُصَلَّى الأَطْهَارِ',englishTitle:'The Prayer Space of the Pure',author:'الطالب الفقير يوسف ولش',tag:'',verses:[]},
-  {id:'q116',arabicTitle:'الصُّبْحُ بَدَا مِنْ طَلْعَتِهِ',englishTitle:'The Light of Dawn is From His Radiance ﷺ',author:'',tag:'Nahw',verses:[]},
-  {id:'q117',arabicTitle:'مواضع الإعراب العشرة',englishTitle:'The Ten Places of Grammatical Inflection',author:'الطالب الفقير يوسف ولش',tag:'',verses:[]},
-  {id:'q118',arabicTitle:'يَا مُحَمَّدْ لَكَ اللِوَا وَالتاَّجْ',englishTitle:'O Muhammad, Yours is the Banner and the Crown',author:'',tag:'',verses:[]},
-  {id:'q119',arabicTitle:'نُورُ الهُدَى وَافَانَا',englishTitle:'The Light of Guidance Has Reached Us',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q120',arabicTitle:'نَتَوَسَّلُ بِالنَّبِيِّ النُّورْ وَابْنِ طٰهَ أَحْمَدَ المَشْهُورْ',englishTitle:'We Take the Prophet of Light as Intermediary',author:'Habib Muhammad Ibn Mustafa',tag:'',verses:[]},
-  {id:'q121',arabicTitle:'يرْتَاحْ قَلْبِي إِذَا حَدْ قَدْ ذَكَرْ فَاطِمَه',englishTitle:'My Heart Rests When Someone Mentions Fatima',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi',verses:[]},
-  {id:'q122',arabicTitle:'اكْــتُــمْ هَـــوَانَـــا',englishTitle:'Conceal Our Love',author:'Shaykh Abū Bakr bin Sālim',tag:'Ba\'Alawi',verses:[]},
-  {id:'q123',arabicTitle:'مَحْبُوبِي بِالوِصَالْ أَنْعَمْ عَلَيَّ',englishTitle:'My Beloved has Blessed Me with Union',author:'Al-Ḥabib Zayn bin Ibrāhīm bin Sumayṭ',tag:'',verses:[]},
-  {id:'q124',arabicTitle:'يَا هَنَانَا بِمُحَمَّدْ',englishTitle:'What Joy for Us in Muḥammad ﷺ',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q125',arabicTitle:'الْزَم بَابَ رَبِّك',englishTitle:'Hold Fast to Your Lord\'s Door',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q126',arabicTitle:'قَدْ بَدَا وَجْهُ الحَبيبِ',englishTitle:'The Face of the Beloved ﷺ Appeared',author:'Muhammad Ibn Al-Habib',tag:'Shadhili',verses:[]},
-  {id:'q127',arabicTitle:'يَا أَبَا الزَّهْرَاء',englishTitle:'O, Father of Zahra',author:'Shaykh Ahmad bin Mustafa al-Alawi',tag:'',verses:[]},
-  {id:'q128',arabicTitle:'يَا طَـالِـبَ الفَـنَا فِي الله',englishTitle:'O You who Seek Effacement in Allah',author:'Muhammad Ibn Al-Habib',tag:'Shadhili',verses:[]},
-  {id:'q129',arabicTitle:'كَمْ لَكَ مِنْ نِعْمَةٍ عَلَيَّ',englishTitle:'How Many Blessings You Have Upon Me',author:'Muhammad Ibn Al-Habib',tag:'Shadhili',verses:[]},
-  {id:'q130',arabicTitle:'There\'s No God Except Allah Hymn',englishTitle:'There\'s No God Except Allah Hymn',author:'Shaykh Muhammad Mendez',tag:'Shadhili',verses:[]},
-  {id:'q131',arabicTitle:'نَحْنُ فِي رَوْضَةِ الرَّسُولِ',englishTitle:'In The Meadow of the Messenger ﷺ',author:'Muhammad Ibn Al-Habib',tag:'',verses:[]},
-  {id:'q132',arabicTitle:'قصيدة البردة',englishTitle:'Qasida Al Burdah',author:'Imam Al Busiri',tag:'',verses:[]},
-  {id:'q133',arabicTitle:'الْغَالِي الْغَالِي رَسُولُ الله',englishTitle:'The Precious, Precious Messenger of Allah',author:'Shaykh Salih Al-Jaʿfari',tag:'',verses:[]},
-  {id:'q134',arabicTitle:'فَزَّازِيَّة',englishTitle:'Fazzaziyya',author:'',tag:'Ba\'Alawi / Ramadan',verses:[]},
-  {id:'q135',arabicTitle:'مرحبًا يَا شَهْرَ رَمَضَان',englishTitle:'Welcome O Month of Ramadan!',author:'',tag:'Ba\'Alawi / Ramadan',verses:[]},
-  {id:'q136',arabicTitle:'يَـا سَـيِّـدَ الرُّسْـلِ غَـارَة',englishTitle:'O Master of the Messengers, Grant Protection',author:'Imam Abu Bakr al-\'Adanī',tag:'Ba\'Alawi',verses:[]},
-  {id:'q137',arabicTitle:'إلَــهِــي نَــسْأَلُــك بِـالإِسْــم الأَعْـظَـم',englishTitle:'O My Lord, We Ask You by the Greatest Name',author:'Imam Abū Bakr b. \'Abd Allāh al-\'Aydarūs',tag:'Ba\'Alawi',verses:[]},
-  {id:'q138',arabicTitle:'صَـــلُّـــوا عَــلَــى الــنُّـــورِ أَحْــمَــد',englishTitle:'Send Blessing Upon the Light of Ahmad',author:'Imam \'Umar al-Miḥdār b. \'Abd al-Raḥmān al-Saqqāf',tag:'Ba\'Alawi',verses:[]},
-  {id:'q139',arabicTitle:'الـرَّبُّ صَـلَّـى دَائِـمَـا وَسَـلَّـم',englishTitle:'The Lord Eternally Bestows Blessings and Peace',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q140',arabicTitle:'مَوْلَانَا مَوْلَانَا يَا سَامِعْ دُعَانَا',englishTitle:'Our Master! Our Master! O Hearer of our call!',author:'الشيخ اللخمي الحريري',tag:'',verses:[]},
-  {id:'q141',arabicTitle:'سَعْـدَنَـا فِي الـدُّنْـيَـا فَـوْزُنَـا فِي الأُخْـرَى',englishTitle:'Our Felicity in This Life and Our Success in the Next',author:'Habib Ahmad Al-Mihdaar',tag:'Ba\'Alawi',verses:[]},
-  {id:'q142',arabicTitle:'نَتَوَسَّلْ بِالحُبَابَةْ',englishTitle:'We Take the Beloved as a Means',author:'ِ\'Abdul Qādir Bin Salim Khard',tag:'',verses:[]},
-  {id:'q143',arabicTitle:'يَا إِمَامَ الرُّسْلِ',englishTitle:'O Leader of the Prophets',author:'Shaykh Abdur Rahim al-Bura\'i',tag:'Ba\'Alawi',verses:[]},
-  {id:'q144',arabicTitle:'جَمِّلْ أَحْوَالَنَا وَ ارْحَمْ وَ لَاتَمْتَحِنَّا',englishTitle:'Beautify Our Condition, Have Mercy on Us, and Do Not Test Us',author:'Shaykh Abū Bakr bin Sālim',tag:'Ba\'Alawi',verses:[]},
-  {id:'q145',arabicTitle:'يَا الله بِحُسْنِ الخَاتِمَةْ',englishTitle:'O Allah! Grant a Beautiful Seal',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q146',arabicTitle:'عَلَى بَابِ الْكَرَمْ وَالْجُود',englishTitle:'At The Door of Generosity and Bounty',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q147',arabicTitle:'يَا رَبَّنَا يَا رَبَّنَا غِثْنَا بِقُرْبِ الْمُصْطَفَى',englishTitle:'O our Lord, grant us aid through the closeness of the Chosen One',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q148',arabicTitle:'صَلَوَاتٌ طَيِّبَاتٌ',englishTitle:'Purest Prayers',author:'Shaykh Salih Al-Jaʿfari',tag:'',verses:[]},
-  {id:'q149',arabicTitle:'طَلَعَ البَدْرُ عَلَيْنَا',englishTitle:'The White Moon Has Risen Over Us',author:'',tag:'',verses:[]},
-  {id:'q150',arabicTitle:'الضِّيَاء اللَّامَعْ',englishTitle:'The Resplendent Illumination',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi / Mawlid',verses:[]},
-  {id:'q151',arabicTitle:'يَا آل بَاعَلَوِي شَفَاعَة',englishTitle:'O Bā \'Alawi, Grant Intercession',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q152',arabicTitle:'سَلَامٌ سَلَامٌ',englishTitle:'Greetings of Peace',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q153',arabicTitle:'قَدْ كَفَانِي عِْلمُ رَبِّي',englishTitle:'The Knowledge of My Lord Has Sufficed Me',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q154',arabicTitle:'سَلَامٌ عَلَى',englishTitle:'Greetings of Peace Upon',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q155',arabicTitle:'قَدْ تَمَّمَ اللهُ مَقَاصِدْنَا',englishTitle:'Allah has Fulfilled our Aims',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q156',arabicTitle:'كرر أيها الإنسان (لَا إِلَه إِلَّا الله)',englishTitle:'Repeat, O Mankind',author:'',tag:'',verses:[]},
-  {id:'q157',arabicTitle:'أَلَا يَاللَّه بِنَظْرَة',englishTitle:'Seeking a Gaze from Allah',author:'',tag:'Ba\'Alawi / Ramadan',verses:[]},
-  {id:'q158',arabicTitle:'صَلَوَاتُ اللَّهِ تَغْشَى أَشْرَفَ الرُّسْلِ الأَطَايِـْب',englishTitle:'The Blessings of Allah Encompass the Noblest of Messengers',author:'Habib Ali bin Muhammad al-Habashi',tag:'',verses:[]},
-  {id:'q159',arabicTitle:'خَيْرَ البَرِيَّةْ',englishTitle:'Best of Creation',author:'',tag:'Shadhili',verses:[]},
-  {id:'q160',arabicTitle:'الشَّرَابْ الطَّهُورْ',englishTitle:'The Purest Drink',author:'Habib Umar Bin Hafiz',tag:'Ba\'Alawi / Mawlid',verses:[]},
-  {id:'q161',arabicTitle:'السَّلَامُ عَلَيْكَ زَيْنَ الأَنْبِيَاءِ',englishTitle:'Peace Be Upon You, O Jewel of the Prophets',author:'Habib Ali bin Muhammad al-Habashi',tag:'Ba\'Alawi',verses:[]},
-  {id:'q162',arabicTitle:'حُبُّ النَّبِي وَ الْآلِ دِينِي',englishTitle:'The Love of the Prophet and His Family Is My Way',author:'',tag:'Shadhili',verses:[]},
-  {id:'q163',arabicTitle:'يَا عَالِمَ السِّرِّ مِنَّا',englishTitle:'O Knower of our secrets',author:'Imam Abdallah Ibn Alawi Al-Haddad',tag:'Ba\'Alawi',verses:[]},
-  {id:'q164',arabicTitle:'Ya Noori',englishTitle:'Ya Noori',author:'Islamic Naat Group & Ansarudeen',tag:'',verses:[]},
-  {id:'q165',arabicTitle:'Dervish Cowboy',englishTitle:'Dervish Cowboy',author:'Abdal Hakim Murad',tag:'Shadhili',verses:[]},
-  {id:'q166',arabicTitle:'عَيْنُ العُيُوْنِ مُحَمَّدُ',englishTitle:'Muhammad, the Light of My Eyes',author:'',tag:'Ba\'Alawi / Ramadan',verses:[]},
-  {id:'q167',arabicTitle:'اَللَّهُ اَللَّهُ يَااللَّه لَنَا بِالْقَبُول',englishTitle:'O Allah, O Allah, O Allah, Grant Us Acceptance',author:'',tag:'Ba\'Alawi',verses:[]},
-  {id:'q168',arabicTitle:'عُودِى يَا لَيَالِى الرِّضَا',englishTitle:'Return, O Nights of Contentment',author:'',tag:'Ba\'Alawi',verses:[]},
-];
-
-let qasaidData = null;
-
-async function loadQasaid() {
-  if (qasaidData) return qasaidData;
-  try {
-    // Try Supabase first
-    const r = await fetch(SUPA_URL+'/rest/v1/qasaid?order=sort_order.asc', {
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-    });
-    if (r.ok) {
-      const rows = await r.json();
-      if (rows && rows.length > 0) {
-        qasaidData = rows;
-        return qasaidData;
-      }
-    }
-  } catch(e){}
-  // Fall back to localStorage overrides then defaults
-  try {
-    const saved = localStorage.getItem(QASAID_KEY);
-    if (saved) { qasaidData = JSON.parse(saved); return qasaidData; }
-  } catch(e){}
-  qasaidData = JSON.parse(JSON.stringify(DEFAULT_QASAID));
-  return qasaidData;
-}
-
-function saveQasaidLocal() {
-  try { localStorage.setItem(QASAID_KEY, JSON.stringify(qasaidData)); } catch(e){}
-}
-
-async function saveQasidaToSupabase(q) {
-  try {
-    await fetch(SUPA_URL+'/rest/v1/qasaid?id=eq.'+q.id, {
-      method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify(q)
-    });
-  } catch(e){}
-}
-
-let qasaidFiltered = null;
-
-async function renderQasaidList(filter='') {
-  const list = document.getElementById('qasaid-list');
-  if (!list) return;
-  list.innerHTML = '<div style="text-align:center;padding:2rem;font-family:Cinzel,serif;font-size:0.75rem;letter-spacing:0.1em;color:var(--text-light)">Loading Qasaid…</div>';
-  const data = await loadQasaid();
-  const q = filter ? data.filter(q =>
-    q.arabicTitle.includes(filter) ||
-    q.englishTitle.toLowerCase().includes(filter.toLowerCase()) ||
-    (q.author||'').toLowerCase().includes(filter.toLowerCase())
-  ) : data;
-  qasaidFiltered = q;
-  if (!q.length) { list.innerHTML = '<p style="color:var(--text-light);font-style:italic;font-size:0.9rem">No qasaid found.</p>'; return; }
-  list.innerHTML = q.map((qas,i) => `
-    <div class="qasaid-item" id="qasaid-item-${qas.id}">
-      <button class="qasaid-toggle" onclick="toggleQasida('${qas.id}')" aria-expanded="false">
-        <div class="qasaid-toggle-author">${esc(qas.author||'')}</div>
-        <div class="qasaid-toggle-titles">
-          <span class="qasaid-arabic-title">${esc(qas.arabicTitle)}</span>
-          <span class="qasaid-english-title">${esc(qas.englishTitle)}</span>
-        </div>
-        <span class="qasaid-toggle-chevron">▾</span>
-      </button>
-      <div class="qasaid-body">
-        ${qas.tag ? `<div style="font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.12em;color:var(--gold);opacity:0.6;margin-bottom:1rem">${esc(qas.tag)}</div>` : ''}
-        <div class="qasaid-verses" id="verses-${qas.id}">
-          ${qas.verses && qas.verses.length ? qas.verses.map(v=>`
-            <div class="qasaid-verse">
-              <span class="qasaid-verse-arabic">${esc(v.arabic)}</span>
-              ${v.translit ? `<span class="qasaid-verse-translit">${esc(v.translit)}</span>` : ''}
-              ${v.english ? `<span class="qasaid-verse-english">${esc(v.english)}</span>` : ''}
-            </div>
-          `).join('') : '<p style="color:var(--text-light);font-style:italic;font-size:0.88rem">No verses added yet.</p>'}
-        </div>
-        <div class="qasaid-editor" id="editor-${qas.id}">
-          <div class="qasaid-editor-field">
-            <span class="qasaid-editor-label">Arabic Title</span>
-            <input type="text" id="edit-arabic-title-${qas.id}" value="${esc(qas.arabicTitle)}" dir="rtl" style="font-family:'Amiri',serif;font-size:1.1rem">
-          </div>
-          <div class="qasaid-editor-field">
-            <span class="qasaid-editor-label">English Title</span>
-            <input type="text" id="edit-english-title-${qas.id}" value="${esc(qas.englishTitle)}">
-          </div>
-          <div class="qasaid-editor-field">
-            <span class="qasaid-editor-label">Author</span>
-            <input type="text" id="edit-author-${qas.id}" value="${esc(qas.author||'')}">
-          </div>
-          <div class="qasaid-editor-field">
-            <span class="qasaid-editor-label">Tag / Tradition</span>
-            <input type="text" id="edit-tag-${qas.id}" value="${esc(qas.tag||'')}">
-          </div>
-          <div class="qasaid-editor-field">
-            <span class="qasaid-editor-label">Verses — one verse per block, Arabic | Transliteration | English (use | to separate, blank line between verses)</span>
-            <textarea id="edit-verses-${qas.id}" style="min-height:260px;direction:ltr">${(qas.verses||[]).map(v=>[v.arabic,v.translit,v.english].join('\n|\n')).join('\n\n---\n\n')}</textarea>
-          </div>
-          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-            <button class="qasaid-edit-btn" onclick="saveQasidaEdit('${qas.id}')" style="background:rgba(201,168,76,0.18)">✓ Save</button>
-            <button class="qasaid-edit-btn" onclick="cancelQasidaEdit('${qas.id}')">✗ Cancel</button>
-            <button class="qasaid-edit-btn" onclick="deleteQasida('${qas.id}')" style="color:#c44;border-color:#c44">Delete</button>
-          </div>
-        </div>
-        <div class="qasaid-admin-bar" id="admin-bar-${qas.id}">
-          ${isLoggedIn() ? `<button class="qasaid-edit-btn" onclick="editQasida('${qas.id}')">✎ Edit</button>` : ''}
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function toggleQasida(id) {
-  const item = document.getElementById('qasaid-item-'+id);
-  if (!item) return;
-  const isOpen = item.classList.contains('open');
-  // Close all
-  document.querySelectorAll('.qasaid-item.open').forEach(el => {
-    el.classList.remove('open');
-    const btn = el.querySelector('.qasaid-toggle');
-    if(btn) btn.setAttribute('aria-expanded','false');
-  });
-  if (!isOpen) {
-    item.classList.add('open');
-    const btn = item.querySelector('.qasaid-toggle');
-    if(btn) btn.setAttribute('aria-expanded','true');
-  }
-}
-
-function editQasida(id) {
-  const item = document.getElementById('qasaid-item-'+id);
-  if (!item) return;
-  item.classList.add('editing');
-}
-
-function cancelQasidaEdit(id) {
-  const item = document.getElementById('qasaid-item-'+id);
-  if (!item) return;
-  item.classList.remove('editing');
-}
-
-async function saveQasidaEdit(id) {
-  const data = await loadQasaid();
-  const q = data.find(x => x.id === id);
-  if (!q) return;
-  q.arabicTitle = document.getElementById('edit-arabic-title-'+id).value.trim();
-  q.englishTitle = document.getElementById('edit-english-title-'+id).value.trim();
-  q.author = document.getElementById('edit-author-'+id).value.trim();
-  q.tag = document.getElementById('edit-tag-'+id).value.trim();
-  // Parse verses
-  const raw = document.getElementById('edit-verses-'+id).value;
-  const blocks = raw.split(/\n---\n/).map(b=>b.trim()).filter(Boolean);
-  q.verses = blocks.map(b => {
-    const parts = b.split(/\n\|\n/);
-    return { arabic:(parts[0]||'').trim(), translit:(parts[1]||'').trim(), english:(parts[2]||'').trim() };
-  });
-  saveQasaidLocal();
-  await saveQasidaToSupabase(q);
-  const item = document.getElementById('qasaid-item-'+id);
-  if (item) item.classList.remove('editing');
-  // Re-render
-  qasaidData = null;
-  renderQasaidList(document.getElementById('qasaid-search-input')?.value || '');
-  notify('Qasida saved ✓');
-}
-
-async function deleteQasida(id) {
-  if (!confirm('Delete this qasida? This cannot be undone.')) return;
-  const data = await loadQasaid();
-  qasaidData = data.filter(x => x.id !== id);
-  saveQasaidLocal();
-  try {
-    await fetch(SUPA_URL+'/rest/v1/qasaid?id=eq.'+id, {
-      method:'DELETE',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-    });
-  } catch(e){}
-  renderQasaidList(document.getElementById('qasaid-search-input')?.value || '');
-}
-
-function filterQasaid(val) {
-  renderQasaidList(val);
-}
-
-function openAddQasida() {
-  const newId = 'q'+Date.now();
-  const blank = {id:newId,arabicTitle:'',englishTitle:'',author:'',tag:'',verses:[]};
-  if (!qasaidData) qasaidData = [];
-  qasaidData.unshift(blank);
-  renderQasaidList();
-  setTimeout(() => {
-    const item = document.getElementById('qasaid-item-'+newId);
-    if(item){ item.classList.add('open','editing'); item.scrollIntoView({behavior:'smooth',block:'center'}); }
-  }, 100);
-}
-
+// Pull to refresh for PWA
 if (window.navigator.standalone) {
   let startY = 0;
   let pulling = false;

@@ -2644,17 +2644,41 @@ function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replac
 // ════════════════════════════════════════════════
 // SALAWAT & PDF MANAGEMENT (Owner/Admin)
 // ════════════════════════════════════════════════
-const SALAWAT_KEY = 'khaak_salawat_v1';
-const PDF_KEY = 'khaak_pdfs_v1';
-
 let salawatPendingFile = null;
 let pdfPendingFile = null;
 let deleteResourceTarget = null; // {type:'salawat'|'pdf', id}
 
-function getSalawatItems(){ try{ return JSON.parse(localStorage.getItem(SALAWAT_KEY))||[]; }catch(e){ return []; } }
-function saveSalawatItems(arr){ localStorage.setItem(SALAWAT_KEY,JSON.stringify(arr)); }
-function getPdfItems(){ try{ return JSON.parse(localStorage.getItem(PDF_KEY))||[]; }catch(e){ return []; } }
-function savePdfItems(arr){ localStorage.setItem(PDF_KEY,JSON.stringify(arr)); }
+// ── Supabase-backed salawat/PDF storage ──
+// Tables needed (run once in Supabase SQL editor):
+//   create table salawat_items (id text primary key, name text, sub text, icon text, url text, text text, created_at timestamptz default now());
+//   create table pdf_items (id text primary key, name text, meta text, url text, created_at timestamptz default now());
+
+async function getSalawatItems(){
+  try{
+    const res=await fetch(SUPA_URL+'/rest/v1/salawat_items?order=created_at.asc',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(!res.ok) return [];
+    return await res.json();
+  }catch(e){ return []; }
+}
+async function addSalawatItem(item){
+  await fetch(SUPA_URL+'/rest/v1/salawat_items',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(item)});
+}
+async function deleteSalawatItem(id){
+  await fetch(SUPA_URL+'/rest/v1/salawat_items?id=eq.'+id,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+}
+async function getPdfItems(){
+  try{
+    const res=await fetch(SUPA_URL+'/rest/v1/pdf_items?order=created_at.asc',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(!res.ok) return [];
+    return await res.json();
+  }catch(e){ return []; }
+}
+async function addPdfItem(item){
+  await fetch(SUPA_URL+'/rest/v1/pdf_items',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(item)});
+}
+async function deletePdfItem(id){
+  await fetch(SUPA_URL+'/rest/v1/pdf_items?id=eq.'+id,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+}
 
 // Show/hide admin buttons when section is shown
 const _origShowSection = showSection;
@@ -2701,18 +2725,23 @@ async function saveSalawat(){
     try { notify('Uploading…'); finalUrl = await uploadToStorage(salawatPendingFile); }
     catch(e){ err.textContent='Upload failed: '+e.message; err.classList.add('show'); return; }
   }
-  const items=getSalawatItems();
-  items.push({id:Date.now().toString(),name,sub,icon,url:finalUrl||null,text:text||null});
-  saveSalawatItems(items);
-  closeModal('add-salawat-modal');
-  renderSalawatGrid();
-  notify('Salawat added ✓');
+  try{
+    notify('Saving…');
+    await addSalawatItem({id:Date.now().toString(),name,sub,icon,url:finalUrl||null,text:text||null});
+    closeModal('add-salawat-modal');
+    await renderSalawatGrid();
+    notify('Salawat added ✓');
+  }catch(e){ err.textContent='Save failed: '+e.message; err.classList.add('show'); }
 }
-function renderSalawatGrid(){
-  const items=getSalawatItems();
+async function renderSalawatGrid(){
   const grid=document.getElementById('salawat-grid');
   if(!grid) return;
-  const adminExtra=items.map((item,i)=>{
+  // Preserve static HTML on first call
+  if(!grid.getAttribute('data-static')){
+    grid.setAttribute('data-static', grid.innerHTML);
+  }
+  const items=await getSalawatItems();
+  const adminExtra=items.map((item)=>{
     const deleteBtn=isLoggedIn()?`<button onclick="event.preventDefault();event.stopPropagation();promptDeleteResource('salawat','${item.id}')" style="position:absolute;top:4px;right:4px;background:rgba(139,26,26,0.8);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>`:'';
     if(item.text && !item.url){
       return `<div class="salawat-card" style="position:relative;cursor:pointer" onclick="openSalawatText('${item.id}')">
@@ -2730,19 +2759,17 @@ function renderSalawatGrid(){
       <span class="salawat-sub">${esc(item.sub||'')}</span>
     </a>`;
   }).join('');
-  // Prepend admin items to the grid (existing static cards remain in HTML after)
-  const staticCards=grid.getAttribute('data-static')||'';
-  if(!grid.getAttribute('data-static')){
-    grid.setAttribute('data-static', grid.innerHTML);
-  }
   grid.innerHTML=adminExtra+grid.getAttribute('data-static');
 }
-function openSalawatText(id){
-  const item=getSalawatItems().find(x=>x.id===id);
-  if(!item) return;
-  document.getElementById('salawat-text-modal-title').textContent=item.name+(item.sub?' — '+item.sub:'');
-  document.getElementById('salawat-text-modal-body').textContent=item.text||'';
-  openModal('salawat-text-modal');
+async function openSalawatText(id){
+  try{
+    const res=await fetch(SUPA_URL+'/rest/v1/salawat_items?id=eq.'+id,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    const rows=await res.json();
+    const item=rows[0]; if(!item) return;
+    document.getElementById('salawat-text-modal-title').textContent=item.name+(item.sub?' — '+item.sub:'');
+    document.getElementById('salawat-text-modal-body').textContent=item.text||'';
+    openModal('salawat-text-modal');
+  }catch(e){ notify('Could not load text.'); }
 }
 
 // ── PDFs ──
@@ -2774,17 +2801,18 @@ async function savePdf(){
     try { notify('Uploading…'); finalUrl = await uploadToStorage(pdfPendingFile); }
     catch(e){ err.textContent='Upload failed: '+e.message; err.classList.add('show'); return; }
   }
-  const items=getPdfItems();
-  items.push({id:Date.now().toString(),name,meta,url:finalUrl});
-  savePdfItems(items);
-  closeModal('add-pdf-modal');
-  renderPdfList();
-  notify('PDF added ✓');
+  try{
+    notify('Saving…');
+    await addPdfItem({id:Date.now().toString(),name,meta,url:finalUrl});
+    closeModal('add-pdf-modal');
+    await renderPdfList();
+    notify('PDF added ✓');
+  }catch(e){ err.textContent='Save failed: '+e.message; err.classList.add('show'); }
 }
-function renderPdfList(){
-  const items=getPdfItems();
+async function renderPdfList(){
   const container=document.getElementById('pdf-list-dynamic');
   if(!container) return;
+  const items=await getPdfItems();
   container.innerHTML=items.map(item=>{
     const deleteBtn=isLoggedIn()?`<button onclick="event.preventDefault();event.stopPropagation();promptDeleteResource('pdf','${item.id}')" style="background:rgba(139,26,26,0.8);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:0.72rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">✕</button>`:'';
     return `<a class="pdf-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" download style="align-items:center">
@@ -2802,21 +2830,21 @@ function promptDeleteResource(type, id){
   document.getElementById('del-resource-title').textContent=type==='salawat'?'Delete this salawat?':'Delete this PDF?';
   openModal('del-resource-modal');
 }
-function confirmDeleteResource(){
+async function confirmDeleteResource(){
   if(!deleteResourceTarget) return;
   const {type,id}=deleteResourceTarget;
-  if(type==='salawat'){
-    const items=getSalawatItems().filter(x=>x.id!==id);
-    saveSalawatItems(items);
-    renderSalawatGrid();
-  } else {
-    const items=getPdfItems().filter(x=>x.id!==id);
-    savePdfItems(items);
-    renderPdfList();
-  }
-  closeModal('del-resource-modal');
-  deleteResourceTarget=null;
-  notify('Deleted ✓');
+  try{
+    if(type==='salawat'){
+      await deleteSalawatItem(id);
+      await renderSalawatGrid();
+    } else {
+      await deletePdfItem(id);
+      await renderPdfList();
+    }
+    closeModal('del-resource-modal');
+    deleteResourceTarget=null;
+    notify('Deleted ✓');
+  }catch(e){ notify('Delete failed.'); }
 }
 
 // ════════════════════════════════════════════════

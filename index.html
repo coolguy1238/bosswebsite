@@ -1339,11 +1339,11 @@ footer .footer-name{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0
       <input class="modal-input" type="text" id="sw-icon" placeholder="☽ 🌟 ✨ 💚 etc." style="text-align:left;max-width:120px">
     </div>
     <div class="form-group">
-      <label class="form-label">Attach a PDF <span style="font-weight:400;font-style:italic;color:var(--text-light)">— or enter a URL below</span></label>
+      <label class="form-label">Attach a PDF or photo <span style="font-weight:400;font-style:italic;color:var(--text-light)">— or enter a URL below</span></label>
       <div class="upload-area" id="sw-upload-area" style="padding:1rem">
-        <input type="file" id="sw-file-input" accept=".pdf" onchange="handleSalawatFile(this.files)">
+        <input type="file" id="sw-file-input" accept=".pdf,image/*" onchange="handleSalawatFile(this.files)">
         <div class="upload-icon">📄</div>
-        <div class="upload-label">Click or drop a PDF here</div>
+        <div class="upload-label">Click or drop a PDF or photo here</div>
       </div>
       <div id="sw-file-name" style="font-size:0.8rem;font-style:italic;color:var(--green-mid);margin-top:0.35rem"></div>
     </div>
